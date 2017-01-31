@@ -2,6 +2,9 @@
 # ensure log dir exists - otherwise postConfigure errors because rsyslogd not running yet
 mkdir -p /var/log/mariadb/columnstore/
 
+# prevent failed to get machine id log errors
+/usr/bin/systemd-machine-id-setup
+
 # set USER env var here and in .bashrc as varying install and admin functions use this for detecting root vs non root install
 /bin/echo "export USER=root" >> /root/.bashrc
 export USER=root
