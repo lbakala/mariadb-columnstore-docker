@@ -1,7 +1,7 @@
 FROM centos:7
 
 # additional dependencies for docker image
-RUN curl -s https://packagecloud.io/install/repositories/imeyer/runit/script.rpm.sh | bash && yum -y update && yum -y install expect perl perl-DBI openssl zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools perl-DBD-MySQL runit which psmisc lsof && yum clean all
+RUN curl -s https://packagecloud.io/install/repositories/imeyer/runit/script.rpm.sh | bash && yum -y update && yum -y install expect perl perl-DBI openssl zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools perl-DBD-MySQL runit which psmisc lsof snappy && yum clean all
 
 # add in files to the container for install
 ADD mariadb-columnstore-*-centos7.x86_64.rpm.tar.gz install.sh /install/
