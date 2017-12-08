@@ -5,16 +5,13 @@ This docker image will startup a single server instance of MariaDB ColumnStore r
 
 ## Requirements
 The following are required:
-- A computer with a 64bit OS, CPU virtualization extensions enabled in the BIOS and minimum 6GB RAM (the VM will use 4GB)
+- A computer with a 64bit OS, CPU virtualization extensions enabled in the BIOS and minimum 6GB RAM
 - Docker 
 - This git tree
-- The MariaDB ColumnStore RPM.tar.gz file (minimum of version 1.0.4 required)
 - (Optionally) Sample DBT3 1G data file from https://www.dropbox.com/s/ljx19r3mgbw7umh/dbt3.tar.gz
 
 ## Installation
 - Install docker: https://docs.docker.com/engine/installation/
-- Download / copy  the ColumnStore CENTOS 7 RPM tar.gz in the mariadb-columnstore-docker directory (same level as DockerFile)
-- Note that with Docker for Windows, mounting directories with data later is sometimes problematic with current versions so it may be advisable to add your dataset for loading to the mariadb-columnstore-docker directory where it will be available under /install in the container with no issues.
 - Run docker build to create the docker image, feel free to choose your own container name other than david:mcs:
 
 ```sh
