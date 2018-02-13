@@ -1,7 +1,7 @@
 FROM centos:7
 
 # additional dependencies for docker image
-RUN curl -s https://packagecloud.io/install/repositories/imeyer/runit/script.rpm.sh | bash && yum -y update && yum -y install expect perl perl-DBI openssl zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools runit which psmisc lsof snappy wget && yum clean all
+RUN curl -s https://packagecloud.io/install/repositories/imeyer/runit/script.rpm.sh | bash && yum -y update && yum -y install expect perl perl-DBI openssl zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools runit which psmisc lsof snappy wget rsync perl-DBD-MySQL less && yum clean all
 
 # download latest GA ColumnStore centos 7 rpms
 RUN mkdir -p /install && cd /install && wget -nv -erobots=off -r -np -nH --cut-dirs 6 -A.rpm.tar.gz https://downloads.mariadb.com/ColumnStore/latest/centos/x86_64/7/ && tar xfz mariadb-columnstore-*-centos7.x86_64.rpm.tar.gz && rm -f mariadb-columnstore-*-centos7.x86_64.rpm.tar.gz 
@@ -16,7 +16,7 @@ RUN export USER=root && yum localinstall -y /install/mariadb-columnstore*.rpm &&
 # copy runit files
 COPY service /etc/service/
 COPY runit_bootstrap /usr/sbin/runit_bootstrap
-RUN chmod 755 /etc/service/systemd-journald/run /etc/service/rsyslogd/run /etc/service/columnstore/run /usr/sbin/runit_bootstrap
+RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap
 
 VOLUME /usr/local/mariadb/columnstore/etc
 VOLUME /usr/local/mariadb/columnstore/data1
