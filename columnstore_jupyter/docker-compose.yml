@@ -2,7 +2,7 @@ version: "2"
 
 services:
   jupyter:
-    build: ./jupyter
+    image: mariadb/columnstore_jupyter:latest
     command: start-notebook.sh --NotebookApp.password='sha1:817af87d3fe5:febd7d6959b12ee6839a26d56f8f54c88922e9c2' 
     hostname: jupyter
     ports:
