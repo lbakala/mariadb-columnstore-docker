@@ -11,5 +11,7 @@ services:
       - ./notebooks:/home/jovyan/work
   columnstore:
     image: mariadb/columnstore_singlenode:latest
+    ports:
+      - "3306:3306"
     links:
       - jupyter
