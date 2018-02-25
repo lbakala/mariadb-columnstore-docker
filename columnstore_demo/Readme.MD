@@ -1,7 +1,7 @@
 # MariaDB ColumnStore Docker Container Setup
 
 ## Introduction
-This docker image will startup a single server instance of MariaDB ColumnStore running on CENTOS 7. It is designed and suitable for demo and evaluation. 
+This docker image will startup a single server instance of MariaDB ColumnStore running on CENTOS 7. It is designed and suitable for demo and evaluation. This additionally includes sample data sets.
 
 ## Requirements
 The following are required:
