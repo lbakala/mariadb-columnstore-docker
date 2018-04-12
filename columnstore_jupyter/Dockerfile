@@ -12,7 +12,7 @@ ADD Python_mcsapi_connector_Test.ipynb /home/jovyan
 ADD Scala_mcsapi_connector_Test.ipynb /home/jovyan
 ADD Python_JDBC_API_Benchmark.ipynb /home/jovyan
 ADD Scala_JDBC_API_Benchmark.ipynb /home/jovyan
-COPY mnist-model-random-forest.tar /home/jovyan/ML_Demo
+COPY mnist-model-random-forest.tar.gz /home/jovyan/ML_Demo
 ADD Model_Training.ipynb /home/jovyan/ML_Demo
 ADD Demo.ipynb /home/jovyan/ML_Demo
 
