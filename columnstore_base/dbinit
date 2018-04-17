@@ -1,0 +1,50 @@
+#!/bin/sh
+
+MCSMYCMD='/usr/local/mariadb/columnstore/mysql/bin/mysql --defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf -u root'
+FLAG=/initialized
+INITDIR=/docker-entrypoint-initdb.d
+LOGFILE=/log/dbinit.log
+
+# Exit here if there is nothing to initialize.
+if [ 0 -eq $(ls $INITDIR/*.{sql,sql.gz,sh} -la | wc -l) ]; then
+    echo "Nothing to do at $(date)" >> $LOGFILE
+    exit 0;
+fi
+
+# Waiting until CS becomes ready.
+/usr/local/mariadb/columnstore/bin/mcsadmin getsystemstatus | grep -q 'System.*ACTIVE' 
+
+while [ 1 -eq $? ]; do
+    sleep 15
+    /usr/local/mariadb/columnstore/bin/mcsadmin getsystemstatus | grep -q 'System.*ACTIVE' 
+done
+
+# Initialize CS only once.
+if [ ! -e $FLAG ]; then
+    # Set database to populate using an env variable
+    if [ -n $(printenv CS_DATABASE) ]; then
+        DBNAME=$(printenv CS_DATABASE)
+    else
+        DBNAME=test
+    fi
+    mkdir /log
+    touch $LOGFILE
+    echo "Start at $(date)" >> $LOGFILE
+    cd /docker-entrypoint-initdb.d/ 
+    for f in $(ls $INITDIR/); do
+        if [[ $f == *.sql ]];then
+            echo "Run $f at $(date)" >> $LOGFILE; 
+            $MCSMYCMD $DBNAME < $f >> $LOGFILE 2>&1 
+        elif [[ $f == *.sql.gz ]];then 
+            echo "Run $f at $(date)" >> $LOGFILE; 
+            zcat $f | $MCSMYCMD $DBNAME >> $LOGFILE 2>&1
+        elif [[ $f == *.sh ]]; then
+            echo "Run $f at $(date)" >> $LOGFILE; 
+            /bin/sh -x $f >> $LOGFILE 2>&1
+        fi; 
+    done;
+    touch $FLAG
+    echo "Finish at $(date)" >> $LOGFILE
+fi;
+
+exit 0

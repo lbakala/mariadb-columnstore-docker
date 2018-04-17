@@ -14,6 +14,7 @@ RUN curl -s https://packagecloud.io/install/repositories/imeyer/runit/script.rpm
 COPY postCfg.sh /install/
 COPY service /etc/service/
 COPY runit_bootstrap /usr/sbin/
+COPY dbinit /usr/sbin/
 
 RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /install/postCfg.sh && \
     mkdir -p /var/log/mariadb/columnstore && \
@@ -21,5 +22,8 @@ RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap
     /bin/echo "export USER=root" >> /root/.bashrc
 
 EXPOSE 3306
+
+RUN mkdir /docker-entrypoint-initdb.d
+RUN mkdir /log
 
 CMD ["/usr/sbin/runit_bootstrap"]
