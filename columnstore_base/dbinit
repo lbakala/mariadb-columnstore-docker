@@ -24,10 +24,10 @@ if [ ! -e $FLAG ]; then
     # Set database to populate using an env variable
     if [ -n $(printenv CS_DATABASE) ]; then
         DBNAME=$(printenv CS_DATABASE)
+        $MCSMYCMD -e "CREATE DATABASE $DBNAME;" >> $LOGFILE 2>&1
     else
         DBNAME=test
     fi
-    mkdir /log
     touch $LOGFILE
     echo "Start at $(date)" >> $LOGFILE
     cd /docker-entrypoint-initdb.d/ 
