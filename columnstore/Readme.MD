@@ -1,12 +1,12 @@
 # MariaDB ColumnStore Docker Container Setup
 
 ## Introduction
-This docker image will startup a single server instance of MariaDB ColumnStore running on CENTOS 7. It is designed and suitable for demo and evaluation. This additionally includes sample data sets.
+This docker image will startup a single server instance of MariaDB ColumnStore running on CENTOS 7. It is designed and suitable for demo and evaluation.
 
 ## Requirements
 The following are required:
 - A computer with a 64bit OS, CPU virtualization extensions enabled in the BIOS and minimum 6GB RAM
-- Docker 
+- Docker
 - This git tree
 
 ## Installation
@@ -47,4 +47,3 @@ $ docker rm -v mcs
 ```sh
 $ docker rmi david/mcs
 ```
-
