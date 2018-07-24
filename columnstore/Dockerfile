@@ -38,4 +38,9 @@ VOLUME /usr/local/mariadb/columnstore/data1
 VOLUME /usr/local/mariadb/columnstore/local
 VOLUME /usr/local/mariadb/columnstore/mysql/db
 
-ENTRYPOINT ["/usr/sbin/runit_bootstrap"]
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh && \
+    ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["/usr/sbin/runit_bootstrap"]
