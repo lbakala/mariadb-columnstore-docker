@@ -1,0 +1,20 @@
+language: bash
+services: docker
+env:
+  - VERSION=columnstore
+  - VERSION=columnstore_jupyter
+
+install:
+  - git clone https://github.com/mariadb-corporation/mariadb-docker-images ~/official-images
+
+before_script:
+  - env | sort
+  - cd "$VERSION"
+  - image="triggered:$VERSION"
+
+script:
+  - travis_retry docker build -t "$image" .
+  - ~/official-images/test/run.sh "$image"
+
+after_script:
+- docker images
