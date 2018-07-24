@@ -1,50 +1,87 @@
 #!/bin/sh
+# Environment variables supported:
+# - CS_POSTCFG_INPUT - if set runs postConfigure with the value piped into stdin
+# - CS_DATABASE - if set create a database with this name
 
-MCSMYCMD='/usr/local/mariadb/columnstore/mysql/bin/mysql --defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf -u root'
+# file used to track / record initialization and prevent subsequent rerun
 FLAG=/initialized
+# directory which can contain sql, sql.gz, and sh scripts that will be run
+# after succesful initialzation.
 INITDIR=/docker-entrypoint-initdb.d
+# log file recording output of custom scripts.
 LOGFILE=/log/dbinit.log
 
-# Exit here if there is nothing to initialize.
-if [ 0 -eq $(ls $INITDIR/*.{sql,sql.gz,sh} -la | wc -l) ]; then
-    echo "Nothing to do at $(date)" >> $LOGFILE
-    exit 0;
-fi
+MCSDIR=/usr/local/mariadb/columnstore
+MCSMYCMD="$MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -u root"
 
-# Waiting until CS becomes ready.
-/usr/local/mariadb/columnstore/bin/mcsadmin getsystemstatus | grep -q 'System.*ACTIVE' 
+# wait for the ProcMon process to start
+wait_for_procmon()
+{
+    ps -e | grep ProcMon
+    while [ 1 -eq $? ]; do
+        sleep 1
+        ps -e | grep ProcMon
+    done
+}
 
-while [ 1 -eq $? ]; do
-    sleep 15
-    /usr/local/mariadb/columnstore/bin/mcsadmin getsystemstatus | grep -q 'System.*ACTIVE' 
-done
 
 # Initialize CS only once.
-if [ ! -e $FLAG ]; then
-    # Set database to populate using an env variable
-    if [ -n $(printenv CS_DATABASE) ]; then
-        DBNAME=$(printenv CS_DATABASE)
+if [ -e $FLAG ]; then
+    echo "Container already initialized at $(date)"
+else
+    # wait for ProcMon to startup
+    echo "Initializing container at $(date) - waiting for ProcMon to start"
+    wait_for_procmon
+
+    # Compute number of custom install files, if any
+    CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
+
+    # first time install with CS_POSTCFG_INPUT set then run postConfigure
+    # with this as input. Must stop columnstore service first as postConfigure
+    # will fail otherwise. The service is only used for restarted pm1 containers
+    # or non pm1 containers in a cluster.
+    if [ ! -z "$CS_POSTCFG_INPUT" ]; then
+        echo "Stopping columnstore service to run postConfigure"
+        /usr/sbin/sv stop columnstore
+        echo -e "$CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
+    elif [ ! -z "$CS_DATABASE" ] || [ $CUSTOM_INSTALL_FILES -gt 0 ]; then
+        # container has custom install files but no postConfigure so wait for
+        # columnstore to startup by some other means
+        echo "Waiting for columnstore to start to run post install files"
+        /usr/sbin/wait_for_columnstore_active
+    fi
+
+    # Create custom database for scripts if needed based on CS_DATABASE env var
+    if [ ! -z "$CS_DATABASE" ]; then
+        echo "Creating custom database: $CS_DATABASE"
+        DBNAME=$CS_DATABASE
         $MCSMYCMD -e "CREATE DATABASE $DBNAME;" >> $LOGFILE 2>&1
     else
         DBNAME=test
     fi
-    touch $LOGFILE
-    echo "Start at $(date)" >> $LOGFILE
-    cd /docker-entrypoint-initdb.d/ 
-    for f in $(ls $INITDIR/); do
-        if [[ $f == *.sql ]];then
-            echo "Run $f at $(date)" >> $LOGFILE; 
-            $MCSMYCMD $DBNAME < $f >> $LOGFILE 2>&1 
-        elif [[ $f == *.sql.gz ]];then 
-            echo "Run $f at $(date)" >> $LOGFILE; 
-            zcat $f | $MCSMYCMD $DBNAME >> $LOGFILE 2>&1
-        elif [[ $f == *.sh ]]; then
-            echo "Run $f at $(date)" >> $LOGFILE; 
-            /bin/sh -x $f >> $LOGFILE 2>&1
-        fi; 
-    done;
-    touch $FLAG
-    echo "Finish at $(date)" >> $LOGFILE
-fi;
 
-exit 0
+    # check for any custom post install sql or shell scripts to run in INITDIR
+    if [ 0 -eq $CUSTOM_INSTALL_FILES ]; then
+        echo "No custom post install files to run at $(date)" >> $LOGFILE
+    else
+        touch $LOGFILE
+        echo "Executing custom post install files at $(date)" >> $LOGFILE
+        cd /docker-entrypoint-initdb.d/
+        for f in $(ls $INITDIR/); do
+            if [[ $f == *.sql ]];then
+                echo "Run $f at $(date)"
+                $MCSMYCMD $DBNAME < $f >> $LOGFILE 2>&1
+            elif [[ $f == *.sql.gz ]];then
+                echo "Run $f at $(date)"
+                zcat $f | $MCSMYCMD $DBNAME >> $LOGFILE 2>&1
+            elif [[ $f == *.sh ]]; then
+                echo "Run $f at $(date)"
+                /bin/sh -x $f >> $LOGFILE 2>&1
+            fi;
+        done;
+        echo "Finish at $(date)" >> $LOGFILE
+    fi
+    echo "Container initilization complete at $(date)"
+    touch $FLAG
+fi
+exit 0;

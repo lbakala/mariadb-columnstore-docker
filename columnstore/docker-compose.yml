@@ -1,0 +1,78 @@
+version: "2"
+services:
+  um1:
+    image: mariadb/columnstore:latest
+    environment:
+      - CS_POSTCFG_INPUT=
+    volumes:
+      - um1_etc:/usr/local/mariadb/columnstore/etc
+      - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
+      - um1_local:/usr/local/mariadb/columnstore/local
+      - ./multi_node_um1:/docker-entrypoint-initdb.d
+    networks:
+      mcsnet:
+        ipv4_address: 10.5.0.2
+    ports:
+      - "3306:3306"
+
+  um2:
+    image: mariadb/columnstore:latest
+    environment:
+      - CS_POSTCFG_INPUT=
+    volumes:
+      - um2_etc:/usr/local/mariadb/columnstore/etc
+      - um2_mysql:/usr/local/mariadb/columnstore/mysql/db
+      - um2_local:/usr/local/mariadb/columnstore/local
+    networks:
+      mcsnet:
+        ipv4_address: 10.5.0.3
+    ports:
+      - "3307:3306"
+
+  pm2:
+    image: mariadb/columnstore:latest
+    environment:
+      - CS_POSTCFG_INPUT=
+    volumes:
+      - dbroot2:/usr/local/mariadb/columnstore/data2
+      - pm2_etc:/usr/local/mariadb/columnstore/etc
+    networks:
+      mcsnet:
+        ipv4_address: 10.5.0.4
+
+  pm1:
+#    security_opt:
+#      - seccomp:unconfined
+    image: mariadb/columnstore:latest
+    environment:
+      - CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n2\num1\n\n\num2\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
+    depends_on:
+      - um1
+      - um2
+      - pm2
+    volumes:
+      - dbroot1:/usr/local/mariadb/columnstore/data1
+      - pm1_etc:/usr/local/mariadb/columnstore/etc
+    networks:
+      mcsnet:
+        ipv4_address: 10.5.0.5
+
+volumes:
+  dbroot1:
+  dbroot2:
+  um1_mysql:
+  um2_mysql:
+  um1_etc:
+  um2_etc:
+  pm1_etc:
+  pm2_etc:
+  um1_local:
+  um2_local:
+
+networks:
+  mcsnet:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
