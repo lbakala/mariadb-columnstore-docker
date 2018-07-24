@@ -10,7 +10,7 @@ install:
 before_script:
   - env | sort
   - cd "$VERSION"
-  - image="mariadb-docker-images:$VERSION"
+  - image="mariadb-columnstore-docker:$VERSION"
 
 script:
   - travis_retry docker build -t "$image" .
