@@ -10,23 +10,26 @@ RUN export USER=root && \
     yum -y install expect zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools runit which psmisc lsof snappy rsync && \
     yum -y install mariadb-columnstore-client mariadb-columnstore-common mariadb-columnstore-libs mariadb-columnstore-platform mariadb-columnstore-server mariadb-columnstore-shared mariadb-columnstore-storage-engine && \
     yum clean all && \
-    rm -rf /var/cache/yum
-
-RUN export USER=root && \
+    rm -rf /var/cache/yum && \
     /usr/bin/systemd-machine-id-setup && \
-    /bin/echo -e "1\ncolumnstore-1\n1\n1\n" | /usr/local/mariadb/columnstore/bin/postConfigure && \
-    /usr/local/mariadb/columnstore/mysql/bin/mysql --defaults-file=/usr/local/mariadb/columnstore/mysql/my.cnf -uroot -vvv -Bse "set sql_mode=NO_ENGINE_SUBSTITUTION;GRANT ALL ON *.* to root@'%';" && \
-    /usr/local/mariadb/columnstore/bin/mcsadmin shutdownsystem y && \
-    /usr/local/mariadb/columnstore/bin/mcsadmin resetAlarm ALL
+    chown -R mysql:mysql /usr/local/mariadb/columnstore/mysql && \
+    ln -s /usr/local/mariadb/columnstore/lib/libcalmysql.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/libcalmysql.so && \
+    ln -s /usr/local/mariadb/columnstore/lib/libudf_mysql.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/libudf_mysql.so && \
+    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_tables.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_tables.so && \
+    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_columns.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_columns.so && \
+    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_extents.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_extents.so && \
+    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_files.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_files.so
 
 COPY service /etc/service/
-COPY runit_bootstrap /usr/sbin/
-COPY dbinit /usr/sbin/
+COPY dbinit runit_bootstrap wait_for_columnstore_active /usr/sbin/
 
-RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap && \
+RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /usr/sbin/dbinit /usr/sbin/wait_for_columnstore_active && \
     mkdir -p /var/log/mariadb/columnstore && \
     mkdir /docker-entrypoint-initdb.d && \
-    mkdir /log 
+    mkdir /log
+
+# default postConfigure input to create single node cluster
+ENV CS_POSTCFG_INPUT "1\ncolumnstore-1\n1\n1\n"
 
 EXPOSE 3306
 

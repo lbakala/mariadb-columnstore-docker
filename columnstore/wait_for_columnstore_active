@@ -1,0 +1,10 @@
+#!/bin/sh
+STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System)
+echo "$STATUS"
+echo "$STATUS" | grep -q 'System.*ACTIVE'
+while [ 1 -eq $? ]; do
+    sleep 5
+    STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System)
+    echo "$STATUS"
+    echo "$STATUS" | grep -q 'System.*ACTIVE'
+done

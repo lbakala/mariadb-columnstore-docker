@@ -1,11 +1,5 @@
 #!/bin/bash
 export > /etc/envvars
 /usr/sbin/dbinit &
-if [ "$1" = "multinode" ]; then
-  grep -q "<IPAddr>127.0.0.1</IPAddr>" /usr/local/mariadb/columnstore/etc/Columnstore.xml
-  if [ $? -eq 0 ]; then
-    echo "Multinode: detected single node configured"
-    cp /usr/local/mariadb/columnstore/etc/Columnstore.xml.installSave  /usr/local/mariadb/columnstore/etc/Columnstore.xml
-  fi
-fi
 exec /usr/sbin/runsvdir-start
+
