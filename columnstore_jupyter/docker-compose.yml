@@ -3,15 +3,17 @@ version: "2"
 services:
   jupyter:
     image: mariadb/columnstore_jupyter:latest
-    command: start-notebook.sh --NotebookApp.password='sha1:817af87d3fe5:febd7d6959b12ee6839a26d56f8f54c88922e9c2' 
+    command: start-notebook.sh --NotebookApp.password='sha1:817af87d3fe5:febd7d6959b12ee6839a26d56f8f54c88922e9c2'
     hostname: jupyter
     ports:
       - "8888:8888"
     volumes:
       - ./notebooks:/home/jovyan/work
   columnstore:
-    image: mariadb/columnstore_singlenode:latest
+    image: mariadb/columnstore:latest
     ports:
       - "3306:3306"
+    volumes:
+      - ./columnstore_um1:/docker-entrypoint-initdb.d
     links:
       - jupyter
