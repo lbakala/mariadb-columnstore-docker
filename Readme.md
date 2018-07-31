@@ -1,8 +1,8 @@
-# MariaDB ColumnStore Docker Repository
 
 -	[Travis CI:  
 	![build status badge](https://img.shields.io/travis/mariadb-corporation/mariadb-columnstore-docker/master.svg)](https://travis-ci.org/mariadb-corporation/mariadb-columnstore-docker/branches)
-
+---
+# MariaDB ColumnStore Docker Repository
 This repository contains varying docker configurations for MariaDB ColumnStore:
 - columnstore : Simple non production single server ColumnStore server
 - columnstore_jupyter : Demonstrates the MariaDB ColumnStore Spark Connector running with a Jupyter notebook.
