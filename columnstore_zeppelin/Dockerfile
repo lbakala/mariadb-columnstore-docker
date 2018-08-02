@@ -28,4 +28,4 @@ RUN cd /tmp &&\
     pwd &&\ 
     ls -la&&\
     dpkg -i mariadb-columnstore-api*.deb
-ADD Columnstore.xml /usr/local/mariadb/columnstore/etc/Columnstore.xmldocker run --rm -dit -e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE='%' -e MYSQL_USER=user -e MYSQL_PASSWORD=pass
+ADD Columnstore.xml /usr/local/mariadb/columnstore/etc/Columnstore.xml

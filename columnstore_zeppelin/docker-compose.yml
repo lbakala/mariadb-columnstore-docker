@@ -2,16 +2,17 @@ version: "2"
 
 services:
   columnstore:
-    image: mariadb/columnstore:latest
+    hostname: server
+    build: ../columnstore_sandbox
     ports:
       - "3306:3306"
-    volumes:
-      - ./columnstore_um1:/docker-entrypoint-initdb.d
-    links:
-      - zeppelin
+    # volumes:
+    #   - ./columnstore_um1:/docker-entrypoint-initdb.d
+
   zeppelin:
     hostname: zeppelin
     build: ../columnstore_zeppelin
+  
     ports:
       - "8080:8080"
     links:
