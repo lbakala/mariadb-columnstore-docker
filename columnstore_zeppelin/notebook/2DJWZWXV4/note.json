@@ -1,0 +1,2296 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n# Bookstore Analytics Sandbox\n### Overview\n#### Online Bookstore Data\nThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore. \nIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed. \nLike \"How am I doing?\", \"What can be improved?\" etc. \n\n#### System Info\nThe data is loaded in a **MariaDB AX** an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\n\nThe data size:\nCards: 1,122,245 rows\nEmails: 1,796,966 rows\nPhones: 1,698,696 rows\nAddresses: 1,867,567 rows\nTransactions: 15,413,748 rows\nLoyaltyPoints: 1,259,978 rows\nCustomers: 1,403,909 rows\nCovers: 20 rows\nTransactionTypes: 3 rows\nMaritalStatuses: 5 rows",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 14:51:09.701",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eBookstore Analytics Sandbox\u003c/h1\u003e\n\u003ch3\u003eOverview\u003c/h3\u003e\n\u003ch4\u003eOnline Bookstore Data\u003c/h4\u003e\n\u003cp\u003eThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore.\u003cbr/\u003eIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed.\u003cbr/\u003eLike \u0026ldquo;How am I doing?\u0026rdquo;, \u0026ldquo;What can be improved?\u0026rdquo; etc. \u003c/p\u003e\n\u003ch4\u003eSystem Info\u003c/h4\u003e\n\u003cp\u003eThe data is loaded in a \u003cstrong\u003eMariaDB AX\u003c/strong\u003e an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\u003c/p\u003e\n\u003cp\u003eThe data size:\u003cbr/\u003eCards: 1,122,245 rows\u003cbr/\u003eEmails: 1,796,966 rows\u003cbr/\u003ePhones: 1,698,696 rows\u003cbr/\u003eAddresses: 1,867,567 rows\u003cbr/\u003eTransactions: 15,413,748 rows\u003cbr/\u003eLoyaltyPoints: 1,259,978 rows\u003cbr/\u003eCustomers: 1,403,909 rows\u003cbr/\u003eCovers: 20 rows\u003cbr/\u003eTransactionTypes: 3 rows\u003cbr/\u003eMaritalStatuses: 5 rows\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117616131_1324110488",
+      "id": "20180801-100016_643917199",
+      "dateCreated": "2018-08-01 10:00:16.131",
+      "dateStarted": "2018-08-01 13:40:01.045",
+      "dateFinished": "2018-08-01 13:40:01.107",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\n//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\n\nval jdbcHostname \u003d \"columnstore\"\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"root\"\nval jdbcPassword \u003d\"\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\n// Regiter the function\nsqlcontext.udf.register(\"sexName\", sexName _)",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:01.168",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nsexName: (s: String)String\njdbcHostname: String \u003d columnstore\njdbcPort: Int \u003d 3306\njdbcDatabase: String \u003d bookstore\njdbcUsername: String \u003d root\njdbcPassword: String \u003d \"\"\ndriverClass: String \u003d org.mariadb.jdbc.Driver\njdbcUrl: String \u003d jdbc:mysql://columnstore:3306/bookstore\nconnectionProperties: java.util.Properties \u003d {}\nres101: Object \u003d null\nres102: Object \u003d null\nres103: Object \u003d null\nres104: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlcontext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@5a20d023\nres106: org.apache.spark.sql.expressions.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType,Some(List(StringType)))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550815_427109915",
+      "id": "20180727-131658_1120553468",
+      "dateCreated": "2018-08-01 09:59:10.815",
+      "dateStarted": "2018-08-01 13:40:01.239",
+      "dateFinished": "2018-08-01 13:40:03.723",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md \n### Books\nIn this first part we will focus mainly on our main commodity - the books. We want to know what we offer to our customers and how can be improved. \n\nLets start by answering our first question.\n\n**Q:**How many books do we sell?\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:58:42.505",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false,
+        "title": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eBooks\u003c/h3\u003e\n\u003cp\u003eIn this first part we will focus mainly on our main commodity - the books. We want to know what we offer to our customers and how can be improved. \u003c/p\u003e\n\u003cp\u003eLets start by answering our first question.\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eHow many books do we sell?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533123769455_-1333669099",
+      "id": "20180801-114249_1496710644",
+      "dateCreated": "2018-08-01 11:42:49.455",
+      "dateStarted": "2018-08-01 13:58:42.507",
+      "dateFinished": "2018-08-01 13:58:42.529",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Loading books ...",
+      "text": "// Load Books\nval pushdown_query \u003d \"(select * from bookstore.books) b\"\nval df_books \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_books.createOrReplaceTempView(\"books\")\ndf_books.printSchema()",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 14:52:28.399",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pushdown_query: String \u003d (select * from bookstore.books) b\ndf_books: org.apache.spark.sql.DataFrame \u003d [book_id: decimal(20,0), cover_price: decimal(7,2) ... 4 more fields]\nroot\n |-- book_id: decimal(20,0) (nullable \u003d false)\n |-- cover_price: decimal(7,2) (nullable \u003d false)\n |-- isbn: string (nullable \u003d false)\n |-- bookname: string (nullable \u003d false)\n |-- category: string (nullable \u003d false)\n |-- discount: decimal(7,2) (nullable \u003d false)\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533118872933_-527614215",
+      "id": "20180801-102112_512639291",
+      "dateCreated": "2018-08-01 10:21:12.933",
+      "dateStarted": "2018-08-01 13:40:03.964",
+      "dateFinished": "2018-08-01 13:40:04.507",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect count(*) `Total Books` from books",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 15:05:35.014",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 16.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 92.0,
+              "optionOpen": true,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Total Books": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Total Books",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": []
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "tableHide": false,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Total Books\n5000\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d96"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533124208702_-1415080682",
+      "id": "20180801-115008_1109697813",
+      "dateCreated": "2018-08-01 11:50:08.702",
+      "dateStarted": "2018-08-01 13:40:04.608",
+      "dateFinished": "2018-08-01 13:40:04.773",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nThis was easy question 5000. \n\nLets try something harder. \t\n\n**Q:**We are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\nDid we achieve those goals?",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 14:51:52.657",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThis was easy question 5000. \u003c/p\u003e\n\u003cp\u003eLets try something harder. \u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWe are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\u003cbr/\u003eDid we achieve those goals?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533124253554_-1846011550",
+      "id": "20180801-115053_1051666037",
+      "dateCreated": "2018-08-01 11:50:53.554",
+      "dateStarted": "2018-08-01 14:51:52.660",
+      "dateFinished": "2018-08-01 14:51:52.692",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Total number of books in Our Bookstore",
+      "text": "%sql\nselect category as `Category`, count(*) `Total Books` from books group by category ORDER BY `Total Books` DESC",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 15:05:29.393",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 382.0,
+              "optionOpen": true,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "Category",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "Total Books",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "updated": false,
+                    "names": {
+                      "Category": "string",
+                      "Total Books": "string"
+                    }
+                  },
+                  "updated": false,
+                  "initialized": false,
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  }
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": false
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Category",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Total Books",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "discount": "0.0",
+          "checkbox": [
+            "0.00",
+            "0.07",
+            "0.03"
+          ],
+          "Discount": [
+            "0.00",
+            "0.03",
+            "0.07"
+          ]
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Category\tTotal Books\nFantasy\t889\nSci-fi\t848\nRomance\t783\nChildren Classics\t650\nDrama\t518\nMystery\t470\nHorror\t394\nHumor\t266\nClassics\t159\nNon-fiction\t23\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d97"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533119179922_752831926",
+      "id": "20180801-102619_1580800426",
+      "dateCreated": "2018-08-01 10:26:19.922",
+      "dateStarted": "2018-08-01 13:40:04.996",
+      "dateFinished": "2018-08-01 13:40:05.660",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nIt looks like we are spot on targeting our audience.",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:05.700",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eIt looks like we are spot on targeting our audience.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533124143374_-14588352",
+      "id": "20180801-114903_393077580",
+      "dateCreated": "2018-08-01 11:49:03.374",
+      "dateStarted": "2018-08-01 13:40:05.795",
+      "dateFinished": "2018-08-01 13:40:05.816",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nNow something more tangable.\n\n**Q:**Are we making good profit from our focus categories ?",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:05.890",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eNow something more tangable.\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eAre we making good profit from our focus categories ?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533123893587_1706144804",
+      "id": "20180801-114453_131041062",
+      "dateCreated": "2018-08-01 11:44:53.587",
+      "dateStarted": "2018-08-01 13:40:05.925",
+      "dateFinished": "2018-08-01 13:40:05.933",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Profitability Potential by Genre",
+      "text": "%sql\nselect  category, avg(cover_price) as `Avg. Price in USD`, count(*) as Items from books group by category order by `Avg. Price in USD`",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 15:03:08.953",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "category",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "avg_price",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "Items",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "updated": false,
+                    "names": {
+                      "category": "string",
+                      "Avg. Price in USD": "string",
+                      "Items": "string"
+                    }
+                  },
+                  "updated": false,
+                  "initialized": false,
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  }
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-90"
+                  },
+                  "xLabelStatus": "rotate",
+                  "stacked": false
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "forceY": true,
+                  "isDateFormat": false,
+                  "dateFormat": ""
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "style": "stack"
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "category",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Avg. Price in USD",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "discount": "0.0",
+          "checkbox": [
+            "0.00",
+            "0.07",
+            "0.03"
+          ],
+          "Discount": [
+            "0.00",
+            "0.03",
+            "0.07"
+          ]
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "category\tAvg. Price in USD\tItems\nHumor\t5.393195\t266\nChildren Classics\t9.463908\t650\nRomance\t9.781252\t783\nNon-fiction\t9.983043\t23\nHorror\t11.111320\t394\nDrama\t13.310811\t518\nMystery\t14.242681\t470\nSci-fi\t18.757123\t848\nClassics\t22.914340\t159\nFantasy\t23.299910\t889\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d98"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550818_605625810",
+      "id": "20180727-155104_1393367914",
+      "dateCreated": "2018-08-01 09:59:10.818",
+      "dateStarted": "2018-08-01 13:40:06.057",
+      "dateFinished": "2018-08-01 13:40:06.908",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nI looks like **Fantasy** and **Sci-Fi** books have good potential for profit, if they sell. ",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:06.964",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eI looks like \u003cstrong\u003eFantasy\u003c/strong\u003e and \u003cstrong\u003eSci-Fi\u003c/strong\u003e books have good potential for profit, if they sell.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533120989660_-80871865",
+      "id": "20180801-105629_1798545765",
+      "dateCreated": "2018-08-01 10:56:29.661",
+      "dateStarted": "2018-08-01 13:40:07.020",
+      "dateFinished": "2018-08-01 13:40:07.037",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nNow lets check if we provide enough variety in those categories. We are targeting **Sci-Fi** and **Fantasy** fans. Our catalog should be as complete as possible.\n**Q:**Do we provide enough variety ?",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:07.119",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eNow lets check if we provide enough variety in those categories. We are targeting \u003cstrong\u003eSci-Fi\u003c/strong\u003e and \u003cstrong\u003eFantasy\u003c/strong\u003e fans. Our catalog should be as complete as possible.\u003cbr/\u003e\u003cstrong\u003eQ:\u003c/strong\u003eDo we provide enough variety ?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533124749016_270825197",
+      "id": "20180801-115909_1683741481",
+      "dateCreated": "2018-08-01 11:59:09.016",
+      "dateStarted": "2018-08-01 13:40:07.171",
+      "dateFinished": "2018-08-01 13:40:07.180",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Variety by Genre",
+      "text": "%sql\nselect  category, avg(cover_price) as `Profitability Potential`, count(*) as Items from books group by category order by Items ",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 14:57:09.876",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "category": "string",
+                      "avg_price": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": false
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "category",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Profitability Potential",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "discount": "0.07",
+          "Discount": [
+            "0.00"
+          ]
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "category\tProfitability Potential\tItems\nNon-fiction\t9.983043\t23\nClassics\t22.914340\t159\nHumor\t5.393195\t266\nHorror\t11.111320\t394\nMystery\t14.242681\t470\nDrama\t13.310811\t518\nChildren Classics\t9.463908\t650\nRomance\t9.781252\t783\nSci-fi\t18.757123\t848\nFantasy\t23.299910\t889\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d99"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550819_603861426",
+      "id": "20180730-075735_302224287",
+      "dateCreated": "2018-08-01 09:59:10.819",
+      "dateStarted": "2018-08-01 13:40:07.334",
+      "dateFinished": "2018-08-01 13:40:08.145",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md \n    The variety chart shows that we have covered **Sci-Fi** and **Fantasy** fans but also we have substential variety **Romance** and **Children** books.\nWe might want to explore the profitability potential those two categories. \nLets get back and click *settings* above and deselect *items* the chart now presents the profitability potential of those books. \nIt looks like  **Romance** and **Children** are not very profitable, but **Classics** are. \n\nAs a result from this quick anlysis we already can make a decision for improvement in the future. Like how our customers like the new changes?; are they going to buy those books? etc.\n\nLet try to identify who our customers are in the next section. ",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:08.237",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe variety chart shows that we have covered \u003cstrong\u003eSci-Fi\u003c/strong\u003e and \u003cstrong\u003eFantasy\u003c/strong\u003e fans but also we have substential variety \u003cstrong\u003eRomance\u003c/strong\u003e and \u003cstrong\u003eChildren\u003c/strong\u003e books.\u003cbr/\u003eWe might want to explore the profitability potential those two categories.\u003cbr/\u003eLets get back and click \u003cem\u003esettings\u003c/em\u003e above and deselect \u003cem\u003eitems\u003c/em\u003e the chart now presents the profitability potential of those books.\u003cbr/\u003eIt looks like \u003cstrong\u003eRomance\u003c/strong\u003e and \u003cstrong\u003eChildren\u003c/strong\u003e are not very profitable, but \u003cstrong\u003eClassics\u003c/strong\u003e are. \u003c/p\u003e\n\u003cp\u003eAs a result from this quick anlysis we already can make a decision for improvement in the future. Like how our customers like the new changes?; are they going to buy those books? etc.\u003c/p\u003e\n\u003cp\u003eLet try to identify who our customers are in the next section.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533125061581_1211657390",
+      "id": "20180801-120421_1033634006",
+      "dateCreated": "2018-08-01 12:04:21.582",
+      "dateStarted": "2018-08-01 13:40:08.291",
+      "dateFinished": "2018-08-01 13:40:08.302",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Customers\nIn this section we will try to identify who our customers are ? what are their preferences? how likely is for them to buy somethin out of their main focus. \n\nLets try to make a demographical profile of our customers. \n\n**Q:**Who is our customer ?",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:08.390",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eCustomers\u003c/h3\u003e\n\u003cp\u003eIn this section we will try to identify who our customers are ? what are their preferences? how likely is for them to buy somethin out of their main focus. \u003c/p\u003e\n\u003cp\u003eLets try to make a demographical profile of our customers. \u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWho is our customer ?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533125807100_-594332642",
+      "id": "20180801-121647_1961203969",
+      "dateCreated": "2018-08-01 12:16:47.100",
+      "dateStarted": "2018-08-01 13:40:08.442",
+      "dateFinished": "2018-08-01 13:40:08.457",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Loading customers ...",
+      "text": "// Load Customers\nval pushdown_query\u003d\"(select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\"\nval df_customers \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_customers.createOrReplaceTempView(\"customers\")\ndf_customers.printSchema()",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:08.541",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "tableHide": true,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pushdown_query: String \u003d (select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\ndf_customers: org.apache.spark.sql.DataFrame \u003d [customer_nm: string, customer_id: decimal(20,0) ... 5 more fields]\nroot\n |-- customer_nm: string (nullable \u003d false)\n |-- customer_id: decimal(20,0) (nullable \u003d false)\n |-- customer_username_nm: string (nullable \u003d false)\n |-- sex: string (nullable \u003d false)\n |-- age: integer (nullable \u003d false)\n |-- ms_id: integer (nullable \u003d false)\n |-- ms_type: string (nullable \u003d false)\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533118971475_1061980290",
+      "id": "20180801-102251_1563285806",
+      "dateCreated": "2018-08-01 10:22:51.476",
+      "dateStarted": "2018-08-01 13:40:08.587",
+      "dateFinished": "2018-08-01 13:40:09.224",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Customer Profile",
+      "text": "%sql\nselect  age, ms_type, count(1) as cnt from customers group by age, ms_type",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 15:03:37.254",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 198.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "age": "string",
+                      "ms_type": "string",
+                      "cnt": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "style": "stack"
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "lineWithFocus": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "age",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "ms_type",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "cnt",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "age\tms_type\tcnt\n76\tMarried\t8184\n101\tDivorced\t2\n85\tSeparated\t3\n57\tWidow\t757\n25\tDivorced\t175\n30\tSeparated\t277\n73\tDivorced\t2064\n66\tNever married\t1079\n79\tMarried\t4214\n27\tDivorced\t165\n85\tDivorced\t131\n69\tWidow\t1819\n47\tDivorced\t3744\n89\tMarried\t566\n42\tNever married\t7790\n22\tDivorced\t13\n60\tDivorced\t4166\n54\tWidow\t812\n82\tNever married\t345\n46\tNever married\t7488\n91\tWidow\t792\n98\tNever married\t31\n31\tWidow\t30\n61\tMarried\t15493\n44\tDivorced\t3435\n48\tSeparated\t756\n52\tWidow\t355\n46\tDivorced\t3745\n67\tSeparated\t166\n87\tDivorced\t70\n75\tWidow\t3793\n72\tSeparated\t138\n88\tSeparated\t2\n14\tNever married\t8372\n12\tNever married\t5077\n33\tMarried\t8432\n67\tMarried\t9462\n63\tNever married\t2157\n90\tDivorced\t44\n87\tSeparated\t3\n61\tNever married\t2523\n40\tNever married\t7126\n73\tMarried\t9019\n56\tMarried\t16941\n94\tWidow\t537\n91\tNever married\t78\n47\tMarried\t13791\n34\tNever married\t10603\n65\tDivorced\t3412\n71\tWidow\t2132\n56\tWidow\t714\n34\tWidow\t68\n20\tSeparated\t23\n62\tSeparated\t323\n74\tMarried\t9508\n50\tMarried\t15478\n99\tWidow\t139\n40\tDivorced\t1969\n74\tSeparated\t118\n22\tSeparated\t17\n87\tWidow\t686\n27\tMarried\t3903\n80\tSeparated\t40\n100\tWidow\t181\n28\tSeparated\t161\n75\tSeparated\t118\n47\tNever married\t7375\n17\tNever married\t12691\n85\tMarried\t947\n51\tNever married\t6157\n95\tDivorced\t15\n88\tDivorced\t157\n35\tSeparated\t525\n60\tSeparated\t346\n15\tMarried\t4\n44\tWidow\t197\n94\tMarried\t163\n77\tSeparated\t64\n24\tDivorced\t128\n80\tWidow\t2878\n32\tNever married\t12478\n55\tNever married\t4651\n22\tMarried\t505\n33\tSeparated\t300\n93\tWidow\t543\n18\tMarried\t7\n101\tWidow\t49\n101\tMarried\t18\n69\tDivorced\t1978\n67\tDivorced\t2469\n29\tSeparated\t377\n72\tWidow\t2329\n82\tDivorced\t472\n46\tMarried\t13844\n72\tDivorced\t2191\n32\tMarried\t7856\n61\tDivorced\t4593\n38\tSeparated\t481\n80\tNever married\t415\n23\tDivorced\t17\n55\tDivorced\t5910\n96\tWidow\t445\n48\tDivorced\t3890\n86\tDivorced\t157\n65\tMarried\t13061\n51\tDivorced\t4976\n81\tWidow\t2715\n27\tNever married\t18104\n86\tWidow\t1709\n79\tWidow\t3517\n63\tSeparated\t361\n96\tSeparated\t1\n74\tNever married\t838\n11\tNever married\t4430\n55\tWidow\t799\n81\tNever married\t388\n71\tMarried\t9363\n29\tNever married\t13331\n57\tNever married\t4653\n21\tMarried\t524\n52\tSeparated\t721\n44\tSeparated\t669\n20\tMarried\t505\n84\tDivorced\t181\n23\tSeparated\t22\n69\tSeparated\t129\n43\tWidow\t81\n90\tNever married\t74\n21\tSeparated\t19\n34\tSeparated\t538\n73\tSeparated\t112\n21\tWidow\t1\n37\tNever married\t10089\n30\tDivorced\t616\n33\tDivorced\t685\n97\tSeparated\t1\n38\tMarried\t10107\n54\tSeparated\t689\n22\tWidow\t1\n29\tDivorced\t653\n89\tDivorced\t92\n28\tWidow\t8\n68\tDivorced\t2165\n66\tWidow\t1417\n22\tNever married\t16064\n67\tNever married\t993\n76\tSeparated\t80\n64\tSeparated\t278\n35\tNever married\t10707\n74\tDivorced\t1877\n30\tMarried\t7613\n49\tMarried\t15955\n68\tSeparated\t151\n50\tSeparated\t730\n60\tNever married\t2243\n58\tMarried\t18048\n71\tDivorced\t2099\n62\tWidow\t1036\n31\tSeparated\t334\n97\tMarried\t186\n59\tWidow\t1136\n40\tMarried\t10785\n92\tWidow\t616\n71\tNever married\t862\n78\tMarried\t4805\n13\tNever married\t7003\n45\tDivorced\t3545\n25\tMarried\t3582\n89\tWidow\t1767\n49\tDivorced\t4992\n25\tSeparated\t136\n60\tMarried\t14302\n27\tSeparated\t131\n38\tDivorced\t1265\n90\tMarried\t306\n26\tWidow\t6\n23\tMarried\t515\n41\tDivorced\t2068\n41\tMarried\t11461\n39\tNever married\t7108\n62\tNever married\t2325\n39\tDivorced\t2056\n59\tDivorced\t4776\n66\tSeparated\t199\n41\tNever married\t7390\n91\tSeparated\t4\n70\tSeparated\t122\n62\tDivorced\t4218\n54\tNever married\t4721\n76\tDivorced\t1597\n30\tWidow\t27\n28\tDivorced\t169\n51\tSeparated\t796\n80\tDivorced\t560\n18\tNever married\t13490\n78\tNever married\t412\n32\tWidow\t30\n88\tWidow\t1280\n70\tNever married\t799\n42\tWidow\t95\n92\tDivorced\t25\n95\tNever married\t44\n77\tWidow\t2336\n65\tWidow\t1695\n16\tMarried\t3\n90\tSeparated\t3\n64\tMarried\t14494\n84\tMarried\t1404\n53\tSeparated\t745\n61\tSeparated\t364\n39\tMarried\t10567\n75\tMarried\t8855\n39\tSeparated\t528\n84\tNever married\t211\n38\tWidow\t49\n42\tMarried\t11719\n36\tMarried\t11296\n34\tDivorced\t1507\n69\tNever married\t780\n57\tDivorced\t5711\n36\tNever married\t10342\n95\tMarried\t141\n43\tSeparated\t515\n74\tWidow\t4098\n44\tNever married\t6704\n78\tDivorced\t975\n25\tWidow\t8\n31\tDivorced\t680\n56\tSeparated\t611\n86\tNever married\t172\n20\tDivorced\t17\n99\tMarried\t44\n32\tSeparated\t320\n14\tMarried\t5\n36\tDivorced\t1433\n93\tNever married\t57\n68\tMarried\t8454\n35\tDivorced\t1523\n19\tWidow\t2\n58\tSeparated\t659\n64\tNever married\t1517\n33\tWidow\t30\n50\tDivorced\t4810\n96\tNever married\t36\n101\tNever married\t4\n63\tDivorced\t4114\n54\tDivorced\t5655\n28\tNever married\t16497\n71\tSeparated\t132\n52\tNever married\t5963\n75\tNever married\t800\n47\tSeparated\t722\n50\tWidow\t399\n93\tDivorced\t29\n78\tSeparated\t58\n79\tSeparated\t39\n99\tNever married\t13\n82\tMarried\t2989\n10\tNever married\t3338\n93\tMarried\t193\n46\tWidow\t193\n100\tMarried\t57\n98\tDivorced\t18\n95\tWidow\t444\n24\tNever married\t13410\n53\tDivorced\t4964\n96\tMarried\t137\n75\tDivorced\t1784\n92\tMarried\t211\n45\tMarried\t13228\n80\tMarried\t3835\n68\tNever married\t948\n9\tNever married\t3766\n37\tMarried\t10933\n32\tDivorced\t626\n76\tNever married\t726\n34\tMarried\t11627\n70\tDivorced\t1916\n91\tMarried\t268\n85\tNever married\t149\n81\tDivorced\t526\n53\tWidow\t425\n83\tWidow\t2435\n46\tSeparated\t743\n45\tWidow\t182\n73\tWidow\t2067\n66\tDivorced\t2584\n60\tWidow\t1041\n19\tSeparated\t17\n97\tNever married\t45\n99\tDivorced\t8\n35\tMarried\t11982\n49\tSeparated\t779\n50\tNever married\t6131\n79\tNever married\t452\n51\tMarried\t15391\n83\tNever married\t315\n76\tWidow\t3572\n28\tMarried\t3631\n45\tSeparated\t696\n96\tDivorced\t18\n17\tMarried\t10\n24\tWidow\t4\n54\tMarried\t17647\n36\tSeparated\t482\n24\tSeparated\t106\n53\tMarried\t16013\n97\tDivorced\t29\n77\tDivorced\t1143\n58\tDivorced\t5796\n79\tDivorced\t658\n36\tWidow\t50\n88\tNever married\t154\n49\tWidow\t398\n57\tMarried\t17863\n45\tNever married\t7090\n85\tWidow\t1378\n89\tSeparated\t1\n26\tMarried\t3868\n68\tWidow\t1079\n19\tDivorced\t12\n58\tNever married\t4728\n86\tSeparated\t10\n77\tMarried\t5596\n8\tNever married\t3259\n37\tSeparated\t502\n57\tSeparated\t589\n82\tSeparated\t28\n48\tMarried\t14329\n61\tWidow\t1092\n64\tWidow\t1775\n87\tMarried\t472\n35\tWidow\t66\n83\tMarried\t2990\n63\tMarried\t13516\n21\tNever married\t14857\n48\tWidow\t198\n49\tNever married\t6115\n56\tNever married\t4484\n38\tNever married\t9164\n51\tWidow\t360\n24\tMarried\t3021\n16\tNever married\t10944\n59\tNever married\t2652\n15\tNever married\t8905\n91\tDivorced\t57\n48\tNever married\t7568\n94\tSeparated\t3\n70\tMarried\t8689\n25\tNever married\t15899\n72\tNever married\t915\n30\tNever married\t11908\n55\tMarried\t18115\n29\tWidow\t30\n100\tDivorced\t10\n64\tDivorced\t3635\n42\tDivorced\t2205\n41\tWidow\t105\n26\tNever married\t16992\n55\tSeparated\t701\n83\tDivorced\t453\n19\tMarried\t511\n98\tMarried\t146\n37\tWidow\t59\n102\tWidow\t39\n26\tSeparated\t157\n72\tMarried\t10358\n47\tWidow\t196\n102\tMarried\t15\n70\tWidow\t1977\n43\tDivorced\t2168\n23\tWidow\t1\n21\tDivorced\t8\n62\tMarried\t14383\n59\tMarried\t16549\n59\tSeparated\t411\n69\tMarried\t8526\n100\tNever married\t19\n95\tSeparated\t2\n78\tWidow\t2059\n20\tNever married\t15351\n86\tMarried\t1202\n26\tDivorced\t173\n53\tNever married\t6327\n29\tMarried\t8616\n31\tMarried\t8680\n65\tNever married\t1354\n93\tSeparated\t3\n37\tDivorced\t1370\n23\tNever married\t17255\n67\tWidow\t1247\n84\tWidow\t2008\n88\tMarried\t935\n65\tSeparated\t246\n83\tSeparated\t35\n43\tMarried\t10718\n81\tMarried\t3294\n40\tSeparated\t563\n58\tWidow\t789\n89\tNever married\t160\n94\tNever married\t57\n27\tWidow\t12\n66\tMarried\t10564\n102\tNever married\t1\n43\tNever married\t7027\n97\tWidow\t579\n92\tNever married\t53\n98\tSeparated\t1\n52\tDivorced\t4834\n87\tNever married\t73\n56\tDivorced\t5446\n98\tWidow\t450\n81\tSeparated\t23\n52\tMarried\t15345\n41\tSeparated\t619\n33\tNever married\t13493\n90\tWidow\t849\n31\tNever married\t13738\n39\tWidow\t69\n20\tWidow\t1\n19\tNever married\t13576\n42\tSeparated\t594\n77\tNever married\t519\n40\tWidow\t78\n16\tDivorced\t1\n73\tNever married\t820\n44\tMarried\t12736\n84\tSeparated\t7\n82\tWidow\t2465\n94\tDivorced\t27\n63\tWidow\t937\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d100",
+            "http://172.18.0.3:4040/jobs/job?id\u003d101",
+            "http://172.18.0.3:4040/jobs/job?id\u003d102",
+            "http://172.18.0.3:4040/jobs/job?id\u003d103",
+            "http://172.18.0.3:4040/jobs/job?id\u003d104"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550820_746846349",
+      "id": "20180727-135426_1794137245",
+      "dateCreated": "2018-08-01 09:59:10.820",
+      "dateStarted": "2018-08-01 13:40:09.326",
+      "dateFinished": "2018-08-01 13:40:11.086",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nThose we demographics only. But we want to know more about their bying habbits.\nHow much they buy?\nHow much they spend? \nWhat do they buy?\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:11.133",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThose we demographics only. But we want to know more about their bying habbits.\u003cbr/\u003eHow much they buy?\u003cbr/\u003eHow much they spend?\u003cbr/\u003eWhat do they buy?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533126395619_-1536635498",
+      "id": "20180801-122635_101901758",
+      "dateCreated": "2018-08-01 12:26:35.619",
+      "dateStarted": "2018-08-01 13:40:11.173",
+      "dateFinished": "2018-08-01 13:40:11.183",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Loading orders ...",
+      "text": "// Load Transactions\nval pushdown_query \u003d \"(SELECT count(t.order_id) orders, SUM(t.price), SUM(t.discounted_price) Amount, t.customer_id,  c.customer_nm, c.sex, c.age, ms.ms_type FROM transactions as t INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN maritalstatuses ms ON ms.ms_id \u003d c.ms_id GROUP BY  t.customer_id, c.customer_nm, c.sex, c.age, ms.ms_type ORDER BY orders desc) as t\"\nval df_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_orders.createOrReplaceTempView(\"transactions\")\ndf_orders.printSchema()",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:11.273",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "tableHide": true,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pushdown_query: String \u003d (SELECT count(t.order_id) orders, SUM(t.price), SUM(t.discounted_price) Amount, t.customer_id,  c.customer_nm, c.sex, c.age, ms.ms_type FROM transactions as t INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN maritalstatuses ms ON ms.ms_id \u003d c.ms_id GROUP BY  t.customer_id, c.customer_nm, c.sex, c.age, ms.ms_type ORDER BY orders desc) as t\ndf_orders: org.apache.spark.sql.DataFrame \u003d [orders: bigint, SUM(t.price): decimal(29,2) ... 6 more fields]\nroot\n |-- orders: long (nullable \u003d false)\n |-- SUM(t.price): decimal(29,2) (nullable \u003d true)\n |-- Amount: decimal(29,2) (nullable \u003d true)\n |-- customer_id: decimal(20,0) (nullable \u003d false)\n |-- customer_nm: string (nullable \u003d false)\n |-- sex: string (nullable \u003d false)\n |-- age: integer (nullable \u003d false)\n |-- ms_type: string (nullable \u003d false)\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533119033774_-1792010973",
+      "id": "20180801-102353_795574613",
+      "dateCreated": "2018-08-01 10:23:53.774",
+      "dateStarted": "2018-08-01 13:40:11.314",
+      "dateFinished": "2018-08-01 13:40:12.367",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nBut lets start with the biggest question. \n**Q:**Who spends more men or women ?",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:12.421",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eBut lets start with the biggest question.\u003cbr/\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWho spends more men or women ?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533127136266_-1528064023",
+      "id": "20180801-123856_489038421",
+      "dateCreated": "2018-08-01 12:38:56.267",
+      "dateStarted": "2018-08-01 13:40:12.466",
+      "dateFinished": "2018-08-01 13:40:12.478",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Orders Distribution by Sex",
+      "text": "%sql\nSELECT SUM(orders) as Orders, sexname(sex) Sex FROM transactions group by sexName(sex)  ORDER by Sex\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:12.566",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "pieChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Orders": "string",
+                      "customer_nm": "string",
+                      "sex": "string",
+                      "age": "string",
+                      "ms_type": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Sex",
+                  "index": 1.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "Sex",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Orders",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Orders\tSex\n8004292\tFemale\n7409456\tMale\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d105"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550839_672305718",
+      "id": "20180730-133456_361425748",
+      "dateCreated": "2018-08-01 09:59:10.839",
+      "dateStarted": "2018-08-01 13:40:12.610",
+      "dateFinished": "2018-08-01 13:40:23.417",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top Buyers Distribution by Sex",
+      "text": "%sql\nSELECT * FROM (SELECT max(orders) as Orders, customer_nm ,customer_id, sexname(sex) as Sex, age, ms_type  FROM transactions group by customer_nm, customer_id, Sex, age, ms_type order by Orders desc limit 10) x order by x.Sex\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:23.446",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 6.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "pieChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Orders": "string",
+                      "customer_nm": "string",
+                      "customer_id": "string",
+                      "Sex": "string",
+                      "age": "string",
+                      "ms_type": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-90"
+                  },
+                  "xLabelStatus": "hide",
+                  "stacked": true
+                },
+                "pieChart": {},
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "style": "stream"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Sex",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Orders",
+                  "index": 0.0,
+                  "aggr": "avg"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Orders\tcustomer_nm\tcustomer_id\tSex\tage\tms_type\n121\tJessica Turner\t60\tFemale\t49\tMarried\n126\tCarol Anderson\t274\tFemale\t35\tMarried\n118\tShannon Ferguson\t2727\tFemale\t36\tMarried\n122\tStacy Moore\t168\tFemale\t78\tMarried\n117\tBriana Brown\t5\tFemale\t45\tMarried\n143\tRonald Johnson\t13\tMale\t26\tMarried\n132\tGregory Beasley\t30\tMale\t45\tMarried\n138\tRyan Estrada\t75\tMale\t33\tNever married\n122\tPatrick Wright\t1743\tMale\t61\tNever married\n116\tJohnny Williams\t2\tMale\t36\tNever married\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d106"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550842_1876574702",
+      "id": "20180730-125045_1914095396",
+      "dateCreated": "2018-08-01 09:59:10.842",
+      "dateStarted": "2018-08-01 13:40:23.523",
+      "dateFinished": "2018-08-01 13:40:37.702",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nIt looks like women buy more.\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:37.781",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eIt looks like women buy more.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533127245434_1564947495",
+      "id": "20180801-124045_109483302",
+      "dateCreated": "2018-08-01 12:40:45.434",
+      "dateStarted": "2018-08-01 13:40:37.860",
+      "dateFinished": "2018-08-01 13:40:37.869",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nBut men lead the cart of most orders per person.\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:37.960",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eBut men lead the cart of most orders per person.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533127296043_1006665845",
+      "id": "20180801-124136_268623677",
+      "dateCreated": "2018-08-01 12:41:36.043",
+      "dateStarted": "2018-08-01 13:40:37.998",
+      "dateFinished": "2018-08-01 13:40:38.013",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n**Q:**But do the young read more than seniores ? \nLets find out.",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:38.099",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eBut do the young read more than seniores ?\u003cbr/\u003eLets find out.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533127584842_878866392",
+      "id": "20180801-124624_825159555",
+      "dateCreated": "2018-08-01 12:46:24.843",
+      "dateStarted": "2018-08-01 13:40:38.142",
+      "dateFinished": "2018-08-01 13:40:38.152",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:38.242",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1533129212092_22297104",
+      "id": "20180801-131332_491173860",
+      "dateCreated": "2018-08-01 13:13:32.092",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Order Distribution by Age",
+      "text": "%sql\nSELECT age,sum(orders) as Orders, AVG(amount) as `Cart Amount`, sexname(sex) Sex FROM transactions group by age,sex\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:53.058",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "orders": "string",
+                      "SUM(t.price)": "string",
+                      "SUM(t.discounted_price)": "string",
+                      "customer_id": "string",
+                      "customer_nm": "string",
+                      "sex": "string",
+                      "age": "string",
+                      "ms_type": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "forceY": false,
+                  "lineWithFocus": true,
+                  "isDateFormat": false
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "age",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "Sex",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "Orders",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "age\tOrders\tCart Amount\tSex\n58\t170372\t108.830301\tFemale\n71\t76973\t110.966367\tMale\n85\t14730\t110.653964\tFemale\n101\t330\t108.827333\tFemale\n62\t125657\t110.059232\tFemale\n61\t135711\t109.664341\tFemale\n45\t129086\t109.794006\tMale\n91\t6404\t102.066874\tFemale\n77\t55726\t111.156700\tFemale\n24\t87083\t109.178492\tMale\n77\t49466\t107.910039\tMale\n84\t20880\t108.359896\tFemale\n30\t116409\t109.061997\tFemale\n96\t3222\t105.857467\tMale\n14\t43632\t110.034109\tMale\n31\t134807\t111.417227\tFemale\n18\t77426\t109.231111\tFemale\n78\t47015\t109.631587\tFemale\n83\t35141\t110.071309\tFemale\n100\t1564\t123.327874\tMale\n10\t19326\t112.970667\tFemale\n34\t126099\t108.741798\tMale\n23\t101909\t109.521257\tFemale\n48\t150928\t109.492428\tFemale\n15\t46789\t109.627773\tMale\n40\t119136\t112.227786\tFemale\n48\t143093\t110.462033\tMale\n57\t165294\t108.994111\tFemale\n102\t252\t91.441481\tMale\n42\t128659\t109.920359\tFemale\n26\t120008\t108.791114\tFemale\n37\t120875\t109.849190\tMale\n97\t4906\t108.898929\tFemale\n12\t28914\t108.189880\tFemale\n70\t77416\t110.776546\tFemale\n25\t113686\t109.801803\tFemale\n67\t81789\t108.712221\tFemale\n49\t161530\t110.464231\tFemale\n76\t74120\t109.181145\tMale\n19\t72608\t108.203808\tMale\n61\t126370\t108.177024\tMale\n16\t63636\t109.828078\tFemale\n73\t80613\t110.424587\tFemale\n38\t119635\t108.974096\tFemale\n33\t121622\t111.235612\tMale\n81\t40609\t111.983561\tFemale\n82\t37557\t113.206523\tFemale\n66\t91890\t110.701114\tFemale\n58\t157645\t109.670637\tMale\n96\t3696\t110.382012\tFemale\n70\t70912\t108.759592\tMale\n11\t24893\t107.233394\tFemale\n86\t17929\t114.837931\tMale\n69\t71466\t113.326331\tMale\n90\t7059\t114.079526\tMale\n32\t111594\t109.219060\tMale\n28\t116132\t109.704348\tFemale\n51\t146245\t109.605946\tMale\n50\t155125\t109.094343\tFemale\n46\t139304\t109.449047\tMale\n67\t73866\t108.617424\tMale\n53\t151639\t110.632022\tMale\n20\t83528\t109.967468\tMale\n9\t20288\t105.980755\tFemale\n12\t26140\t108.519265\tMale\n64\t124963\t109.911314\tFemale\n19\t82082\t110.723592\tFemale\n30\t108263\t110.565479\tMale\n47\t146901\t108.999292\tFemale\n43\t118928\t110.213614\tFemale\n29\t130972\t110.146091\tFemale\n59\t145888\t110.669175\tFemale\n78\t44334\t109.728229\tMale\n51\t157840\t109.873116\tFemale\n89\t13790\t111.341496\tMale\n64\t113909\t109.621122\tMale\n34\t140002\t109.725868\tFemale\n100\t1394\t101.940286\tFemale\n87\t7121\t111.614364\tMale\n17\t66620\t111.079256\tMale\n40\t108301\t110.445115\tMale\n42\t117356\t109.954268\tMale\n65\t103574\t108.450511\tMale\n68\t74319\t110.492899\tFemale\n94\t3960\t112.366201\tMale\n50\t145523\t109.394018\tMale\n71\t84085\t109.903600\tFemale\n31\t123382\t109.359278\tMale\n29\t122003\t109.851377\tMale\n91\t6607\t115.455087\tMale\n17\t73300\t110.110759\tFemale\n20\t92409\t111.791361\tFemale\n63\t113159\t109.310599\tMale\n102\t303\t102.037143\tFemale\n41\t114610\t109.639596\tMale\n14\t47851\t108.100755\tFemale\n72\t88799\t109.360939\tFemale\n60\t119519\t112.797039\tMale\n44\t135042\t110.402414\tFemale\n84\t21170\t114.262301\tMale\n22\t95049\t110.170307\tFemale\n9\t20367\t108.581630\tMale\n36\t123035\t108.957704\tMale\n25\t102710\t109.393181\tMale\n82\t32792\t109.996218\tMale\n54\t158513\t110.320172\tMale\n39\t105455\t109.383817\tMale\n33\t130599\t109.294479\tFemale\n43\t107414\t110.301818\tMale\n101\t401\t89.060233\tMale\n81\t37214\t111.238276\tMale\n52\t153765\t108.811283\tFemale\n35\t131088\t109.465638\tMale\n28\t107730\t109.625451\tMale\n46\t145980\t109.715449\tFemale\n73\t75723\t111.657340\tMale\n24\t94584\t109.009480\tFemale\n10\t17924\t107.909032\tMale\n69\t75903\t109.782856\tFemale\n47\t136259\t110.433218\tMale\n21\t80503\t109.883485\tMale\n87\t7046\t104.159820\tFemale\n88\t13877\t112.150849\tMale\n36\t137427\t111.939895\tFemale\n80\t40532\t108.445241\tMale\n27\t127414\t110.281358\tFemale\n60\t125082\t109.063434\tFemale\n56\t148683\t109.147064\tMale\n8\t19485\t114.334202\tFemale\n83\t33848\t111.661636\tMale\n49\t148588\t108.988835\tMale\n63\t118349\t110.468306\tFemale\n74\t92859\t108.387820\tFemale\n62\t119240\t109.297963\tMale\n38\t111093\t110.125167\tMale\n44\t125609\t109.820434\tMale\n98\t3563\t107.621433\tFemale\n75\t81021\t109.029088\tMale\n55\t171696\t109.362655\tFemale\n88\t14070\t109.909352\tFemale\n92\t4891\t103.897953\tFemale\n90\t7437\t113.247681\tFemale\n68\t66634\t110.526637\tMale\n39\t116154\t108.679265\tFemale\n54\t166362\t109.969420\tFemale\n35\t141456\t110.184605\tFemale\n8\t16858\t106.780275\tMale\n85\t13609\t107.752449\tMale\n27\t119361\t110.200857\tMale\n23\t94005\t110.948625\tMale\n95\t3392\t109.001374\tMale\n99\t1498\t135.309727\tFemale\n93\t4610\t106.160962\tFemale\n15\t50489\t109.135137\tFemale\n57\t157620\t109.320699\tMale\n98\t3297\t106.239421\tMale\n59\t133861\t108.833642\tMale\n66\t83460\t111.336319\tMale\n16\t56131\t109.102030\tMale\n11\t23085\t107.451201\tMale\n45\t144267\t111.695684\tFemale\n32\t123951\t111.435269\tFemale\n53\t159974\t108.508585\tFemale\n65\t110016\t107.536689\tFemale\n55\t157496\t109.543723\tMale\n75\t86520\t109.025105\tFemale\n95\t3801\t115.947057\tFemale\n93\t4306\t106.672506\tMale\n79\t47139\t110.209395\tMale\n56\t161460\t110.654057\tFemale\n76\t80465\t108.747812\tFemale\n21\t88027\t109.231159\tFemale\n72\t86111\t110.237546\tMale\n37\t130768\t109.383379\tFemale\n26\t110446\t108.756020\tMale\n89\t14531\t107.676025\tFemale\n80\t43683\t109.401992\tFemale\n52\t145410\t110.812983\tMale\n13\t37769\t111.117229\tMale\n94\t4933\t114.802098\tFemale\n41\t122513\t109.153767\tFemale\n18\t70788\t110.636525\tMale\n92\t4909\t114.581560\tMale\n86\t19147\t112.546033\tFemale\n99\t1172\t120.039574\tMale\n79\t51194\t111.252743\tFemale\n74\t86370\t109.331208\tMale\n13\t40013\t111.704068\tFemale\n22\t88773\t111.307069\tMale\n97\t4453\t114.576071\tMale\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d107",
+            "http://172.18.0.3:4040/jobs/job?id\u003d108",
+            "http://172.18.0.3:4040/jobs/job?id\u003d109",
+            "http://172.18.0.3:4040/jobs/job?id\u003d110",
+            "http://172.18.0.3:4040/jobs/job?id\u003d111"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550837_1316059750",
+      "id": "20180728-025641_1739767145",
+      "dateCreated": "2018-08-01 09:59:10.837",
+      "dateStarted": "2018-08-01 13:40:38.347",
+      "dateFinished": "2018-08-01 13:40:49.517",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md \nLets focus on our top customers and try to profile them in order to answer the following question:\n\n**Q:**What are the reading preferencess of our top customers?\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:49.618",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLets focus on our top customers and try to profile them in order to answer the following question:\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWhat are the reading preferencess of our top customers?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533130335958_1845622524",
+      "id": "20180801-133215_1474859950",
+      "dateCreated": "2018-08-01 13:32:15.958",
+      "dateStarted": "2018-08-01 13:40:49.685",
+      "dateFinished": "2018-08-01 13:40:49.692",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Loading Top Users ...",
+      "text": "// Load Top users Transactions\nval pushdown_query \u003d \"(SELECT c.customer_id,c.customer_nm,b.category, SUM(discounted_price) disc_price FROM bookstore.transactions AS t  INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN books b ON b.book_id \u003d t.book_id WHERE c.customer_id IN (60,274,2727,168,5,13,30,75,1743,2) GROUP BY  c.customer_id,c.customer_nm,b.category) as o\"\nval df_top_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_top_orders.createOrReplaceTempView(\"top_transactions\")\ndf_top_orders.printSchema()",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:49.785",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pushdown_query: String \u003d (SELECT c.customer_id,c.customer_nm,b.category, SUM(discounted_price) disc_price FROM bookstore.transactions AS t  INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN books b ON b.book_id \u003d t.book_id WHERE c.customer_id IN (60,274,2727,168,5,13,30,75,1743,2) GROUP BY  c.customer_id,c.customer_nm,b.category) as o\ndf_top_orders: org.apache.spark.sql.DataFrame \u003d [customer_id: decimal(20,0), customer_nm: string ... 2 more fields]\nroot\n |-- customer_id: decimal(20,0) (nullable \u003d false)\n |-- customer_nm: string (nullable \u003d false)\n |-- category: string (nullable \u003d false)\n |-- disc_price: decimal(29,2) (nullable \u003d true)\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533129234038_-970124989",
+      "id": "20180801-131354_704222410",
+      "dateCreated": "2018-08-01 13:13:54.038",
+      "dateStarted": "2018-08-01 13:40:49.921",
+      "dateFinished": "2018-08-01 13:40:50.504",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql \nSELECT * FROM top_transactions order by customer_id,category",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 14:59:48.317",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "stackedAreaChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "customer_id": "string",
+                      "customer_nm": "string",
+                      "category": "string",
+                      "disc_price": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "pieChart": {},
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "style": "expand"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "customer_nm",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "category",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "disc_price",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "editorHide": true,
+        "runOnSelectionChange": true
+      },
+      "settings": {
+        "params": {
+          "Customer": "126",
+          "formName": "60"
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "customer_id\tcustomer_nm\tcategory\tdisc_price\n2\tJohnny Williams\tChildren Classics\t94.36\n2\tJohnny Williams\tClassics\t11.54\n2\tJohnny Williams\tDrama\t73.20\n2\tJohnny Williams\tFantasy\t264.72\n2\tJohnny Williams\tHorror\t86.04\n2\tJohnny Williams\tHumor\t9.79\n2\tJohnny Williams\tMystery\t88.17\n2\tJohnny Williams\tRomance\t56.96\n2\tJohnny Williams\tSci-fi\t220.53\n5\tBriana Brown\tChildren Classics\t74.58\n5\tBriana Brown\tDrama\t130.36\n5\tBriana Brown\tFantasy\t412.66\n5\tBriana Brown\tHorror\t70.07\n5\tBriana Brown\tHumor\t28.23\n5\tBriana Brown\tMystery\t118.91\n5\tBriana Brown\tNon-fiction\t39.28\n5\tBriana Brown\tRomance\t47.83\n5\tBriana Brown\tSci-fi\t118.61\n13\tRonald Johnson\tChildren Classics\t166.45\n13\tRonald Johnson\tClassics\t17.98\n13\tRonald Johnson\tDrama\t61.32\n13\tRonald Johnson\tFantasy\t381.95\n13\tRonald Johnson\tHorror\t80.06\n13\tRonald Johnson\tHumor\t23.85\n13\tRonald Johnson\tMystery\t104.41\n13\tRonald Johnson\tNon-fiction\t13.49\n13\tRonald Johnson\tRomance\t126.09\n13\tRonald Johnson\tSci-fi\t326.54\n30\tGregory Beasley\tChildren Classics\t50.30\n30\tGregory Beasley\tClassics\t70.12\n30\tGregory Beasley\tDrama\t92.89\n30\tGregory Beasley\tFantasy\t383.83\n30\tGregory Beasley\tHorror\t64.24\n30\tGregory Beasley\tHumor\t14.65\n30\tGregory Beasley\tMystery\t106.71\n30\tGregory Beasley\tRomance\t149.94\n30\tGregory Beasley\tSci-fi\t272.30\n60\tJessica Turner\tChildren Classics\t87.12\n60\tJessica Turner\tClassics\t29.44\n60\tJessica Turner\tDrama\t119.06\n60\tJessica Turner\tFantasy\t285.51\n60\tJessica Turner\tHorror\t61.51\n60\tJessica Turner\tHumor\t37.20\n60\tJessica Turner\tMystery\t78.75\n60\tJessica Turner\tNon-fiction\t8.62\n60\tJessica Turner\tRomance\t92.09\n60\tJessica Turner\tSci-fi\t256.74\n75\tRyan Estrada\tChildren Classics\t53.48\n75\tRyan Estrada\tClassics\t36.86\n75\tRyan Estrada\tDrama\t111.47\n75\tRyan Estrada\tFantasy\t450.08\n75\tRyan Estrada\tHorror\t18.73\n75\tRyan Estrada\tHumor\t5.38\n75\tRyan Estrada\tMystery\t85.11\n75\tRyan Estrada\tNon-fiction\t14.90\n75\tRyan Estrada\tRomance\t141.72\n75\tRyan Estrada\tSci-fi\t359.66\n168\tStacy Moore\tChildren Classics\t70.69\n168\tStacy Moore\tClassics\t78.10\n168\tStacy Moore\tDrama\t142.92\n168\tStacy Moore\tFantasy\t247.73\n168\tStacy Moore\tHorror\t56.49\n168\tStacy Moore\tHumor\t19.55\n168\tStacy Moore\tMystery\t70.25\n168\tStacy Moore\tRomance\t137.23\n168\tStacy Moore\tSci-fi\t274.86\n274\tCarol Anderson\tChildren Classics\t107.88\n274\tCarol Anderson\tClassics\t51.49\n274\tCarol Anderson\tDrama\t90.48\n274\tCarol Anderson\tFantasy\t229.93\n274\tCarol Anderson\tHorror\t44.91\n274\tCarol Anderson\tHumor\t13.56\n274\tCarol Anderson\tMystery\t116.07\n274\tCarol Anderson\tRomance\t169.47\n274\tCarol Anderson\tSci-fi\t336.05\n1743\tPatrick Wright\tChildren Classics\t91.62\n1743\tPatrick Wright\tClassics\t83.05\n1743\tPatrick Wright\tDrama\t92.24\n1743\tPatrick Wright\tFantasy\t317.18\n1743\tPatrick Wright\tHorror\t37.97\n1743\tPatrick Wright\tHumor\t18.94\n1743\tPatrick Wright\tMystery\t105.57\n1743\tPatrick Wright\tRomance\t74.14\n1743\tPatrick Wright\tSci-fi\t192.48\n2727\tShannon Ferguson\tChildren Classics\t152.09\n2727\tShannon Ferguson\tClassics\t68.16\n2727\tShannon Ferguson\tDrama\t40.93\n2727\tShannon Ferguson\tFantasy\t291.64\n2727\tShannon Ferguson\tHorror\t60.94\n2727\tShannon Ferguson\tHumor\t23.27\n2727\tShannon Ferguson\tMystery\t23.41\n2727\tShannon Ferguson\tRomance\t150.70\n2727\tShannon Ferguson\tSci-fi\t169.61\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d112"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533130147619_-159469675",
+      "id": "20180801-132907_936203382",
+      "dateCreated": "2018-08-01 13:29:07.619",
+      "dateStarted": "2018-08-01 13:40:50.582",
+      "dateFinished": "2018-08-01 13:40:51.491",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql \nSELECT customer_nm Name, category Category, disc_price `Money Spent` FROM top_transactions WHERE customer_id IN (${Customer\u003d5,5(Briana Brown)|274(Carol Anderson)|30(Gregory Beasley)|60(Jessica Turner)|2(Johnny Williams)|1743(Patrick Wright)|13(Ronald Johnson)|75(Ryan Estrada)|2727(Shannon Ferguson)|168(Stacy Moore)})",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:53.546",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "customer_id": "string",
+                      "customer_nm": "string",
+                      "category": "string",
+                      "disc_price": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "pieChart": {},
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "Category",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "Money Spent",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "editorHide": true,
+        "runOnSelectionChange": true
+      },
+      "settings": {
+        "params": {
+          "Customer": "75",
+          "formName": "2"
+        },
+        "forms": {
+          "Customer": {
+            "type": "Select",
+            "options": [
+              {
+                "value": "5",
+                "displayName": "Briana Brown"
+              },
+              {
+                "value": "274",
+                "displayName": "Carol Anderson"
+              },
+              {
+                "value": "30",
+                "displayName": "Gregory Beasley"
+              },
+              {
+                "value": "60",
+                "displayName": "Jessica Turner"
+              },
+              {
+                "value": "2",
+                "displayName": "Johnny Williams"
+              },
+              {
+                "value": "1743",
+                "displayName": "Patrick Wright"
+              },
+              {
+                "value": "13",
+                "displayName": "Ronald Johnson"
+              },
+              {
+                "value": "75",
+                "displayName": "Ryan Estrada"
+              },
+              {
+                "value": "2727",
+                "displayName": "Shannon Ferguson"
+              },
+              {
+                "value": "168",
+                "displayName": "Stacy Moore"
+              }
+            ],
+            "name": "Customer",
+            "defaultValue": "5",
+            "hidden": false
+          }
+        }
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "Name\tCategory\tMoney Spent\nRyan Estrada\tFantasy\t450.08\nRyan Estrada\tMystery\t85.11\nRyan Estrada\tDrama\t111.47\nRyan Estrada\tSci-fi\t359.66\nRyan Estrada\tClassics\t36.86\nRyan Estrada\tHorror\t18.73\nRyan Estrada\tHumor\t5.38\nRyan Estrada\tChildren Classics\t53.48\nRyan Estrada\tRomance\t141.72\nRyan Estrada\tNon-fiction\t14.90\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://172.18.0.3:4040/jobs/job?id\u003d113"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550843_-1572477692",
+      "id": "20180730-154044_674099208",
+      "dateCreated": "2018-08-01 09:59:10.843",
+      "dateStarted": "2018-08-01 13:40:51.586",
+      "dateFinished": "2018-08-01 13:40:52.695",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nConclusion ...\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:52.702",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eConclusion \u0026hellip;\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533129554922_1106192781",
+      "id": "20180801-131914_1950129089",
+      "dateCreated": "2018-08-01 13:19:14.922",
+      "dateStarted": "2018-08-01 13:40:52.790",
+      "dateFinished": "2018-08-01 13:40:52.804",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-01 13:40:52.703",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1533130852702_-1621675049",
+      "id": "20180801-134052_2113947674",
+      "dateCreated": "2018-08-01 13:40:52.702",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "MariaDB AX Sandbox/Scala Bookstore Analytics",
+  "id": "2DJWZWXV4",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

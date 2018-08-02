@@ -1,0 +1,707 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n## Scala Example\n### Insert through JDBC\nVariables to connect to MariaDB ColumnStore throuhg JDBC are set and a SparkContext is initiated.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.176",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eScala Example\u003c/h2\u003e\n\u003ch3\u003eInsert through JDBC\u003c/h3\u003e\n\u003cp\u003eVariables to connect to MariaDB ColumnStore throuhg JDBC are set and a SparkContext is initiated.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890174_-1283660394",
+      "id": "20180724-150408_714219319",
+      "dateCreated": "2018-07-25 14:11:30.174",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\nval url \u003d \"jdbc:mysql://columnstore:3306\"\n\nvar connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", \"root\")\nconnectionProperties.put(\"driver\", \"org.mariadb.jdbc.Driver\")\n\nval sqlContext \u003d new SQLContext(sc)\nimport sqlContext.implicits._\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.181",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nurl: String \u003d jdbc:mysql://columnstore:3306\nconnectionProperties: java.util.Properties \u003d {}\nres25: Object \u003d null\nres26: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlContext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@1328a99\nimport sqlContext.implicits._\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890180_-1100957015",
+      "id": "20180724-092511_1706672733",
+      "dateCreated": "2018-07-25 14:11:30.180",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nA sample DataFrame is created, that shows numbers and their ASCII representation,",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.182",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eA sample DataFrame is created, that shows numbers and their ASCII representation,\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890181_1654292220",
+      "id": "20180724-150653_1887728845",
+      "dateCreated": "2018-07-25 14:11:30.181",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val sampleDF \u003d sc.makeRDD(0 to 127).map(i \u003d\u003e (i, i.toChar.toString)).toDF(\"number\", \"ASCII_representation\")\nsampleDF.printSchema()\nsampleDF.registerTempTable(\"df\")\nsqlContext.sql(\"SELECT number, ASCII_representation from df WHERE number \u003e 64 LIMIT 10\").show()",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.182",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "sampleDF: org.apache.spark.sql.DataFrame \u003d [number: int, ASCII_representation: string]\nroot\n |-- number: integer (nullable \u003d false)\n |-- ASCII_representation: string (nullable \u003d true)\n\nwarning: there was one deprecation warning; re-run with -deprecation for details\n+------+--------------------+\n|number|ASCII_representation|\n+------+--------------------+\n|    65|                   A|\n|    66|                   B|\n|    67|                   C|\n|    68|                   D|\n|    69|                   E|\n|    70|                   F|\n|    71|                   G|\n|    72|                   H|\n|    73|                   I|\n|    74|                   J|\n+------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890182_996472905",
+      "id": "20180724-093907_1361016737",
+      "dateCreated": "2018-07-25 14:11:30.182",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nand is inserted into MariaDB CoumnStore through JDBC in database \"test\" table \"scalaexample\".",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.183",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eand is inserted into MariaDB CoumnStore through JDBC in database \u0026ldquo;test\u0026rdquo; table \u0026ldquo;scalaexample\u0026rdquo;.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890182_907205074",
+      "id": "20180724-150810_111487792",
+      "dateCreated": "2018-07-25 14:11:30.183",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "sampleDF.write.mode(\"overwrite\").\n  option(\"numPartitions\", 1).\n  option(\"createTableOptions\", \"ENGINE\u003dcolumnstore\").\n  option(\"createTableColumnTypes\", \"number INT, ASCII_representation CHAR(1)\").\n  jdbc(url, \"test.scalaexample\", connectionProperties)",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.183",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890183_-80018482",
+      "id": "20180724-093930_380907260",
+      "dateCreated": "2018-07-25 14:11:30.183",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Insert through native ColumnStore API (bulk insert)\nVariables to connect to MariaDB ColumnStore through the native ColumnStore API are already set in /usr/local/mariadb/columnstore/etc/Columnstore.xml.\nThe necessary library is loaded, the ColumnStoreDriver is instantiated, and table \"scalaexample\" in database \"test\" is set for the bulk insert.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.186",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eInsert through native ColumnStore API (bulk insert)\u003c/h3\u003e\n\u003cp\u003eVariables to connect to MariaDB ColumnStore through the native ColumnStore API are already set in /usr/local/mariadb/columnstore/etc/Columnstore.xml.\u003cbr/\u003eThe necessary library is loaded, the ColumnStoreDriver is instantiated, and table \u0026ldquo;scalaexample\u0026rdquo; in database \u0026ldquo;test\u0026rdquo; is set for the bulk insert.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890186_722489747",
+      "id": "20180724-151250_172347146",
+      "dateCreated": "2018-07-25 14:11:30.186",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import com.mariadb.columnstore.api.ColumnStoreDriver\n\nval d \u003d new ColumnStoreDriver();\nvar b \u003d d.createBulkInsert(\"test\", \"scalaexample\", 0, 0);",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.187",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import com.mariadb.columnstore.api.ColumnStoreDriver\nd: com.mariadb.columnstore.api.ColumnStoreDriver \u003d com.mariadb.columnstore.api.ColumnStoreDriver@2c9bd349\nb: com.mariadb.columnstore.api.ColumnStoreBulkInsert \u003d com.mariadb.columnstore.api.ColumnStoreBulkInsert@281c9b8c\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890187_1485804495",
+      "id": "20180724-093929_926998582",
+      "dateCreated": "2018-07-25 14:11:30.187",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nData is inserted into ColumnStore.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.189",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eData is inserted into ColumnStore.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890188_-1178031860",
+      "id": "20180724-143539_1671033100",
+      "dateCreated": "2018-07-25 14:11:30.188",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "for (row \u003c- sampleDF.collect()){\n    b.setColumn(0, row.getInt(0))\n    b.setColumn(1, row.getString(1))\n    b.writeRow()\n}\nb.commit()",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.189",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890189_2141963022",
+      "id": "20180724-151713_1607872584",
+      "dateCreated": "2018-07-25 14:11:30.189",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nFinally, a summary of the insert process is shown.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.190",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eFinally, a summary of the insert process is shown.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890190_-654246864",
+      "id": "20180724-151725_862282306",
+      "dateCreated": "2018-07-25 14:11:30.190",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val summary \u003d b.getSummary()\nprintln(\"Execution time: \" + summary.getExecutionTime())\nprintln(\"Rows inserted: \" + summary.getRowsInsertedCount())\nprintln(\"Truncation count: \" + summary.getTruncationCount())\nprintln(\"Saturated count: \" + summary.getSaturatedCount())\nprintln(\"Invalid count: \" + summary.getInvalidCount())",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.191",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "summary: com.mariadb.columnstore.api.ColumnStoreSummary \u003d com.mariadb.columnstore.api.ColumnStoreSummary@40e11a2b\nExecution time: 1.171232574\nRows inserted: 128\nTruncation count: 1\nSaturated count: 0\nInvalid count: 0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890191_1401125482",
+      "id": "20180724-151651_61429611",
+      "dateCreated": "2018-07-25 14:11:30.191",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nFinally, a summary of the insert process is shown.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.200",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eFinally, a summary of the insert process is shown.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890191_-136851776",
+      "id": "20180724-153048_1522486851",
+      "dateCreated": "2018-07-25 14:11:30.191",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val summary \u003d b.getSummary()\nprintln(\"Execution time: \" + summary.getExecutionTime())\nprintln(\"Rows inserted: \" + summary.getRowsInsertedCount())\nprintln(\"Truncation count: \" + summary.getTruncationCount())\nprintln(\"Saturated count: \" + summary.getSaturatedCount())\nprintln(\"Invalid count: \" + summary.getInvalidCount())",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.210",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "summary: com.mariadb.columnstore.api.ColumnStoreSummary \u003d com.mariadb.columnstore.api.ColumnStoreSummary@22c3282d\nExecution time: 1.171232574\nRows inserted: 128\nTruncation count: 1\nSaturated count: 0\nInvalid count: 0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890210_-1701469199",
+      "id": "20180724-153130_1014233875",
+      "dateCreated": "2018-07-25 14:11:30.210",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n### Insert through custom function and ColumnStore API (automatic type detection)¶\nRequires an existing table with a corresponding schema.",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.210",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eInsert through custom function and ColumnStore API (automatic type detection)¶\u003c/h3\u003e\n\u003cp\u003eRequires an existing table with a corresponding schema.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890210_1790658157",
+      "id": "20180724-153140_2072086550",
+      "dateCreated": "2018-07-25 14:11:30.210",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import com.mariadb.columnstore.api.{ColumnStoreDriver,ColumnStoreDecimal,columnstore_data_types_t}\nimport org.apache.spark.sql.{Row,DataFrame}\nimport java.math.BigInteger\n\nobject ColumnStoreExporter {\n  def export( database: String, table: String, df: DataFrame ) : Unit \u003d {\n    val rows \u003d df.collect()\n    val driver \u003d new ColumnStoreDriver()\n    val bulkInsert \u003d driver.createBulkInsert(database, table, 0, 0)\n\n    // get the column count of table\n    val dbCatalog \u003d driver.getSystemCatalog\n    val dbTable \u003d dbCatalog.getTable(database, table)\n    val dbTableColumnCount \u003d dbTable.getColumnCount\n\n    // insert row by row into table\n    try {\n      for (row \u003c- rows){\n        for (columnId \u003c- 0 until row.size){\n          if (columnId \u003c dbTableColumnCount){\n            row.get(columnId) match {\n              case input:Boolean \u003d\u003e if (input) bulkInsert.setColumn(columnId, 1)\n              else bulkInsert.setColumn(columnId, 0);\n              case input:Byte \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:java.sql.Date \u003d\u003e bulkInsert.setColumn(columnId, input.toString)\n              case input:java.math.BigDecimal \u003d\u003e\n                val dbColumn \u003d dbTable.getColumn(columnId)\n                if (dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_DECIMAL) ||\n                  dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_UDECIMAL) ||\n                  dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_FLOAT) ||\n                  dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_UFLOAT) ||\n                  dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_DOUBLE) ||\n                  dbColumn.getType.equals(columnstore_data_types_t.DATA_TYPE_UDOUBLE)){\n                  \n                  bulkInsert.setColumn(columnId, new ColumnStoreDecimal(input.toPlainString))\n                }\n                else {\n                  bulkInsert.setColumn(columnId, input.toBigInteger)\n                }\n              case input:Double \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:Float \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:Integer \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:Long \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:Short \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:String \u003d\u003e bulkInsert.setColumn(columnId, input)\n              case input:java.sql.Timestamp \u003d\u003e bulkInsert.setColumn(columnId, input.toString)\n              case _ \u003d\u003e throw new Exception(\"Parsing error, can\u0027t convert \" +  row.get(columnId).getClass + \".\")\n            }\n          }\n        }\n        bulkInsert.writeRow()\n      }\n      bulkInsert.commit()\n    }\n    catch {\n      case e: Exception \u003d\u003e bulkInsert.rollback(); e.printStackTrace();\n    }\n    finally{ // print a short summary of the insertion process\n      val summary \u003d bulkInsert.getSummary\n      println(\"Execution time: \" + summary.getExecutionTime)\n      println(\"Rows inserted: \" + summary.getRowsInsertedCount)\n      println(\"Truncation count: \" + summary.getTruncationCount)\n      println(\"Saturated count: \" + summary.getSaturatedCount)\n      println(\"Invalid count: \" + summary.getInvalidCount)\n    }\n  }\n}",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.210",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import com.mariadb.columnstore.api.{ColumnStoreDriver, ColumnStoreDecimal, columnstore_data_types_t}\nimport org.apache.spark.sql.{Row, DataFrame}\nimport java.math.BigInteger\ndefined object ColumnStoreExporter\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890210_1001855246",
+      "id": "20180724-153205_1350413407",
+      "dateCreated": "2018-07-25 14:11:30.210",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "ColumnStoreExporter.export(\"test\",\"scalaexample\",sampleDF)",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.211",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Execution time: 0.13510448\nRows inserted: 128\nTruncation count: 1\nSaturated count: 0\nInvalid count: 0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890211_909911715",
+      "id": "20180724-153243_952656178",
+      "dateCreated": "2018-07-25 14:11:30.211",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "dateUpdated": "2018-07-25 14:11:30.211",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {},
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1532527890211_-1957118917",
+      "id": "20180724-153312_1458776363",
+      "dateCreated": "2018-07-25 14:11:30.211",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "~Trash/Scala Example",
+  "id": "2DP4G3H4W",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

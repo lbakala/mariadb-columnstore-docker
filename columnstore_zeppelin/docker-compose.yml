@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  columnstore:
+    image: mariadb/columnstore:latest
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./columnstore_um1:/docker-entrypoint-initdb.d
+    links:
+      - zeppelin
+  zeppelin:
+    hostname: zeppelin
+    build: ../columnstore_zeppelin
+    ports:
+      - "8080:8080"
+    links:
+      - columnstore
+    volumes:
+    - ../columnstore_zeppelin/notebook:/zeppelin/notebook
