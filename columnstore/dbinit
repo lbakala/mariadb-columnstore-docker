@@ -75,6 +75,7 @@ else
                 echo "Run $f at $(date)"
                 zcat $f | $MCSMYCMD $DBNAME >> $LOGFILE 2>&1
             elif [[ $f == *.sh ]]; then
+                chmod 755 $f
                 echo "Run $f at $(date)"
                 /bin/sh -x $f >> $LOGFILE 2>&1
             fi;
