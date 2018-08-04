@@ -69,6 +69,7 @@ services:
       - pm2
     volumes:
     - ../columnstore_zeppelin/notebook:/zeppelin/notebook
+    - um1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
         ipv4_address: 10.5.0.6

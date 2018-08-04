@@ -18,5 +18,6 @@ RUN mkdir -p  ${SPARK_HOME}/jars && \
     curl -O https://downloads.mariadb.com/Connectors/java/connector-java-2.2.6/mariadb-java-client-2.2.6.jar
 ADD spark-defaults.conf ${SPARK_HOME}/conf
 ADD zeppelin-env.sh /zeppelin/conf
+#Overwritten in multinode.
 ADD Columnstore.xml /usr/local/mariadb/columnstore/etc/Columnstore.xml
 COPY notebook /zeppelin/notebook
