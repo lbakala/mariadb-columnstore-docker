@@ -3,7 +3,7 @@
     {
       "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\nval jdbcHostname \u003d \"columnstore\"\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"root\"\nval jdbcPassword \u003d\"\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\nval pushdown_query \u003d \"(select * from bookstore.books) b\"\nval df_books \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_books.createOrReplaceTempView(\"books\")\ndf_books.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:31:43.670",
+      "dateUpdated": "2018-08-04 10:40:36.817",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -16,7 +16,7 @@
           "completionSupport": true
         },
         "editorMode": "ace/mode/scala",
-        "editorHide": false,
+        "editorHide": true,
         "tableHide": true
       },
       "settings": {
@@ -43,14 +43,14 @@
     },
     {
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:31:43.561",
+      "dateUpdated": "2018-08-04 10:40:36.889",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
         "results": {},
         "editorSetting": {},
-        "editorHide": false
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -67,7 +67,7 @@
       "title": "Price Distribution by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Cover Price(Avg)`, count(*) as Items from books where discount IN (${checkbox(,):Discount\u003d0.00|0.03|0.07,0.00|0.03|0.07}) group by category order by `Cover Price(Avg)`",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:33.837",
+      "dateUpdated": "2018-08-04 10:40:36.968",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -244,18 +244,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d0"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532706664528_-1042816294",
       "id": "20180727-155104_1393367914",
@@ -269,7 +257,7 @@
       "title": "Variety by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Cover Price(Avg)`, count(*) as Items from books WHERE discount IN (${checkbox(,):Discount\u003d0.00|0.03|0.07,0.00|0.03|0.07}) group by category order by Items ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:38.818",
+      "dateUpdated": "2018-08-04 10:40:37.013",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -394,18 +382,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d1"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532937455064_1123435734",
       "id": "20180730-075735_302224287",
@@ -418,7 +394,7 @@
     {
       "text": "val pushdown_query\u003d\"(select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\"\n\nval df_customers \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_customers.createOrReplaceTempView(\"customers\")\ndf_customers.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:40.302",
+      "dateUpdated": "2018-08-04 10:40:37.064",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -432,7 +408,7 @@
         },
         "editorMode": "ace/mode/scala",
         "title": false,
-        "editorHide": false,
+        "editorHide": true,
         "tableHide": true
       },
       "settings": {
@@ -461,7 +437,7 @@
       "title": "Customer Profile",
       "text": "%sql\nselect  age, ms_type, count(1) as cnt from customers group by age, ms_type",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:32:31.139",
+      "dateUpdated": "2018-08-04 10:40:37.101",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -562,22 +538,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d2",
-            "http://172.18.0.3:4040/jobs/job?id\u003d3",
-            "http://172.18.0.3:4040/jobs/job?id\u003d4",
-            "http://172.18.0.3:4040/jobs/job?id\u003d5",
-            "http://172.18.0.3:4040/jobs/job?id\u003d6"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532699666861_-1684096974",
       "id": "20180727-135426_1794137245",
@@ -590,7 +550,7 @@
     {
       "text": "\nval pushdown_query\u003d\"(select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\"\nval df_transactions \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_transactions.createOrReplaceTempView(\"transactions\")\ndf_transactions.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:45.057",
+      "dateUpdated": "2018-08-04 10:40:37.131",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -631,7 +591,7 @@
     {
       "text": "%spark\nval pushdown_query \u003d \"(SELECT count(t.order_id) orders, SUM(t.price), SUM(t.discounted_price) Amount, t.customer_id,  c.customer_nm, c.sex, c.age, ms.ms_type FROM transactions as t INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN maritalstatuses ms ON ms.ms_id \u003d c.ms_id GROUP BY  t.customer_id, c.customer_nm, c.sex, c.age, ms.ms_type ORDER BY orders desc) as t\"\nval df_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_orders.createOrReplaceTempView(\"transactions\")\ndf_orders.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:46.019",
+      "dateUpdated": "2018-08-04 10:40:37.159",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -672,7 +632,7 @@
     {
       "text": "//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\nsqlcontext.udf.register(\"sexName\", sexName _)",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:30:47.706",
+      "dateUpdated": "2018-08-04 10:40:37.186",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -714,7 +674,7 @@
       "title": "Order Distribution by Age",
       "text": "%sql\nSELECT age,sum(orders) as Orders, AVG(amount) as `Car Amount` FROM transactions group by age\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:32:31.393",
+      "dateUpdated": "2018-08-04 10:40:37.210",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -817,22 +777,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d7",
-            "http://172.18.0.3:4040/jobs/job?id\u003d8",
-            "http://172.18.0.3:4040/jobs/job?id\u003d9",
-            "http://172.18.0.3:4040/jobs/job?id\u003d10",
-            "http://172.18.0.3:4040/jobs/job?id\u003d11"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532746601913_1679550802",
       "id": "20180728-025641_1739767145",
@@ -846,7 +790,7 @@
       "title": "Orders Distribution by Sex",
       "text": "%sql\nSELECT SUM(orders) as Orders, sexname(sex) Sex FROM transactions group by sexName(sex)  ORDER by Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:31:05.773",
+      "dateUpdated": "2018-08-04 10:40:37.242",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -925,18 +869,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d12"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532957696883_-656775348",
       "id": "20180730-133456_361425748",
@@ -950,7 +882,7 @@
       "title": "Top Buyers Distribution by Sex",
       "text": "%sql\nSELECT * FROM (SELECT max(orders) as Orders, customer_nm, sexname(sex) as Sex, age, ms_type  FROM transactions group by customer_nm, Sex, age, ms_type order by Orders desc limit 10) x order by x.Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:31:19.396",
+      "dateUpdated": "2018-08-04 10:40:37.280",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -1043,18 +975,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://172.18.0.3:4040/jobs/job?id\u003d13"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532955045009_1426871634",
       "id": "20180730-125045_1914095396",
@@ -1067,7 +987,7 @@
     {
       "text": "%sql\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-01 10:31:43.205",
+      "dateUpdated": "2018-08-04 10:40:37.306",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1079,7 +999,8 @@
           "completionKey": "TAB",
           "completionSupport": true
         },
-        "editorMode": "ace/mode/sql"
+        "editorMode": "ace/mode/sql",
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -1093,7 +1014,7 @@
       "progressUpdateIntervalMs": 500
     }
   ],
-  "name": "Scala Bookstore Analytics",
+  "name": "~Trash/Scala Bookstore Analytics",
   "id": "2DK6N74VA",
   "noteParams": {},
   "noteForms": {},

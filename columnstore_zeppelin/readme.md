@@ -9,11 +9,6 @@ Build columnstore
 $ docker build -t mariadb/columnstore:latest ../columnstore
 ```
 
-Build columnstore with the sandbox dataset
-```sh
-$ docker build -t mariadb/columnstore_sandbox:latest ../columnstore_sandbox
-```
-
 Build zeppelin instance.
 ```sh
 $ docker build -t mariadb/columnstore_zeppelin:latest ../columnstore_zeppelin
