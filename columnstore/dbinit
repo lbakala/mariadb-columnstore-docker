@@ -8,8 +8,6 @@ FLAG=/initialized
 # directory which can contain sql, sql.gz, and sh scripts that will be run
 # after succesful initialzation.
 INITDIR=/docker-entrypoint-initdb.d
-# log file recording output of custom scripts.
-LOGFILE=/log/dbinit.log
 
 MCSDIR=/usr/local/mariadb/columnstore
 MCSMYCMD="$MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -u root"
@@ -55,31 +53,31 @@ else
     if [ ! -z "$CS_DATABASE" ]; then
         echo "Creating custom database: $CS_DATABASE"
         DBNAME=$CS_DATABASE
-        $MCSMYCMD -e "CREATE DATABASE $DBNAME;" >> $LOGFILE 2>&1
+        $MCSMYCMD -vvv -e "CREATE DATABASE $DBNAME;" 2>&1
     else
         DBNAME=test
     fi
 
     # check for any custom post install sql or shell scripts to run in INITDIR
     if [ 0 -eq $CUSTOM_INSTALL_FILES ]; then
-        echo "No custom post install files to run at $(date)" >> $LOGFILE
+        echo "No custom post install files to run at $(date)"
     else
-        touch $LOGFILE
-        echo "Executing custom post install files at $(date)" >> $LOGFILE
+        echo "Executing custom post install files at $(date)"
         cd /docker-entrypoint-initdb.d/
         for f in $(ls $INITDIR/); do
             if [[ $f == *.sql ]];then
                 echo "Run $f at $(date)"
-                $MCSMYCMD $DBNAME < $f >> $LOGFILE 2>&1
+                $MCSMYCMD -vvv $DBNAME < $f 2>&1
             elif [[ $f == *.sql.gz ]];then
                 echo "Run $f at $(date)"
-                zcat $f | $MCSMYCMD $DBNAME >> $LOGFILE 2>&1
+                zcat $f | $MCSMYCMD -vvv $DBNAME 2>&1
             elif [[ $f == *.sh ]]; then
+                chmod 755 $f
                 echo "Run $f at $(date)"
-                /bin/sh -x $f >> $LOGFILE 2>&1
+                /bin/sh -x $f 2>&1
             fi;
         done;
-        echo "Finish at $(date)" >> $LOGFILE
+        echo "Finish at $(date)"
     fi
     echo "Container initilization complete at $(date)"
     touch $FLAG

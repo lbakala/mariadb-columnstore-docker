@@ -1,10 +1,26 @@
 #!/bin/sh
-STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System)
-echo "$STATUS"
+
+# wait for mcsadmin getSystemStatus to show active
+STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+echo "mcsadmin getSystemStatus: $STATUS"
 echo "$STATUS" | grep -q 'System.*ACTIVE'
 while [ 1 -eq $? ]; do
     sleep 5
-    STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System)
-    echo "$STATUS"
+    STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+    echo "mcsadmin getSystemStatus: $STATUS"
     echo "$STATUS" | grep -q 'System.*ACTIVE'
 done
+
+# during install the system status can be active but the cs system catalog
+# is still being created, so wait for this to complete.
+if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
+    echo "Waiting for system catalog to be fully created"
+    STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;")
+    while [ 1 -eq $? ]; do
+        echo "cs create table test error: $STATUS"
+        sleep 2
+        STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;")
+    done
+    /usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest;"
+    echo "System ready"
+fi
