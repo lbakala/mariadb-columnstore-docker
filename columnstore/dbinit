@@ -79,7 +79,7 @@ else
         done;
         echo "Finish at $(date)"
     fi
-    echo "Container initilization complete at $(date)"
+    echo "Container initialization complete at $(date)"
     touch $FLAG
 fi
 exit 0;

@@ -43,7 +43,7 @@ Enter 'mcsadmin' to access the MariaDB ColumnStore Admin console
 
 NOTE: The MariaDB ColumnStore Alias Commands are in /etc/profile.d/columnstoreAlias.sh
 
-Container initilization complete at Tue Jul 24 05:16:48 UTC 2018
+Container initialization complete at Tue Jul 24 05:16:48 UTC 2018
 ```
 
 - To access tools such as mcsadmin and cpimport for data loading, it is easiest to run docker exec for shell access into the container:

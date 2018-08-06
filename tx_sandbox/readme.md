@@ -1,4 +1,4 @@
-# MariaDB TS Sandbox Docker ImageDataset
+# MariaDB TX Sandbox Docker ImageDataset
 
 This sandbox data loaded in this doker image is based on procedural generated data representing a typical online bookstore data.
 The names of the books, authors and customers are all procedural generated.  
@@ -20,7 +20,7 @@ Default password is:
 
 Alterntively you can access the database from commandline:
 ```sh
-mysql -h127.0.0.1 -uzeppelin_user -pzeppelin_pass -D bookstore
+mysql -h127.0.0.1 -usandbox -phighlyillogical -D bookstore
 ```
 
 ## Build and run using docker

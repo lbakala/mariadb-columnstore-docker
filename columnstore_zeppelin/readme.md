@@ -3,7 +3,8 @@
 ## Building
 - Install docker: https://docs.docker.com/engine/installation/
 
-The space requirement for the docker images is around 4GB
+The space requirement for the docker images is around 4GB disk space. 
+The docker application should have minimum 4GB RAM Memmory allocated in order for those 5 machines to work properly.
 
 Make sure you are in columnstore_zeppelin folder
 ```sh
@@ -28,6 +29,9 @@ $ docker-compose up --build
 ```
 
 It can take up to 10 min before the cluster starts and the data is ingested. 
+
+The following log entry marks the end of the load. 
+```"Container initialization complete at ..."```
 
 The status of data ingest can be tracked in the UM1 container log file.
 
