@@ -1,9 +1,103 @@
 {
   "paragraphs": [
     {
-      "text": "%md\n# Bookstore Analytics Sandbox\n### Overview\n#### Online Bookstore Data\nThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore. \nIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed. \nLike \"How am I doing?\", \"What can be improved?\" etc. \n\n#### System Info\nThe data is loaded in a **MariaDB AX** an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\n\nThe data size:\nCards: 1,122,245 rows\nEmails: 1,796,966 rows\nPhones: 1,698,696 rows\nAddresses: 1,867,567 rows\nTransactions: 15,413,748 rows\nLoyaltyPoints: 1,259,978 rows\nCustomers: 1,403,909 rows\nCovers: 20 rows\nTransactionTypes: 3 rows\nMaritalStatuses: 5 rows",
+      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\n//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\n\nval jdbcHostname \u003d \"10.5.0.2\"\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"zeppelin_user\"\nval jdbcPassword \u003d\"zeppelin_pass\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\n// Regiter the function\nsqlcontext.udf.register(\"sexName\", sexName _)",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:28.254",
+      "dateUpdated": "2018-08-09 12:11:20.019",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nsexName: (s: String)String\njdbcHostname: String \u003d 10.5.0.2\njdbcPort: Int \u003d 3306\njdbcDatabase: String \u003d bookstore\njdbcUsername: String \u003d zeppelin_user\njdbcPassword: String \u003d zeppelin_pass\ndriverClass: String \u003d org.mariadb.jdbc.Driver\njdbcUrl: String \u003d jdbc:mysql://10.5.0.2:3306/bookstore\nconnectionProperties: java.util.Properties \u003d {}\nres7: Object \u003d null\nres8: Object \u003d null\nres9: Object \u003d null\nres10: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlcontext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@1d97d79d\nres12: org.apache.spark.sql.expressions.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType,Some(List(StringType)))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533117550815_427109915",
+      "id": "20180727-131658_1120553468",
+      "dateCreated": "2018-08-01 09:59:10.815",
+      "dateStarted": "2018-08-09 12:05:13.911",
+      "dateFinished": "2018-08-09 12:05:18.755",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "// Load Books\nval pushdown_query \u003d \"(SELECT \u0027transactions:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactions UNION ALL SELECT \u0027loyaltypoints:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM loyaltypoints UNION ALL SELECT \u0027customers:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM customers UNION ALL SELECT \u0027cards:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM cards UNION ALL SELECT \u0027emails:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM emails UNION ALL SELECT \u0027addresses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM addresses UNION ALL SELECT \u0027phones:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM phones UNION ALL SELECT \u0027books:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM books UNION ALL SELECT \u0027maritalstatuses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM maritalstatuses UNION ALL SELECT \u0027transactiontypes:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactiontypes ) ts\"\nval df_stats \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_stats.createOrReplaceTempView(\"stats\")\ndf_stats.printSchema()\ndf_stats.show()",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-09 12:11:04.432",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "tableHide": true,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pushdown_query: String \u003d (SELECT \u0027transactions:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactions UNION ALL SELECT \u0027loyaltypoints:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM loyaltypoints UNION ALL SELECT \u0027customers:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM customers UNION ALL SELECT \u0027cards:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM cards UNION ALL SELECT \u0027emails:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM emails UNION ALL SELECT \u0027addresses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM addresses UNION ALL SELECT \u0027phones:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM phones UNION ALL SELECT \u0027books:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM books UNION ALL SELECT \u0027maritalstatuses:\u0027 AS `Table Name`, count(*) AS `N...df_stats: org.apache.spark.sql.DataFrame \u003d [Table Name: string, Number of Rows: bigint]\nroot\n |-- Table Name: string (nullable \u003d false)\n |-- Number of Rows: long (nullable \u003d false)\n\n+-----------------+--------------+\n|       Table Name|Number of Rows|\n+-----------------+--------------+\n|transactiontypes:|             3|\n|           books:|          5000|\n|           cards:|       1122245|\n| maritalstatuses:|             5|\n|   loyaltypoints:|       1259978|\n|       customers:|       1403909|\n|          phones:|       1698696|\n|       addresses:|       1867567|\n|          emails:|       1796966|\n|    transactions:|      15413748|\n+-----------------+--------------+\n\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d0"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533553065021_654471107",
+      "id": "20180806-105745_1945139528",
+      "dateCreated": "2018-08-06 10:57:45.021",
+      "dateStarted": "2018-08-09 12:05:19.019",
+      "dateFinished": "2018-08-09 12:05:24.599",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Bookstore Analytics Sandbox\n### Overview\n#### Online Bookstore Data\nThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore. \nIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed. \nLike \"How am I doing?\", \"What can be improved?\" etc. \n\n#### System Info\nThe data is loaded in a **MariaDB AX** an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\n\nFirst lets check the data we have:",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-09 12:05:24.645",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -28,7 +122,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eBookstore Analytics Sandbox\u003c/h1\u003e\n\u003ch3\u003eOverview\u003c/h3\u003e\n\u003ch4\u003eOnline Bookstore Data\u003c/h4\u003e\n\u003cp\u003eThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore.\u003cbr/\u003eIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed.\u003cbr/\u003eLike \u0026ldquo;How am I doing?\u0026rdquo;, \u0026ldquo;What can be improved?\u0026rdquo; etc. \u003c/p\u003e\n\u003ch4\u003eSystem Info\u003c/h4\u003e\n\u003cp\u003eThe data is loaded in a \u003cstrong\u003eMariaDB AX\u003c/strong\u003e an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\u003c/p\u003e\n\u003cp\u003eThe data size:\u003cbr/\u003eCards: 1,122,245 rows\u003cbr/\u003eEmails: 1,796,966 rows\u003cbr/\u003ePhones: 1,698,696 rows\u003cbr/\u003eAddresses: 1,867,567 rows\u003cbr/\u003eTransactions: 15,413,748 rows\u003cbr/\u003eLoyaltyPoints: 1,259,978 rows\u003cbr/\u003eCustomers: 1,403,909 rows\u003cbr/\u003eCovers: 20 rows\u003cbr/\u003eTransactionTypes: 3 rows\u003cbr/\u003eMaritalStatuses: 5 rows\u003c/p\u003e\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eBookstore Analytics Sandbox\u003c/h1\u003e\n\u003ch3\u003eOverview\u003c/h3\u003e\n\u003ch4\u003eOnline Bookstore Data\u003c/h4\u003e\n\u003cp\u003eThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore.\u003cbr/\u003eIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed.\u003cbr/\u003eLike \u0026ldquo;How am I doing?\u0026rdquo;, \u0026ldquo;What can be improved?\u0026rdquo; etc. \u003c/p\u003e\n\u003ch4\u003eSystem Info\u003c/h4\u003e\n\u003cp\u003eThe data is loaded in a \u003cstrong\u003eMariaDB AX\u003c/strong\u003e an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\u003c/p\u003e\n\u003cp\u003eFirst lets check the data we have:\u003c/p\u003e\n\u003c/div\u003e"
           }
         ]
       },
@@ -36,29 +130,92 @@
       "jobName": "paragraph_1533117616131_1324110488",
       "id": "20180801-100016_643917199",
       "dateCreated": "2018-08-01 10:00:16.131",
-      "dateStarted": "2018-08-04 12:48:28.416",
-      "dateFinished": "2018-08-04 12:48:28.494",
+      "dateStarted": "2018-08-09 12:05:24.780",
+      "dateFinished": "2018-08-09 12:05:24.829",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\n//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\n\nval jdbcHostname \u003d \"10.5.0.2\"\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"zeppelin_user\"\nval jdbcPassword \u003d\"zeppelin_pass\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\n// Regiter the function\nsqlcontext.udf.register(\"sexName\", sexName _)",
+      "text": "%sql\nselect `Table Name`, `Number of Rows` from stats ORDER BY 2 DESC",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:55:23.678",
+      "dateUpdated": "2018-08-09 12:10:56.134",
       "config": {
-        "tableHide": true,
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "Table Name",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "Number of Rows",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "Table Name": "string",
+                      "Number of Rows": "number"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
         "editorSetting": {
-          "language": "scala",
+          "language": "sql",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": true
         },
-        "colWidth": 12.0,
-        "editorMode": "ace/mode/scala",
-        "fontSize": 9.0,
-        "editorHide": false,
-        "results": {},
-        "enabled": true
+        "editorMode": "ace/mode/sql",
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -68,24 +225,36 @@
         "code": "SUCCESS",
         "msg": [
           {
-            "type": "TEXT",
-            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nsexName: (s: String)String\njdbcHostname: String \u003d 10.5.0.2\njdbcPort: Int \u003d 3306\njdbcDatabase: String \u003d bookstore\njdbcUsername: String \u003d zeppelin_user\njdbcPassword: String \u003d zeppelin_pass\ndriverClass: String \u003d org.mariadb.jdbc.Driver\njdbcUrl: String \u003d jdbc:mysql://10.5.0.2:3306/bookstore\nconnectionProperties: java.util.Properties \u003d {}\nres95: Object \u003d null\nres96: Object \u003d null\nres97: Object \u003d null\nres98: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlcontext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@67469ef9\nres100: org.apache.spark.sql.expressions.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType,Some(List(StringType)))\n"
+            "type": "TABLE",
+            "data": "Table Name\tNumber of Rows\ntransactions:\t15413748\naddresses:\t1867567\nemails:\t1796966\nphones:\t1698696\ncustomers:\t1403909\nloyaltypoints:\t1259978\ncards:\t1122245\nbooks:\t5000\nmaritalstatuses:\t5\ntransactiontypes:\t3\n"
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d21"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
-      "jobName": "paragraph_1533117550815_427109915",
-      "id": "20180727-131658_1120553468",
-      "dateCreated": "2018-08-01 09:59:10.815",
-      "dateStarted": "2018-08-04 12:48:28.763",
-      "dateFinished": "2018-08-04 12:48:31.762",
+      "jobName": "paragraph_1533555103848_586257524",
+      "id": "20180806-113143_503473269",
+      "dateCreated": "2018-08-06 11:31:43.849",
+      "dateStarted": "2018-08-09 12:10:43.012",
+      "dateFinished": "2018-08-09 12:10:44.204",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \n### Books\nIn this first part we will focus mainly on our main commodity - the books. We want to know what we offer to our customers and how can be improved. \n\nLets start by answering our first question.\n\n**Q:**How many books do we sell?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:31.797",
+      "dateUpdated": "2018-08-09 12:05:26.017",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -119,8 +288,8 @@
       "jobName": "paragraph_1533123769455_-1333669099",
       "id": "20180801-114249_1496710644",
       "dateCreated": "2018-08-01 11:42:49.455",
-      "dateStarted": "2018-08-04 12:48:32.011",
-      "dateFinished": "2018-08-04 12:48:32.053",
+      "dateStarted": "2018-08-09 12:05:26.123",
+      "dateFinished": "2018-08-09 12:05:26.137",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -128,7 +297,7 @@
       "title": "Loading books ...",
       "text": "// Load Books\nval pushdown_query \u003d \"(select * from books) b\"\nval df_books \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_books.createOrReplaceTempView(\"books\")\ndf_books.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:52.551",
+      "dateUpdated": "2018-08-09 12:05:26.220",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -143,7 +312,7 @@
         "editorMode": "ace/mode/scala",
         "title": true,
         "editorHide": true,
-        "tableHide": false
+        "tableHide": true
       },
       "settings": {
         "params": {},
@@ -162,42 +331,67 @@
       "jobName": "paragraph_1533118872933_-527614215",
       "id": "20180801-102112_512639291",
       "dateCreated": "2018-08-01 10:21:12.933",
-      "dateStarted": "2018-08-04 12:48:32.255",
-      "dateFinished": "2018-08-04 12:48:33.286",
+      "dateStarted": "2018-08-09 12:05:26.342",
+      "dateFinished": "2018-08-09 12:05:27.183",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql\nselect count(*) `Total Books` from books",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:33.358",
+      "dateUpdated": "2018-08-09 12:11:57.868",
       "config": {
         "colWidth": 12.0,
-        "fontSize": 16.0,
+        "fontSize": 9.0,
         "enabled": true,
         "results": {
           "0": {
             "graph": {
               "mode": "table",
               "height": 92.0,
-              "optionOpen": true,
+              "optionOpen": false,
               "setting": {
                 "table": {
-                  "tableGridState": {},
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "Total Books",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
                   "tableColumnTypeState": {
+                    "updated": false,
                     "names": {
                       "Total Books": "string"
-                    },
-                    "updated": false
+                    }
                   },
+                  "updated": false,
+                  "initialized": false,
                   "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
                   "tableOptionValue": {
                     "useFilter": false,
                     "showPagination": false,
                     "showAggregationFooter": false
-                  },
-                  "updated": false,
-                  "initialized": false
+                  }
                 },
                 "multiBarChart": {
                   "rotate": {
@@ -227,7 +421,7 @@
           "completionSupport": true
         },
         "editorMode": "ace/mode/sql",
-        "tableHide": true,
+        "tableHide": false,
         "editorHide": true
       },
       "settings": {
@@ -243,19 +437,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d22"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533124208702_-1415080682",
       "id": "20180801-115008_1109697813",
       "dateCreated": "2018-08-01 11:50:08.702",
-      "dateStarted": "2018-08-04 12:48:33.499",
-      "dateFinished": "2018-08-04 12:48:34.005",
+      "dateStarted": "2018-08-09 12:11:57.938",
+      "dateFinished": "2018-08-09 12:11:58.156",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "%md\nThis was easy question 5000. \n\nLets try something harder. \t\n\n**Q:**We are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\nDid we achieve those goals?",
+      "text": "%md\nThis was easy question - 5000. \n\nLets try something harder. \t\n\n**Q:**We are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\nDid we achieve those goals?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:34.098",
+      "dateUpdated": "2018-08-09 12:05:28.307",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -280,7 +486,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThis was easy question 5000. \u003c/p\u003e\n\u003cp\u003eLets try something harder. \u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWe are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\u003cbr/\u003eDid we achieve those goals?\u003c/p\u003e\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThis was easy question - 5000. \u003c/p\u003e\n\u003cp\u003eLets try something harder. \u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWe are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\u003cbr/\u003eDid we achieve those goals?\u003c/p\u003e\n\u003c/div\u003e"
           }
         ]
       },
@@ -288,8 +494,8 @@
       "jobName": "paragraph_1533124253554_-1846011550",
       "id": "20180801-115053_1051666037",
       "dateCreated": "2018-08-01 11:50:53.554",
-      "dateStarted": "2018-08-04 12:48:34.180",
-      "dateFinished": "2018-08-04 12:48:34.204",
+      "dateStarted": "2018-08-09 12:05:28.402",
+      "dateFinished": "2018-08-09 12:05:28.427",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -297,7 +503,7 @@
       "title": "Total number of books in Our Bookstore",
       "text": "%sql\nselect category as `Category`, count(*) `Total Books` from books group by category ORDER BY `Total Books` DESC",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:50:51.671",
+      "dateUpdated": "2018-08-09 12:05:28.501",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -442,19 +648,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d3"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533119179922_752831926",
       "id": "20180801-102619_1580800426",
       "dateCreated": "2018-08-01 10:26:19.922",
-      "dateStarted": "2018-08-04 12:50:51.727",
-      "dateFinished": "2018-08-04 12:50:52.690",
+      "dateStarted": "2018-08-09 12:05:28.592",
+      "dateFinished": "2018-08-09 12:05:31.317",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nIt looks like we are spot on targeting our audience.",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:36.578",
+      "dateUpdated": "2018-08-09 12:05:31.400",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -487,15 +705,183 @@
       "jobName": "paragraph_1533124143374_-14588352",
       "id": "20180801-114903_393077580",
       "dateCreated": "2018-08-01 11:49:03.374",
-      "dateStarted": "2018-08-04 12:48:36.654",
-      "dateFinished": "2018-08-04 12:48:36.668",
+      "dateStarted": "2018-08-09 12:05:31.551",
+      "dateFinished": "2018-08-09 12:05:31.562",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nLets check some titles from our catalog.\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-09 12:05:31.651",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLets check some titles from our catalog.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1533815012232_1443941754",
+      "id": "20180809-114332_2041881029",
+      "dateCreated": "2018-08-09 11:43:32.232",
+      "dateStarted": "2018-08-09 12:05:31.784",
+      "dateFinished": "2018-08-09 12:05:31.795",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect category,bookname from books",
+      "user": "anonymous",
+      "dateUpdated": "2018-08-09 12:05:31.883",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "category",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {
+                            "term": "Sci-Fi"
+                          }
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "bookname",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {
+                          "priority": 0.0,
+                          "direction": "asc"
+                        },
+                        "filters": [
+                          {
+                            "term": ""
+                          }
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "category": "string",
+                      "bookname": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": true,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "category\tbookname\nSci-fi\tAbandoned In the Depths\nSci-fi\tAliens And Doctors\nSci-fi\tExtermination On Mars\nFantasy\tButcher Without Fear\nHorror\tGrowls At the Convention\nSci-fi\tCyborgs And Children\nMystery\tCautious of the Celiffs\nFantasy\tCreation of Hell\nFantasy\tEnchanters And Dragons\nRomance\tFlame In the Forest\nFantasy\tSoldier of the West\nFantasy\tForeigner of the North\nFantasy\tTraitor of Limbo\nChildren Classics\tDay In My House\nChildren Classics\tCaterpillar of Sunshine\nChildren Classics\tAdventure of My Family\nRomance\tClinging To Time\nDrama\tRaven of the Lost Ones\nFantasy\tFamily of the Gods\nMystery\tCompanions In the City\nFantasy\tShamans And Skeletons\nHumor\tConfused By the Boy\nDrama\tWomen And Knights\nHorror\tWolves And Fish\nChildren Classics\tBasement of Life\nRomance\tBoyfriends And Loves\nSci-fi\tAssassins And Strangers\nFantasy\tCreator of the Curse\nHumor\tKnight During the Night\nRomance\tEnd of Romance\nRomance\tAngel of Passion\nFantasy\tAnimals And Imps\nChildren Classics\tKings of Utopia\nRomance\tSweetheart In the Night\nFantasy\tDruids of Magic\nDrama\tCourier of Misery\nSci-fi\tCreators of the Outlands\nChildren Classics\tBoring At My Pet Dragon\nDrama\tMen of the Curse\nRomance\tSecret Admirers And Boys\nFantasy\tOwl of the Shield\nRomance\tKnights And Lovers\nDrama\tBearer of Earth\nSci-fi\tArmies And Doctors\nMystery\tMystery of an Asteroid\nChildren Classics\tKing of Rain\nHumor\tLaughing Strategy\nDrama\tDoctors And Children\nRomance\tBound To My Past\nChildren Classics\tForest In the Mountains\nDrama\tEnemies And Patrons\nDrama\tAdmiring My Leader\nRomance\tFiance of Hell\nChildren Classics\tPig of Stone\nRomance\tFoundation of Dawn\nSci-fi\tAgent of the New World\nSci-fi\tMystery of Outer Space\nSci-fi\tCaptain of Earth\nMystery\tDreams of the Moon\nChildren Classics\tAttic of the Sun\nClassics\tTurtles And Kings\nRomance\tLadyloves And Mistresses\nDrama\tDog of Pain\nMystery\tConscious of Heaven\nRomance\tSweeties And Guests\nSci-fi\tInvader On My Ship\nHumor\tJester And Stranger\nRomance\tSeparated By Time\nChildren Classics\tLion of My Dreams\nMystery\tMuted By the Dark\nDrama\tAngels And Soldiers\nChildren Classics\tTigers of Life\nRomance\tSweeties And Lovebirds\nChildren Classics\tSheep of Sunshine\nSci-fi\tCommanders And Aliens\nRomance\tServants And Heartthrobs\nRomance\tDears And Strangers\nFantasy\tTroll Without Courage\nRomance\tMen of the South\nSci-fi\tVeterans And Martians\nSci-fi\tCyborgs And Hunters\nHorror\tMonsters And Hunters\nRomance\tButterflies And Trueloves\nChildren Classics\tLittle Bird of Stone\nChildren Classics\tGiving With My Cat\nChildren Classics\tFrogs And Little Dragons\nHorror\tSnake In the Forest\nDrama\tInvader of the Curse\nFantasy\tChoking In the East\nRomance\tDance of My Husband\nClassics\tRobots And Spiders\nFantasy\tVampire of the Wind\nRomance\tPossessed By My Girl\nHorror\tGirls of Detention\nFantasy\tTraitors of Silver\nFantasy\tMermaids of the Sea\nChildren Classics\tMice And Kittens\nHorror\tWomen And Women\nRomance\tAccident of Dawn\nDrama\tCleaning Up Time\nSci-fi\tOpen To the Aliens\nChildren Classics\tDragon of Wood\nHumor\tLove of That Boy\nMystery\tHero of the Void\nMystery\tEnemies And Soldiers\nHorror\tHorses In My Closet\nHorror\tWorking In My Dreams\nDrama\tTraitors Without Time\nFantasy\tSeparated At Spells\nRomance\tValentines of Fond Memories\nMystery\tWarrior of a Creature\nFantasy\tRemember the Mist\nChildren Classics\tOwl of the Moon\nChildren Classics\tChicken of Fire\nSci-fi\tFortune of the Fog\nChildren Classics\tOwls of Puzzles\nSci-fi\tAbandoned By Moon Rocks\nHorror\tGhost In My Dreams\nSci-fi\tIntruder of Our Destiny\nFantasy\tWarlocks of the Sea\nSci-fi\tRight For the New World\nHorror\tCaptured On the Ceiling\nRomance\tHoneys With Funny Socks\nSci-fi\tAssassin of Our Culture\nHorror\tAbandoned In History\nSci-fi\tGuests of the Stars\nDrama\tBringers And Supporters\nChildren Classics\tDucks In the Mountains\nChildren Classics\tGhosts of the Sun\nMystery\tPuzzle In the River\nFantasy\tCall To My End\nFantasy\tBleeding At the South\nChildren Classics\tDino In My House\nFantasy\tWarlocks of Secrets\nChildren Classics\tTigers And Bunnies\nRomance\tMan of the Evening\nMystery\tAdmiration of the Underground\nFantasy\tRebels And Protectors\nRomance\tBathing In Love\nRomance\tRemember Time\nRomance\tSweetheart of the West\nSci-fi\tWomen On My Ship\nChildren Classics\tDoor In My Town\nChildren Classics\tCow of Sunshine\nRomance\tQueens And Lovebirds\nMystery\tAlarmed By My Secrets\nSci-fi\tStatue of the Future\nRomance\tAngels And Knights\nRomance\tQueen of the Ocean\nRomance\tElement of Fortune\nClassics\tHeirs And Wolves\nDrama\tWitches of Dawn\nFantasy\tHunters And Women\nFantasy\tCulling of the Skull\nChildren Classics\tFoxes of My Land\nChildren Classics\tA Day With My Pet\nClassics\tScared of the Mist\nFantasy\tGiant of the Sea\nFantasy\tDemon of the Broken Banner\nMystery\tMuted By My Home\nSci-fi\tVeterans of the Future\nChildren Classics\tBubble of My New Cat\nFantasy\tRenewal of the Ocean\nDrama\tChildren And Secretaries\nRomance\tElifes And Lovebirds\nMystery\tSwindlers of the Chasm\nMystery\tPriests of the Past\nRomance\tAmusing the Stranger\nMystery\tRune In My Town\nSci-fi\tRuins of the Planet\nSci-fi\tDestruction of Darkness\nChildren Classics\tAttic of Rainbows\nSci-fi\tNation of Stardust\nRomance\tFlame of the Mountains\nFantasy\tPriestess of the Eclipse\nRomance\tChanging My Future\nMystery\tAware of the Forest\nHorror\tLights Behind Me\nDrama\tWidows With Guns\nMystery\tAgents And Humans\nChildren Classics\tLittle Ducks And Lions\nMystery\tSnakes of the Flowers\nSci-fi\tHeroes of Mars\nSci-fi\tDirectors And Intruders\nDrama\tPirates of Anguish\nMystery\tRats of the Swamp\nRomance\tSweethearts And Dears\nSci-fi\tConfinement of the Androids\nSci-fi\tVisitors And Enemies\nHorror\tTeachers And Monks\nMystery\tLoved By the North\nHorror\tSpiders And Children\nRomance\tNeighbors of Fire\nRomance\tLovebirds And Sweethearts\nHumor\tMan And Horse\nRomance\tQueens And Gods\nHumor\tAmbition of My Town\nRomance\tGirls At My Work\nChildren Classics\tTigers In the River\nRomance\tForeigners And Roommates\nDrama\tScared of My Friends\nRomance\tPleasing My Boyfriend\nSci-fi\tCrazy of the New Gods\nFantasy\tUnion of the North\nDrama\tAgents of Doom\nMystery\tCrushed By a Tower\nSci-fi\tCultured By the Robotic Police\nClassics\tDancing In the Ocean\nMystery\tAgent From Beyond the Grave\nHumor\tChild And Companion\nSci-fi\tAmbush On My Ship\nChildren Classics\tMice And Owls\nChildren Classics\tAdventure In Space\nDrama\tAngel of the Void\nFantasy\tSlaves of Demons\nMystery\tFigures And Giants\nChildren Classics\tDucks And Birds\nFantasy\tCompanions And Werewolves\nSci-fi\tIntruders And Visitors\nRomance\tHope For My Past\nRomance\tSuitors With a Cheeky Smile\nFantasy\tProtectors of Glory\nRomance\tGirlfriends And Admirers\nHorror\tOblivious To the Sea\nClassics\tGiants of the Solstice\nRomance\tGods With a Crush\nHumor\tBliss Program\nChildren Classics\tDragons And Little Birds\nFantasy\tMages And Warlocks\nChildren Classics\tKid of the Moon\nFantasy\tCrossbow of Misfortune\nHorror\tSongs In the Basement\nSci-fi\tRebels And Soldiers\nDrama\tPrepare For the Depths\nSci-fi\tCaptain of the Galaxy\nRomance\tHeartthrobs And Beloved\nFantasy\tSummoners And Kings\nMystery\tPuzzles of the Forest\nChildren Classics\tCleaning With My House\nMystery\tSeclusion of the Flowers\nDrama\tPatron of Dusk\nChildren Classics\tShield of Utopia\nRomance\tFoundation of Eternity\nFantasy\tVulture Without Fear\nHorror\tHaunted By the North\nMystery\tWolves In the Mountains\nDrama\tGuardian of Destruction\nChildren Classics\tGirl of the Moon\nRomance\tHoneys And Guests\nDrama\tFarmers of Nightmares\nDrama\tPatron of the Stockades\nFantasy\tDefeat Without Glory\nRomance\tVisitors of the Mountains\nChildren Classics\tBed of Utopia\nSci-fi\tAndroids In the Center of the Earth\nDrama\tCullers With Silver Hair\nSci-fi\tClosed For the Depths\nNon-fiction\tHonest Animals\nChildren Classics\tLittle Birds And Ducks\nSci-fi\tWomen And Heroes\nMystery\tCode of the Lake\nFantasy\tBandits Without Hope\nDrama\tHorses of Despair\nFantasy\tWarlocks of Magic\nFantasy\tWarriors And Vampires\nRomance\tBelonging To My Admirer\nSci-fi\tVictory of the Aliens\nFantasy\tMermen And Spies\nChildren Classics\tCrazy With My Dad\nRomance\tDears And Butterflies\nSci-fi\tBeginning of the Void\nRomance\tVisiting Adoration\nRomance\tFruit In the River\nFantasy\tCats of the Plague\nFantasy\tGuardians With Determination\nRomance\tFlame With a Cheeky Smile\nMystery\tEnemies In the Lake\nRomance\tMistress With Hazel Eyes\nSci-fi\tSecurity of Robots\nSci-fi\tCourage For My Planet\nRomance\tQueen of the Mountains\nHorror\tDemon of Hell\nRomance\tAdmirers And Butterflies\nFantasy\tVisiting the Nation\nRomance\tEnd of Freedom\nRomance\tHusbands of Insanity\nSci-fi\tAngel of Exploration\nNon-fiction\tDevils Around the World\nChildren Classics\tBirds of Secrets\nSci-fi\tBeasts of the Future\nDrama\tRuination of Freedom\nDrama\tBlood In the Mines\nClassics\tLord of Utopia\nHorror\tHumans Behind the Door\nRomance\tEnd of Heaven\nMystery\tTraitors of the Nether\nSci-fi\tHunters And Spies\nDrama\tDishonor of Desire\nDrama\tExecution of Bad News\nRomance\tGuarding My Past\nFantasy\tCountry of Hell\nDrama\tExecution of Limbo\nSci-fi\tExtermination of Alien Elife\nFantasy\tRevenge of Insanity\nMystery\tStranger In My Town\nRomance\tStranger With Black Hair\nChildren Classics\tAmazing World of the Forest\nRomance\tLuck of Hope\nFantasy\tMonk of Dawn\nHorror\tAbandoned In the North\nChildren Classics\tJealous of the Forest\nRomance\tGirlfriend of Silver\nMystery\tRat of History\nSci-fi\tDoctor of Our Destiny\nFantasy\tDoom of Heaven\nHorror\tSigns In the Library\nFantasy\tSmile At the Hills\nRomance\tAngels And Butterflies\nFantasy\tEnchanter of the Lost Ones\nRomance\tChase of Eternity\nDrama\tCommanding the Ocean\nSci-fi\tSource of Men\nDrama\tCouriers And Inventors\nDrama\tPeasants And Warriors\nMystery\tPredictions of Darkness\nFantasy\tSeparated In Secrets\nChildren Classics\tCooking With My New Dog\nFantasy\tStarting the Invaders\nFantasy\tStrangers And Ghosts\nSci-fi\tMonument of the Moon\nClassics\tMending the Void\nFantasy\tGoblin of the Bow\nSci-fi\tGirls of Outer Space\nMystery\tGiants And Girls\nFantasy\tRaised By the Void\nChildren Classics\tBear of Utopia\nFantasy\tShelter At Nature\nMystery\tKnight of the Sun\nChildren Classics\tPocket of Mystery\nFantasy\tSailing Into the Dungeons\nDrama\tAnger of Fire\nFantasy\tHurt By the Dungeons\nChildren Classics\tGirls And Dragons\nChildren Classics\tMountain of Yesterday\nRomance\tBound To My Girlfriend\nSci-fi\tAgent of Darkness\nFantasy\tTurtles And Officers\nRomance\tAngels of Reality\nFantasy\tEnemies And Warlocks\nSci-fi\tGuests And Defenders\nHorror\tCorrupted In the Pits\nFantasy\tChanging the Eternals\nFantasy\tGoblin of the Dungeons\nChildren Classics\tPuppies In My Town\nFantasy\tElife of the Lost Ones\nFantasy\tMermaids of Dread\nSci-fi\tRobots And Droids\nHorror\tVultures During Halloween\nRomance\tGuests And Dearests\nFantasy\tLord of Glory\nFantasy\tGoal of the Immortals\nSci-fi\tGirls of the Vacuum\nDrama\tDead In the Traitors\nFantasy\tNymphs With Determination\nSci-fi\tPlanet of Nowhere\nRomance\tLadyloves And Guests\nRomance\tGods of the Evening\nDrama\tOrigin of Afflication\nSci-fi\tAgent In the Past\nRomance\tChanging Love\nHorror\tAmbushed At the Convention\nDrama\tChildren And Defenders\nFantasy\tAgents And Summoners\nSci-fi\tInspired By the Revolution\nMystery\tBound To a Tower\nHumor\tPower of My Village\nSci-fi\tPilots And Beasts\nFantasy\tHunters And Pirates\nFantasy\tHonor Without Direction\nClassics\tGangster Without Duty\nSci-fi\tCyborgs And Friends\nRomance\tVision of the Ocean\nDrama\tOpponents And Slaves\nSci-fi\tElife After My Journey\nSci-fi\tVisitors And Intruders\nFantasy\tHope of Wood\nDrama\tWeep For My Home\nDrama\tMen And Butchers\nDrama\tEnemies And Witches\nHorror\tGhost At the Tombs\nSci-fi\tAbandoned In Electricity\nHumor\tWhispers In the Museum\nChildren Classics\tGhosts of Tomorrow\nFantasy\tStill Breathing In the River\nDrama\tDesign of the Nether\nRomance\tSweethearts And Secret Admirers\nRomance\tSongs of the Sea\nRomance\tMemory of My Friend\nRomance\tLoves of Love\nHumor\tBoy And Chicken\nRomance\tName of Tomorrow\nDrama\tRunning Into the President\nSci-fi\tCaution of Moondust\nDrama\tOpponents of the Lost Ones\nChildren Classics\tPrince of Rain\nSci-fi\tPerfection of My Planet\nChildren Classics\tLight In My House\nMystery\tIllusion of Shadows\nMystery\tBlacksmiths And Fish\nHumor\tRebel Arrangement\nDrama\tWitch of Breaking Hearts\nSci-fi\tInvaders of New Earth\nSci-fi\tDefenders of Sunshine\nDrama\tAncestors And Medics\nHumor\tLaughter of Gags\nSci-fi\tTraitors And Doctors\nRomance\tLoss of Insanity\nDrama\tDescendant of Stone\nFantasy\tAnger of the Rose\nClassics\tBattling At the Slaves\nRomance\tGirlfriends In the River\nDrama\tWidows of Fortune\nHorror\tSerpents Who Smiles\nRomance\tBeloved And Neighbors\nMystery\tClouds of a Man\nSci-fi\tHope of Moondust\nChildren Classics\tDrawing With My House\nFantasy\tWitches And Lions\nMystery\tHorses And Doctors\nHumor\tBliss of Lies\nSci-fi\tElement of the Sands\nDrama\tHeirs And Vultures\nRomance\tRise of Insanity\nSci-fi\tDirector of Our Destiny\nFantasy\tGuardians of the Rose\nSci-fi\tAndroids And Emperors\nFantasy\tProtectors of Twilight\nRomance\tFrozen By the Elife\nChildren Classics\tGirls And Lions\nHumor\tAngry With My Intentions\nChildren Classics\tGirl In the River\nRomance\tRoot of the River\nDrama\tChase Without Desire\nFantasy\tTravel To the Skies\nRomance\tBirth of Joy\nDrama\tAssistants of Bad News\nMystery\tRebirth of a Person\nMystery\tFriends In the Mountains\nDrama\tCollectors And Creators\nRomance\tElifes of the Stars\nFantasy\tWitch Without Duty\nFantasy\tPaladin of Wood\nFantasy\tPhantoms of Ice\nMystery\tHeirs In My Town\nSci-fi\tAndroids And Aliens\nDrama\tDecisions of Power\nHorror\tColleague of Hell\nHorror\tRituals At the Tombs\nDrama\tOpponents And Rats\nDrama\tCarnage Without Time\nSci-fi\tBeasts of War\nFantasy\tSwindler With Silver\nMystery\tExplosion of Animals\nMystery\tTraitors And Thieves\nFantasy\tInception of the Gods\nFantasy\tTraitors And Zombies\nRomance\tRoommate With Freckles\nFantasy\tTurtles of the Skull\nDrama\tSick of the Jungle\nSci-fi\tEnemies of Aliens\nRomance\tButterflies of the West\nSci-fi\tStatue of the Intruders\nRomance\tBeloved of the Forest\nFantasy\tSlaves of the Dagger\nRomance\tRestoration of Insanity\nHorror\tHumble In the Dungeons\nRomance\tGuest of Insanity\nMystery\tFigures And Doctors\nChildren Classics\tMouse On the Moon\nMystery\tFoe of Nature\nDrama\tElife With Debt\nChildren Classics\tLions And Puppies\nFantasy\tWolves And Sages\nChildren Classics\tPlaying With Fantasy\nFantasy\tEnchantment of Perfection\nRomance\tMen And Honeys\nRomance\tVisiting His Parents\nClassics\tMurder Without a Conscience\nDrama\tDeputy of Breaking Hearts\nSci-fi\tRestoration On My Ship\nChildren Classics\tDogs In My House\nChildren Classics\tBoys And Bears\nMystery\tLion In My Country\nSci-fi\tTraitor of Our Legacy\nChildren Classics\tChickens of My House\nHorror\tVoices Under My Bed\nFantasy\tMonument of Rainbows\nSci-fi\tBeasts And Women\nDrama\tFollowers of the Void\nDrama\tBuilders With Hoods\nFantasy\tAgents And Heroes\nSci-fi\tAlien In the Portal\nFantasy\tDwelling In the Phantoms\nRomance\tValentines And Colleagues\nFantasy\tBorder of My Dreams\nSci-fi\tDevoted To Aliens\nSci-fi\tDestruction of the Stars\nSci-fi\tGuardians And Soldiers\nFantasy\tScared At Time\nRomance\tEdge of Yesterday\nFantasy\tAgents Without Sin\nFantasy\tCriminal With Determination\nRomance\tFuture of the Mountains\nFantasy\tDisruption of the Night\nRomance\tLove of Romance\nSci-fi\tEmperors With Four Eyes\nHumor\tWealth of Fire\nSci-fi\tThrone of the Faceless Ones\nDrama\tLurking In My Past\nFantasy\tVampires of the Void\nChildren Classics\tSnowman of Fantasia\nChildren Classics\tSheep of Rainbows\nSci-fi\tHatred of the Androids\nChildren Classics\tGirl of My Country\nHorror\tMutants And Visitors\nDrama\tBaker of Time\nNon-fiction\tPlanets And Preys\nHorror\tFiends During Halloween\nSci-fi\tClones And Foreigners\nChildren Classics\tKittens And Foxes\nDrama\tSpy of Stone\nChildren Classics\tMountain of Mystery\nChildren Classics\tDoor of My Land\nMystery\tSpies And Agents\nSci-fi\tOfficer of Time\nClassics\tEffect of the Plague\nSci-fi\tSpy of Darkness\nMystery\tWolves And Girls\nHorror\tSpiders And Vultures\nDrama\tConfinement of Damnation\nFantasy\tGoal of Nightmares\nDrama\tLoathing the South\nRomance\tHoneys And Sweethearts\nChildren Classics\tMice of My Country\nSci-fi\tIntruder of the Void\nDrama\tHaunting the Country\nRomance\tOrigin In the River\nMystery\tButchers And Girls\nMystery\tButchers of a Shadow\nChildren Classics\tFearless With Flowers\nDrama\tChild of the Forest\nMystery\tElife of a Star\nChildren Classics\tCloset In the Mountains\nDrama\tAssassins of the Stockades\nRomance\tKnights And Honeys\nDrama\tAngels And Bakers\nRomance\tColleagues And Beloved\nSci-fi\tDependent On the Fog\nChildren Classics\tToad of My Dreams\nMystery\tGuardians And Spies\nHorror\tTeachers Behind You\nRomance\tDears And Guests\nHumor\tExcitement of My Journey\nRomance\tIntelligent Her Parents\nDrama\tDeputies of the East\nFantasy\tDestiny of Greatness\nMystery\tChild of the Underground\nDrama\tChildren of the Frontline\nChildren Classics\tLittle Ducks of My Imagination\nSci-fi\tDroids And Assassins\nHorror\tMumbling On the Ceiling\nHorror\tRats And Neighbors\nFantasy\tAliens And Fighters\nSci-fi\tAlien of War\nChildren Classics\tChair of My Dreams\nSci-fi\tFailing of the Aliens\nChildren Classics\tChicken of My Land\nFantasy\tSpider of Wood\nChildren Classics\tKittens And Wizards\nHorror\tSerpents In the Elevator\nHumor\tHelp of the President\nRomance\tLucky With Her Parents\nChildren Classics\tDogs of Dreams\nFantasy\tHunters of Insanity\nRomance\tAdmirers of the North\nFantasy\tHawk of Destruction\nClassics\tGuarded By the Mountains\nClassics\tSpies And Girls\nRomance\tBoys of My Adoration\nSci-fi\tCreators And Rebels\nRomance\tAngels of the Solstice\nMystery\tNightmares of the Chasm\nFantasy\tTroll of Gold\nMystery\tBandits And Serpents\nHumor\tHarlequin And Horse\nChildren Classics\tBirds And Cows\nRomance\tLove of Joy\nFantasy\tBirth of Magic\nRomance\tTaste of My Secret Admirer\nRomance\tBeloved And Suitors\nMystery\tDogs And Pilots\nSci-fi\tDirector of the Universe\nChildren Classics\tKings And Little Dragons\nMystery\tFrozen By Dreams\nFantasy\tLuck of the Wind\nSci-fi\tOrigin of Death\nHumor\tRat of Stunts\nHumor\tDoctor On a Day Out\nNon-fiction\tGlamor of the Lands\nSci-fi\tChild of the Crash\nDrama\tRebels And Doctors\nRomance\tKnight of Eternity\nRomance\tAdmirers of the Forest\nHorror\tCautious of My Demise\nDrama\tPeasant of Dread\nSci-fi\tOfficer of the Vacuum\nMystery\tBlinded By My Home\nMystery\tAssassins In My Country\nDrama\tVultures of the Plague\nFantasy\tGnomes And Imps\nRomance\tGirlfriends of the Rose\nRomance\tHeartthrob of Fond Memories\nFantasy\tAgents of the Banner\nSci-fi\tCommanders of War\nDrama\tDecay of Destruction\nChildren Classics\tDoor of My Imagination\nSci-fi\tVolunteers And Mercenaries\nDrama\tButchers of Repentance\nSci-fi\tBetrayal of the Worlds\nHorror\tCautious of the Darkness\nFantasy\tHeroes And Skeletons\nSci-fi\tAndroids of the Stars\nFantasy\tPriests of the Rose\nFantasy\tElves of the Undead\nFantasy\tPirates And Warriors\nHorror\tFiends Behind Me\nRomance\tElifes And Servants\nNon-fiction\tHerbs of Our Realm\nChildren Classics\tDuck of Stone\nRomance\tButterflies And Butterflies\nSci-fi\tDoctors And Creatures\nChildren Classics\tFoolish With the Animals\nFantasy\tGuarded By Time\nChildren Classics\tMan In My School\nFantasy\tEnchanters Without a Home\nClassics\tCurse With Gold\nFantasy\tCriminals of Secrets\nRomance\tAdmirer Without Shame\nRomance\tGods At My School\nSci-fi\tMen of the Moon\nRomance\tStrangers And Knights\nChildren Classics\tMouse of Miracles\nMystery\tEnemies of a Shadow\nChildren Classics\tField of Mysteries\nFantasy\tLuck of Summer\nDrama\tMessenger of the End\nRomance\tFlame of Love\nFantasy\tNymphs of the Light\nChildren Classics\tLittle Duck of Puzzles\nFantasy\tWitches And Bandits\nFantasy\tTower of Dread\nSci-fi\tDarkness of New Earth\nFantasy\tSeparated In Hope\nRomance\tAdmirer of the Forest\nMystery\tCreated By the Black Smoke\nHumor\tPoems Program\nDrama\tForeigner of the Nether\nSci-fi\tBirth of the Vacuum\nFantasy\tGrave of Darkness\nRomance\tSweeties With Hazel Eyes\nChildren Classics\tGoats And Bears\nRomance\tGuests And Lovers\nSci-fi\tSins of Robotic Control\nDrama\tFrightened of the Traitor\nRomance\tPraise the \nFantasy\tBlacksmiths And Heirs\nRomance\tRestoration In the Mountain\nHorror\tHands At the Tombs\nSci-fi\tAliens And Directors\nSci-fi\tHunter of Men\nMystery\tTurtles And Heirs\nRomance\tNeighbors With Brown Hair\nRomance\tForeigners And Girls\nRomance\tWorld of Lust\nSci-fi\tCaptains And Men\nRomance\tNeighbors And Strangers\nHorror\tFish And Angels\nFantasy\tFriends And Butchers\nFantasy\tLion of Dawn\nRomance\tFluke of Eternity\nRomance\tLadylove At My School\nSci-fi\tVolunteer In the News\nMystery\tConfused By the Mines\nMystery\tButchers And Heroes\nSci-fi\tSpy In the Future\nDrama\tWolves And Descendants\nChildren Classics\tAdventure of Sunshine\nChildren Classics\tCows of the Sun\nSci-fi\tGuardians And Agents\nMystery\tVultures of Outer Space\nHorror\tDefiant In the Hills\nMystery\tHatred of the Mines\nFantasy\tBegging In the Sea\nDrama\tConfinement of the Prison\nFantasy\tInception Without Hate\nDrama\tCourier of Hope\nFantasy\tSpies of the Nation\nClassics\tRuination of the West\nFantasy\tRobots of the End\nDrama\tCreators And Butchers\nRomance\tBelonging To the River\nFantasy\tSearching In the King\nFantasy\tAliens of Misfortune\nHorror\tStudents With Fire\nDrama\tAware of Dreams\nDrama\tAnnihilation of the Gods\nSci-fi\tLost In My Planet\nDrama\tCuller Without a Goal\nRomance\tGirls And Gods\nRomance\tDestiny of My Adoration\nMystery\tSage of Nature\nRomance\tLove of Heaven\nDrama\tAssassin of the East\nFantasy\tInvaders And Invaders\nMystery\tGoddess of the Past\nChildren Classics\tToad of Miracles\nFantasy\tImps And Rogues\nFantasy\tWitches of the Banished\nFantasy\tMeeting In Nightmares\nRomance\tKissing My Guy\nHorror\tWhispers At the River\nRomance\tOrigin of the Stars\nRomance\tExciting My Secret Admirer\nHumor\tDelight of Magic\nMystery\tEnchanted By My Home\nChildren Classics\tWizards And Chickens\nRomance\tVisitors At My Work\nMystery\tCompanions of a Beast\nDrama\tBringers of Breaking Hearts\nHorror\tForeigners Asks Weird Questions\nRomance\tDance of My Girlfriend\nSci-fi\tCreatures And Girls\nRomance\tGod of Dawn\nRomance\tFluke of Desire\nDrama\tRoot With Guns\nMystery\tWorship of Animals\nSci-fi\tDestruction of the New Order\nRomance\tValentines of the River\nHumor\tWord of the Brothers\nRomance\tGirlfriends of the Stars\nSci-fi\tFriend of Men\nHorror\tWitches And Strangers\nSci-fi\tIntruders of Nowhere\nDrama\tNumb To the Void\nClassics\tEmperor of Desire\nDrama\tTraitor of the Forest\nHorror\tGuest Next Door\nMystery\tRelics of a Person\nFantasy\tProtectors And Fighters\nMystery\tPrediction of the Lake\nSci-fi\tBored By My Journey\nChildren Classics\tAttic In the Mountains\nFantasy\tHealing the Sea\nRomance\tWelcome To Eternity\nMystery\tKey In My Yard\nChildren Classics\tPocket of Secrets\nFantasy\tElves of Power\nChildren Classics\tLittle Bird of Gold\nFantasy\tTurtles of Hell\nSci-fi\tRevenge of Eternity\nFantasy\tCyborgs of the Banner\nFantasy\tNymphs And Spiders\nSci-fi\tRobots With Spaceships\nFantasy\tDead In the Pits\nSci-fi\tStranger of Death\nDrama\tUndoing Without Faith\nSci-fi\tRestoration of Time\nChildren Classics\tDinos In My School\nRomance\tOblivious To the Night\nChildren Classics\tGift of My Village\nNon-fiction\tRare Physics\nHumor\tRat And Serpent\nSci-fi\tOrigin of Technology\nDrama\tStranger of Agony\nDrama\tDeputies Without a Goal\nHumor\tChicken With a Hat\nFantasy\tSearching In the Animals\nFantasy\tPersuer of the Land\nDrama\tOpponents And Bearers\nMystery\tThieves And Wolves\nChildren Classics\tKids of Fantasy\nMystery\tDeath of Yesterday\nMystery\tAssassin of the Flowers\nDrama\tDoctors of Breaking Hearts\nFantasy\tFailure of Misfortune\nDrama\tTrust the Maze\nRomance\tMaid of Freedom\nSci-fi\tWorld of New Elife\nFantasy\tDogs And Children\nDrama\tDescendant Without a Conscience\nRomance\tHoneys of Romance\nSci-fi\tCreatures of the Outlands\nClassics\tStrangers of Despair\nRomance\tNymphs With Hazel Eyes\nFantasy\tRejecting the Champions\nSci-fi\tEmperors And Traitors\nFantasy\tWarriors And Defenders\nRomance\tWomen of the North\nFantasy\tDescendants And Summoners\nClassics\tSigns At My End\nChildren Classics\tDinos And Little Birds\nMystery\tBlacksmiths In My House\nRomance\tAltering My Guy\nRomance\tFoundation of My Dreams\nSci-fi\tHunters And Medics\nRomance\tBody of Joy\nHumor\tJester Program\nFantasy\tEnhancing Magic\nSci-fi\tRoot of Darkness\nSci-fi\tBorder of Our Ship\nFantasy\tWhispers In the Tombs\nRomance\tListening To the Husband\nRomance\tHappy For Him\nMystery\tFigures And Bandits\nChildren Classics\tGrowing With My New Cat\nHumor\tRobot During My Travel\nDrama\tFailure of History\nSci-fi\tDependent On the End of Earth\nChildren Classics\tMan of Sunshine\nMystery\tCode In My Town\nHorror\tWolves Without a Mouth\nFantasy\tIgnoring the Hills\nFantasy\tLimit of the Lost Ones\nSci-fi\tIntruder of the Ocean\nRomance\tColleagues Without Shame\nMystery\tLions of the Underground\nRomance\tLuck of Desire\nFantasy\tNecromancers And Lions\nHorror\tStranger In the Forest\nChildren Classics\tCelebrating With My Town\nSci-fi\tGirl of Outer Space\nRomance\tStrangers of the Evening\nClassics\tInvaders With Wings\nChildren Classics\tLion of Yesterday\nFantasy\tElife In the King\nClassics\tAnger of the Ocean\nRomance\tValentines In the River\nFantasy\tChase Without Courage\nDrama\tCulling of the Gods\nChildren Classics\tMice And Girls\nChildren Classics\tAttic of Utopia\nSci-fi\tCommanders And Friends\nHumor\tBuffoon Plan\nSci-fi\tRebels of the Stars\nFantasy\tAncestry of the Banner\nFantasy\tOgre of Deception\nHumor\tAnger of My Actions\nDrama\tMessengers And Bearers\nHumor\tSpider With a Hat\nDrama\tAltering My School\nFantasy\tBattling At the Skies\nChildren Classics\tWindow of Miracles\nFantasy\tDescendants of Power\nMystery\tPuzzle of a Creature\nChildren Classics\tCats of Tomorrow\nRomance\tPassion of Dawn\nSci-fi\tInfluence of the New Order\nHumor\tBoy And Queen\nFantasy\tRunning In the Light\nChildren Classics\tLions of the Sun\nSci-fi\tCorruption of Outer Space\nChildren Classics\tCar of My Land\nRomance\tRejecting the Shadows\nHumor\tAgent And Doctor\nNon-fiction\tRobots of Time\nFantasy\tBorder of Hope\nRomance\tQueens With Hazel Eyes\nHumor\tHumor Has Been Naughty\nFantasy\tConstruction of the Sword\nSci-fi\tBoys And Spies\nSci-fi\tAliens of the Void\nChildren Classics\tTrain of Secrets\nRomance\tLust of the South\nFantasy\tDoctors And Gnomes\nFantasy\tPersuers And Traitors\nChildren Classics\tLittle Duck of My House\nMystery\tAgents And Agents\nClassics\tLion of Eternity\nFantasy\tGoblin of Earth\nMystery\tChildren In My Yard\nChildren Classics\tFoxes And Little Birds\nFantasy\tRunning In the Mountains\nFantasy\tGirl of Twilight\nFantasy\tFish And Deceivers\nMystery\tPriests And Doctors\nMystery\tWorship of History\nSci-fi\tBetter Time Travellers\nHumor\tDoctor Adventure\nDrama\tBound To the Slaves\nDrama\tCleaning Up History\nChildren Classics\tPrince of Utopia\nFantasy\tStelife of Deception\nRomance\tTruelove With Hazel Eyes\nRomance\tSuitors And Nymphs\nHorror\tDemons In the Field\nChildren Classics\tWindow of Sunshine\nDrama\tProduct of Repentance\nSci-fi\tFortune of Electricity\nMystery\tPirate In My Village\nRomance\tLoves of Heaven\nFantasy\tStrangers With Silver\nClassics\tChild of the End\nFantasy\tFlee To the East\nHorror\tDogs Without a Mouth\nFantasy\tUnion of Utopia\nRomance\tAccident At My School\nMystery\tRebel of the River\nDrama\tSoldiers And Deputies\nSci-fi\tObliteration On Mars\nClassics\tSpire of Destruction\nMystery\tHunters And Creators\nHumor\tWealth of the Guard\nSci-fi\tAbandoned In Stardust\nRomance\tChoice of the South\nClassics\tGuardians With Vigor\nMystery\tSpider of the Forest\nDrama\tBegging the Prison\nFantasy\tMagic With Money\nDrama\tPirate of the Void\nSci-fi\tVisitor of the Galaxy\nSci-fi\tVeterans And Aliens\nRomance\tLove of the South\nHorror\tSkinner of the Forest\nDrama\tBlacksmith of Anguish\nSci-fi\tRestoration of the Stars\nChildren Classics\tKids And Mice\nDrama\tAssassins And Bringers\nDrama\tBandits of the End\nDrama\tGuardian of Eternity\nRomance\tHappy For My Guy\nClassics\tWorld of Hope\nSci-fi\tCreation of the Androids\nDrama\tConfinement of the Plague\nMystery\tPirate of the Flowers\nSci-fi\tForeigners of Our Ship\nRomance\tListening To Secrets\nSci-fi\tBoys And Robots\nRomance\tElement of My Mind\nClassics\tHumans Without Faith\nFantasy\tGhost of the Ancients\nFantasy\tDemise of Dread\nSci-fi\tFriends of Outer Space\nFantasy\tDescendants With Determination\nRomance\tFlame of My Adoration\nSci-fi\tInception of the New Order\nSci-fi\tLonging For Electricity\nSci-fi\tEnemies And Creatures\nSci-fi\tThrone of the Orbit\nMystery\tFish of a Person\nChildren Classics\tFox of Rainbows\nDrama\tLearning From My Home\nDrama\tBattle the River\nDrama\tPeon Without Desire\nFantasy\tHero With Money\nFantasy\tHeirs of Whispers\nSci-fi\tFather of My Planet\nFantasy\tMermen of Magic\nFantasy\tCrypt Without a Goal\nDrama\tOfficer With Debt\nChildren Classics\tCuriosity of Life\nChildren Classics\tBoring At My Neighbors\nRomance\tSweeties And Heartthrobs\nRomance\tGirlfriends And Dears\nRomance\tTemptations of Passion\nSci-fi\tNation On My Ship\nHumor\tTrust Strategy\nRomance\tLadylove of My Admiration\nSci-fi\tMen of Stardust\nFantasy\tHeirs And Creators\nSci-fi\tPilot of Mars\nClassics\tSpiders And Invaders\nSci-fi\tDevoted To Robotic Control\nRomance\tBoy of Yesterday\nFantasy\tWarlocks of Glory\nDrama\tTraitors And Widows\nSci-fi\tBroken a Nuclear Winter\nFantasy\tRestoration of Twilight\nMystery\tDefenders of a Cat\nHorror\tHorrors During Full Moon\nRomance\tLovebirds of Insanity\nMystery\tLoved By the Depths\nChildren Classics\tTrain of Silver\nRomance\tAccepting My Elife\nHumor\tImpressed By the Jester\nSci-fi\tAgents of the Future\nRomance\tSweeties And Girlfriends\nSci-fi\tEnemies And Medics\nChildren Classics\tGirls And Dogs\nDrama\tPreparing For the City\nMystery\tSwindlers of a Beast\n"
+          },
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"result-alert alert-warning\" role\u003d\"alert\"\u003e\u003cbutton type\u003d\"button\" class\u003d\"close\" data-dismiss\u003d\"alert\" aria-label\u003d\"Close\"\u003e\u003cspan aria-hidden\u003d\"true\"\u003e\u0026times;\u003c/span\u003e\u003c/button\u003e\u003cstrong\u003eOutput is truncated\u003c/strong\u003e to 1000 rows. Learn more about \u003cstrong\u003ezeppelin.spark.maxResult\u003c/strong\u003e\u003c/div\u003e"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d4"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1533734882585_-1080173944",
+      "id": "20180808-132802_1631161718",
+      "dateCreated": "2018-08-08 13:28:02.585",
+      "dateStarted": "2018-08-09 12:05:31.959",
+      "dateFinished": "2018-08-09 12:05:32.218",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nNow something more tangable.\n\n**Q:**Are we making good profit from our focus categories ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:36.753",
+      "dateUpdated": "2018-08-09 12:05:32.259",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -528,8 +914,8 @@
       "jobName": "paragraph_1533123893587_1706144804",
       "id": "20180801-114453_131041062",
       "dateCreated": "2018-08-01 11:44:53.587",
-      "dateStarted": "2018-08-04 12:48:36.858",
-      "dateFinished": "2018-08-04 12:48:36.879",
+      "dateStarted": "2018-08-09 12:05:32.446",
+      "dateFinished": "2018-08-09 12:05:32.467",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -537,7 +923,7 @@
       "title": "Profitability Potential by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Avg. Price in USD`, count(*) as Items from books group by category order by `Avg. Price in USD`",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:21.877",
+      "dateUpdated": "2018-08-09 12:16:02.200",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -695,19 +1081,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d5"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533117550818_605625810",
       "id": "20180727-155104_1393367914",
       "dateCreated": "2018-08-01 09:59:10.818",
-      "dateStarted": "2018-08-04 12:48:37.032",
-      "dateFinished": "2018-08-04 12:48:39.025",
+      "dateStarted": "2018-08-09 12:05:32.653",
+      "dateFinished": "2018-08-09 12:05:34.862",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nI looks like **Fantasy** and **Sci-Fi** books have good potential for profit, if they sell. ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:39.036",
+      "dateUpdated": "2018-08-09 12:05:34.876",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -740,15 +1138,15 @@
       "jobName": "paragraph_1533120989660_-80871865",
       "id": "20180801-105629_1798545765",
       "dateCreated": "2018-08-01 10:56:29.661",
-      "dateStarted": "2018-08-04 12:48:39.171",
-      "dateFinished": "2018-08-04 12:48:39.201",
+      "dateStarted": "2018-08-09 12:05:35.034",
+      "dateFinished": "2018-08-09 12:05:35.064",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nNow lets check if we provide enough variety in those categories. We are targeting **Sci-Fi** and **Fantasy** fans. Our catalog should be as complete as possible.\n**Q:**Do we provide enough variety ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:39.267",
+      "dateUpdated": "2018-08-09 12:05:35.134",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -781,8 +1179,8 @@
       "jobName": "paragraph_1533124749016_270825197",
       "id": "20180801-115909_1683741481",
       "dateCreated": "2018-08-01 11:59:09.016",
-      "dateStarted": "2018-08-04 12:48:39.369",
-      "dateFinished": "2018-08-04 12:48:39.382",
+      "dateStarted": "2018-08-09 12:05:35.230",
+      "dateFinished": "2018-08-09 12:05:35.247",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -790,7 +1188,7 @@
       "title": "Variety by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Profitability Potential`, count(*) as Items from books group by category order by Items ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:22.019",
+      "dateUpdated": "2018-08-09 12:16:02.300",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -890,19 +1288,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d6"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533117550819_603861426",
       "id": "20180730-075735_302224287",
       "dateCreated": "2018-08-01 09:59:10.819",
-      "dateStarted": "2018-08-04 12:48:39.538",
-      "dateFinished": "2018-08-04 12:48:41.454",
+      "dateStarted": "2018-08-09 12:05:35.450",
+      "dateFinished": "2018-08-09 12:05:36.780",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \n    The variety chart shows that we have covered **Sci-Fi** and **Fantasy** fans but also we have substential variety **Romance** and **Children** books.\nWe might want to explore the profitability potential those two categories. \nLets get back and click *settings* above and deselect *items* the chart now presents the profitability potential of those books. \nIt looks like  **Romance** and **Children** are not very profitable, but **Classics** are. \n\nAs a result from this quick anlysis we already can make a decision for improvement in the future. Like how our customers like the new changes?; are they going to buy those books? etc.\n\nLet try to identify who our customers are in the next section. ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:41.457",
+      "dateUpdated": "2018-08-09 12:05:36.863",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -935,15 +1345,15 @@
       "jobName": "paragraph_1533125061581_1211657390",
       "id": "20180801-120421_1033634006",
       "dateCreated": "2018-08-01 12:04:21.582",
-      "dateStarted": "2018-08-04 12:48:41.597",
-      "dateFinished": "2018-08-04 12:48:41.631",
+      "dateStarted": "2018-08-09 12:05:36.955",
+      "dateFinished": "2018-08-09 12:05:36.977",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n### Customers\nIn this section we will try to identify who our customers are ? what are their preferences? how likely is for them to buy somethin out of their main focus. \n\nLets try to make a demographical profile of our customers. \n\n**Q:**Who is our customer ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:41.692",
+      "dateUpdated": "2018-08-09 12:05:37.051",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -976,8 +1386,8 @@
       "jobName": "paragraph_1533125807100_-594332642",
       "id": "20180801-121647_1961203969",
       "dateCreated": "2018-08-01 12:16:47.100",
-      "dateStarted": "2018-08-04 12:48:41.796",
-      "dateFinished": "2018-08-04 12:48:41.814",
+      "dateStarted": "2018-08-09 12:05:37.143",
+      "dateFinished": "2018-08-09 12:05:37.162",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -985,7 +1395,7 @@
       "title": "Loading customers ...",
       "text": "// Load Customers\nval pushdown_query\u003d\"(select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\"\nval df_customers \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_customers.createOrReplaceTempView(\"customers\")\ndf_customers.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:41.886",
+      "dateUpdated": "2018-08-09 12:05:37.243",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1019,8 +1429,8 @@
       "jobName": "paragraph_1533118971475_1061980290",
       "id": "20180801-102251_1563285806",
       "dateCreated": "2018-08-01 10:22:51.476",
-      "dateStarted": "2018-08-04 12:48:41.962",
-      "dateFinished": "2018-08-04 12:48:43.067",
+      "dateStarted": "2018-08-09 12:05:37.365",
+      "dateFinished": "2018-08-09 12:05:38.159",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1028,7 +1438,7 @@
       "title": "Customer Profile",
       "text": "%sql\nselect  age, ms_type, count(1) as cnt from customers group by age, ms_type",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:22.154",
+      "dateUpdated": "2018-08-09 12:16:02.508",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -1126,23 +1536,39 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "age\tms_type\tcnt\n76\tMarried\t8184\n101\tDivorced\t2\n85\tSeparated\t3\n57\tWidow\t757\n25\tDivorced\t175\n30\tSeparated\t277\n73\tDivorced\t2064\n66\tNever married\t1079\n79\tMarried\t4214\n27\tDivorced\t165\n85\tDivorced\t131\n69\tWidow\t1819\n47\tDivorced\t3744\n42\tNever married\t7790\n89\tMarried\t566\n22\tDivorced\t13\n60\tDivorced\t4166\n54\tWidow\t812\n82\tNever married\t345\n46\tNever married\t7488\n98\tNever married\t31\n91\tWidow\t792\n31\tWidow\t30\n61\tMarried\t15493\n44\tDivorced\t3435\n48\tSeparated\t756\n52\tWidow\t355\n46\tDivorced\t3745\n87\tDivorced\t70\n67\tSeparated\t166\n75\tWidow\t3793\n72\tSeparated\t138\n88\tSeparated\t2\n14\tNever married\t8372\n33\tMarried\t8432\n12\tNever married\t5077\n63\tNever married\t2157\n67\tMarried\t9462\n87\tSeparated\t3\n90\tDivorced\t44\n56\tMarried\t16941\n40\tNever married\t7126\n61\tNever married\t2523\n73\tMarried\t9019\n94\tWidow\t537\n91\tNever married\t78\n47\tMarried\t13791\n34\tNever married\t10603\n65\tDivorced\t3412\n71\tWidow\t2132\n56\tWidow\t714\n34\tWidow\t68\n20\tSeparated\t23\n50\tMarried\t15478\n74\tMarried\t9508\n62\tSeparated\t323\n99\tWidow\t139\n40\tDivorced\t1969\n74\tSeparated\t118\n22\tSeparated\t17\n87\tWidow\t686\n27\tMarried\t3903\n80\tSeparated\t40\n100\tWidow\t181\n28\tSeparated\t161\n75\tSeparated\t118\n47\tNever married\t7375\n17\tNever married\t12691\n85\tMarried\t947\n51\tNever married\t6157\n95\tDivorced\t15\n88\tDivorced\t157\n60\tSeparated\t346\n35\tSeparated\t525\n15\tMarried\t4\n44\tWidow\t197\n94\tMarried\t163\n77\tSeparated\t64\n80\tWidow\t2878\n24\tDivorced\t128\n32\tNever married\t12478\n55\tNever married\t4651\n22\tMarried\t505\n93\tWidow\t543\n33\tSeparated\t300\n101\tWidow\t49\n18\tMarried\t7\n101\tMarried\t18\n67\tDivorced\t2469\n69\tDivorced\t1978\n29\tSeparated\t377\n72\tWidow\t2329\n82\tDivorced\t472\n46\tMarried\t13844\n72\tDivorced\t2191\n32\tMarried\t7856\n80\tNever married\t415\n61\tDivorced\t4593\n38\tSeparated\t481\n23\tDivorced\t17\n96\tWidow\t445\n55\tDivorced\t5910\n48\tDivorced\t3890\n86\tDivorced\t157\n65\tMarried\t13061\n81\tWidow\t2715\n51\tDivorced\t4976\n27\tNever married\t18104\n79\tWidow\t3517\n86\tWidow\t1709\n63\tSeparated\t361\n96\tSeparated\t1\n74\tNever married\t838\n55\tWidow\t799\n11\tNever married\t4430\n81\tNever married\t388\n71\tMarried\t9363\n29\tNever married\t13331\n20\tMarried\t505\n57\tNever married\t4653\n52\tSeparated\t721\n21\tMarried\t524\n44\tSeparated\t669\n23\tSeparated\t22\n84\tDivorced\t181\n69\tSeparated\t129\n90\tNever married\t74\n43\tWidow\t81\n21\tSeparated\t19\n34\tSeparated\t538\n73\tSeparated\t112\n21\tWidow\t1\n37\tNever married\t10089\n30\tDivorced\t616\n33\tDivorced\t685\n97\tSeparated\t1\n38\tMarried\t10107\n54\tSeparated\t689\n22\tWidow\t1\n29\tDivorced\t653\n89\tDivorced\t92\n28\tWidow\t8\n68\tDivorced\t2165\n66\tWidow\t1417\n22\tNever married\t16064\n67\tNever married\t993\n76\tSeparated\t80\n64\tSeparated\t278\n30\tMarried\t7613\n35\tNever married\t10707\n74\tDivorced\t1877\n49\tMarried\t15955\n68\tSeparated\t151\n50\tSeparated\t730\n62\tWidow\t1036\n58\tMarried\t18048\n97\tMarried\t186\n71\tDivorced\t2099\n60\tNever married\t2243\n31\tSeparated\t334\n40\tMarried\t10785\n59\tWidow\t1136\n92\tWidow\t616\n71\tNever married\t862\n78\tMarried\t4805\n45\tDivorced\t3545\n89\tWidow\t1767\n13\tNever married\t7003\n25\tMarried\t3582\n49\tDivorced\t4992\n25\tSeparated\t136\n60\tMarried\t14302\n38\tDivorced\t1265\n27\tSeparated\t131\n90\tMarried\t306\n26\tWidow\t6\n41\tDivorced\t2068\n23\tMarried\t515\n39\tNever married\t7108\n41\tMarried\t11461\n62\tNever married\t2325\n39\tDivorced\t2056\n59\tDivorced\t4776\n66\tSeparated\t199\n41\tNever married\t7390\n91\tSeparated\t4\n70\tSeparated\t122\n62\tDivorced\t4218\n54\tNever married\t4721\n76\tDivorced\t1597\n30\tWidow\t27\n28\tDivorced\t169\n80\tDivorced\t560\n51\tSeparated\t796\n18\tNever married\t13490\n78\tNever married\t412\n32\tWidow\t30\n70\tNever married\t799\n88\tWidow\t1280\n95\tNever married\t44\n92\tDivorced\t25\n42\tWidow\t95\n65\tWidow\t1695\n77\tWidow\t2336\n16\tMarried\t3\n90\tSeparated\t3\n64\tMarried\t14494\n84\tMarried\t1404\n53\tSeparated\t745\n61\tSeparated\t364\n39\tMarried\t10567\n39\tSeparated\t528\n75\tMarried\t8855\n84\tNever married\t211\n38\tWidow\t49\n42\tMarried\t11719\n36\tMarried\t11296\n34\tDivorced\t1507\n69\tNever married\t780\n57\tDivorced\t5711\n95\tMarried\t141\n36\tNever married\t10342\n43\tSeparated\t515\n44\tNever married\t6704\n74\tWidow\t4098\n78\tDivorced\t975\n25\tWidow\t8\n56\tSeparated\t611\n31\tDivorced\t680\n86\tNever married\t172\n99\tMarried\t44\n20\tDivorced\t17\n32\tSeparated\t320\n14\tMarried\t5\n36\tDivorced\t1433\n93\tNever married\t57\n68\tMarried\t8454\n35\tDivorced\t1523\n19\tWidow\t2\n64\tNever married\t1517\n58\tSeparated\t659\n33\tWidow\t30\n50\tDivorced\t4810\n96\tNever married\t36\n101\tNever married\t4\n63\tDivorced\t4114\n28\tNever married\t16497\n54\tDivorced\t5655\n71\tSeparated\t132\n52\tNever married\t5963\n75\tNever married\t800\n93\tDivorced\t29\n50\tWidow\t399\n47\tSeparated\t722\n78\tSeparated\t58\n79\tSeparated\t39\n99\tNever married\t13\n82\tMarried\t2989\n10\tNever married\t3338\n46\tWidow\t193\n93\tMarried\t193\n100\tMarried\t57\n98\tDivorced\t18\n95\tWidow\t444\n24\tNever married\t13410\n53\tDivorced\t4964\n96\tMarried\t137\n75\tDivorced\t1784\n92\tMarried\t211\n45\tMarried\t13228\n68\tNever married\t948\n80\tMarried\t3835\n9\tNever married\t3766\n32\tDivorced\t626\n37\tMarried\t10933\n76\tNever married\t726\n34\tMarried\t11627\n70\tDivorced\t1916\n91\tMarried\t268\n85\tNever married\t149\n83\tWidow\t2435\n53\tWidow\t425\n81\tDivorced\t526\n46\tSeparated\t743\n45\tWidow\t182\n73\tWidow\t2067\n66\tDivorced\t2584\n60\tWidow\t1041\n97\tNever married\t45\n19\tSeparated\t17\n99\tDivorced\t8\n35\tMarried\t11982\n49\tSeparated\t779\n50\tNever married\t6131\n79\tNever married\t452\n51\tMarried\t15391\n83\tNever married\t315\n76\tWidow\t3572\n28\tMarried\t3631\n45\tSeparated\t696\n96\tDivorced\t18\n17\tMarried\t10\n24\tWidow\t4\n54\tMarried\t17647\n36\tSeparated\t482\n24\tSeparated\t106\n53\tMarried\t16013\n97\tDivorced\t29\n77\tDivorced\t1143\n58\tDivorced\t5796\n79\tDivorced\t658\n36\tWidow\t50\n88\tNever married\t154\n49\tWidow\t398\n57\tMarried\t17863\n45\tNever married\t7090\n85\tWidow\t1378\n89\tSeparated\t1\n26\tMarried\t3868\n68\tWidow\t1079\n19\tDivorced\t12\n58\tNever married\t4728\n86\tSeparated\t10\n77\tMarried\t5596\n8\tNever married\t3259\n57\tSeparated\t589\n37\tSeparated\t502\n82\tSeparated\t28\n48\tMarried\t14329\n64\tWidow\t1775\n61\tWidow\t1092\n87\tMarried\t472\n35\tWidow\t66\n83\tMarried\t2990\n63\tMarried\t13516\n21\tNever married\t14857\n48\tWidow\t198\n56\tNever married\t4484\n38\tNever married\t9164\n51\tWidow\t360\n49\tNever married\t6115\n24\tMarried\t3021\n59\tNever married\t2652\n16\tNever married\t10944\n15\tNever married\t8905\n91\tDivorced\t57\n48\tNever married\t7568\n94\tSeparated\t3\n70\tMarried\t8689\n25\tNever married\t15899\n72\tNever married\t915\n55\tMarried\t18115\n30\tNever married\t11908\n29\tWidow\t30\n100\tDivorced\t10\n64\tDivorced\t3635\n42\tDivorced\t2205\n41\tWidow\t105\n26\tNever married\t16992\n55\tSeparated\t701\n83\tDivorced\t453\n19\tMarried\t511\n98\tMarried\t146\n102\tWidow\t39\n37\tWidow\t59\n26\tSeparated\t157\n72\tMarried\t10358\n47\tWidow\t196\n102\tMarried\t15\n43\tDivorced\t2168\n70\tWidow\t1977\n21\tDivorced\t8\n23\tWidow\t1\n62\tMarried\t14383\n59\tMarried\t16549\n59\tSeparated\t411\n69\tMarried\t8526\n100\tNever married\t19\n95\tSeparated\t2\n78\tWidow\t2059\n20\tNever married\t15351\n86\tMarried\t1202\n26\tDivorced\t173\n31\tMarried\t8680\n29\tMarried\t8616\n53\tNever married\t6327\n65\tNever married\t1354\n93\tSeparated\t3\n37\tDivorced\t1370\n23\tNever married\t17255\n67\tWidow\t1247\n88\tMarried\t935\n84\tWidow\t2008\n83\tSeparated\t35\n65\tSeparated\t246\n43\tMarried\t10718\n40\tSeparated\t563\n58\tWidow\t789\n81\tMarried\t3294\n89\tNever married\t160\n94\tNever married\t57\n27\tWidow\t12\n66\tMarried\t10564\n102\tNever married\t1\n43\tNever married\t7027\n97\tWidow\t579\n92\tNever married\t53\n98\tSeparated\t1\n52\tDivorced\t4834\n87\tNever married\t73\n56\tDivorced\t5446\n98\tWidow\t450\n81\tSeparated\t23\n52\tMarried\t15345\n41\tSeparated\t619\n33\tNever married\t13493\n90\tWidow\t849\n31\tNever married\t13738\n39\tWidow\t69\n20\tWidow\t1\n19\tNever married\t13576\n42\tSeparated\t594\n77\tNever married\t519\n40\tWidow\t78\n16\tDivorced\t1\n44\tMarried\t12736\n73\tNever married\t820\n84\tSeparated\t7\n82\tWidow\t2465\n94\tDivorced\t27\n63\tWidow\t937\n"
+            "data": "age\tms_type\tcnt\n76\tMarried\t8184\n85\tSeparated\t3\n101\tDivorced\t2\n57\tWidow\t757\n25\tDivorced\t175\n30\tSeparated\t277\n66\tNever married\t1079\n73\tDivorced\t2064\n79\tMarried\t4214\n85\tDivorced\t131\n27\tDivorced\t165\n69\tWidow\t1819\n47\tDivorced\t3744\n42\tNever married\t7790\n89\tMarried\t566\n22\tDivorced\t13\n60\tDivorced\t4166\n82\tNever married\t345\n54\tWidow\t812\n46\tNever married\t7488\n91\tWidow\t792\n98\tNever married\t31\n31\tWidow\t30\n61\tMarried\t15493\n44\tDivorced\t3435\n48\tSeparated\t756\n52\tWidow\t355\n46\tDivorced\t3745\n67\tSeparated\t166\n87\tDivorced\t70\n75\tWidow\t3793\n72\tSeparated\t138\n88\tSeparated\t2\n33\tMarried\t8432\n12\tNever married\t5077\n14\tNever married\t8372\n67\tMarried\t9462\n63\tNever married\t2157\n90\tDivorced\t44\n87\tSeparated\t3\n73\tMarried\t9019\n40\tNever married\t7126\n56\tMarried\t16941\n61\tNever married\t2523\n94\tWidow\t537\n91\tNever married\t78\n47\tMarried\t13791\n34\tNever married\t10603\n65\tDivorced\t3412\n71\tWidow\t2132\n56\tWidow\t714\n34\tWidow\t68\n20\tSeparated\t23\n74\tMarried\t9508\n50\tMarried\t15478\n99\tWidow\t139\n62\tSeparated\t323\n40\tDivorced\t1969\n74\tSeparated\t118\n22\tSeparated\t17\n87\tWidow\t686\n27\tMarried\t3903\n80\tSeparated\t40\n100\tWidow\t181\n28\tSeparated\t161\n75\tSeparated\t118\n47\tNever married\t7375\n17\tNever married\t12691\n85\tMarried\t947\n51\tNever married\t6157\n95\tDivorced\t15\n88\tDivorced\t157\n35\tSeparated\t525\n60\tSeparated\t346\n15\tMarried\t4\n44\tWidow\t197\n94\tMarried\t163\n77\tSeparated\t64\n80\tWidow\t2878\n24\tDivorced\t128\n32\tNever married\t12478\n55\tNever married\t4651\n33\tSeparated\t300\n93\tWidow\t543\n22\tMarried\t505\n101\tWidow\t49\n101\tMarried\t18\n18\tMarried\t7\n67\tDivorced\t2469\n69\tDivorced\t1978\n29\tSeparated\t377\n82\tDivorced\t472\n72\tWidow\t2329\n46\tMarried\t13844\n72\tDivorced\t2191\n61\tDivorced\t4593\n32\tMarried\t7856\n80\tNever married\t415\n38\tSeparated\t481\n23\tDivorced\t17\n55\tDivorced\t5910\n96\tWidow\t445\n48\tDivorced\t3890\n86\tDivorced\t157\n65\tMarried\t13061\n81\tWidow\t2715\n51\tDivorced\t4976\n27\tNever married\t18104\n79\tWidow\t3517\n86\tWidow\t1709\n63\tSeparated\t361\n96\tSeparated\t1\n74\tNever married\t838\n81\tNever married\t388\n11\tNever married\t4430\n55\tWidow\t799\n71\tMarried\t9363\n29\tNever married\t13331\n57\tNever married\t4653\n44\tSeparated\t669\n21\tMarried\t524\n84\tDivorced\t181\n20\tMarried\t505\n52\tSeparated\t721\n23\tSeparated\t22\n69\tSeparated\t129\n90\tNever married\t74\n43\tWidow\t81\n21\tSeparated\t19\n34\tSeparated\t538\n73\tSeparated\t112\n21\tWidow\t1\n37\tNever married\t10089\n33\tDivorced\t685\n30\tDivorced\t616\n97\tSeparated\t1\n54\tSeparated\t689\n38\tMarried\t10107\n22\tWidow\t1\n29\tDivorced\t653\n89\tDivorced\t92\n28\tWidow\t8\n68\tDivorced\t2165\n66\tWidow\t1417\n22\tNever married\t16064\n67\tNever married\t993\n76\tSeparated\t80\n64\tSeparated\t278\n30\tMarried\t7613\n35\tNever married\t10707\n74\tDivorced\t1877\n49\tMarried\t15955\n68\tSeparated\t151\n50\tSeparated\t730\n58\tMarried\t18048\n71\tDivorced\t2099\n60\tNever married\t2243\n62\tWidow\t1036\n97\tMarried\t186\n31\tSeparated\t334\n40\tMarried\t10785\n59\tWidow\t1136\n92\tWidow\t616\n71\tNever married\t862\n78\tMarried\t4805\n13\tNever married\t7003\n25\tMarried\t3582\n45\tDivorced\t3545\n89\tWidow\t1767\n49\tDivorced\t4992\n25\tSeparated\t136\n60\tMarried\t14302\n90\tMarried\t306\n38\tDivorced\t1265\n27\tSeparated\t131\n26\tWidow\t6\n41\tDivorced\t2068\n23\tMarried\t515\n39\tNever married\t7108\n41\tMarried\t11461\n62\tNever married\t2325\n39\tDivorced\t2056\n59\tDivorced\t4776\n66\tSeparated\t199\n41\tNever married\t7390\n91\tSeparated\t4\n70\tSeparated\t122\n62\tDivorced\t4218\n76\tDivorced\t1597\n54\tNever married\t4721\n30\tWidow\t27\n28\tDivorced\t169\n80\tDivorced\t560\n51\tSeparated\t796\n18\tNever married\t13490\n78\tNever married\t412\n32\tWidow\t30\n70\tNever married\t799\n88\tWidow\t1280\n92\tDivorced\t25\n42\tWidow\t95\n95\tNever married\t44\n65\tWidow\t1695\n77\tWidow\t2336\n16\tMarried\t3\n90\tSeparated\t3\n64\tMarried\t14494\n84\tMarried\t1404\n53\tSeparated\t745\n61\tSeparated\t364\n75\tMarried\t8855\n39\tMarried\t10567\n84\tNever married\t211\n39\tSeparated\t528\n38\tWidow\t49\n42\tMarried\t11719\n36\tMarried\t11296\n34\tDivorced\t1507\n69\tNever married\t780\n57\tDivorced\t5711\n36\tNever married\t10342\n43\tSeparated\t515\n95\tMarried\t141\n74\tWidow\t4098\n44\tNever married\t6704\n78\tDivorced\t975\n25\tWidow\t8\n56\tSeparated\t611\n31\tDivorced\t680\n86\tNever married\t172\n99\tMarried\t44\n20\tDivorced\t17\n32\tSeparated\t320\n14\tMarried\t5\n36\tDivorced\t1433\n93\tNever married\t57\n68\tMarried\t8454\n35\tDivorced\t1523\n19\tWidow\t2\n64\tNever married\t1517\n58\tSeparated\t659\n33\tWidow\t30\n50\tDivorced\t4810\n96\tNever married\t36\n101\tNever married\t4\n63\tDivorced\t4114\n28\tNever married\t16497\n54\tDivorced\t5655\n71\tSeparated\t132\n52\tNever married\t5963\n75\tNever married\t800\n50\tWidow\t399\n47\tSeparated\t722\n93\tDivorced\t29\n78\tSeparated\t58\n79\tSeparated\t39\n99\tNever married\t13\n82\tMarried\t2989\n10\tNever married\t3338\n93\tMarried\t193\n100\tMarried\t57\n98\tDivorced\t18\n46\tWidow\t193\n95\tWidow\t444\n24\tNever married\t13410\n53\tDivorced\t4964\n96\tMarried\t137\n75\tDivorced\t1784\n92\tMarried\t211\n45\tMarried\t13228\n80\tMarried\t3835\n68\tNever married\t948\n9\tNever married\t3766\n37\tMarried\t10933\n32\tDivorced\t626\n76\tNever married\t726\n70\tDivorced\t1916\n34\tMarried\t11627\n91\tMarried\t268\n85\tNever married\t149\n83\tWidow\t2435\n81\tDivorced\t526\n53\tWidow\t425\n46\tSeparated\t743\n45\tWidow\t182\n73\tWidow\t2067\n60\tWidow\t1041\n66\tDivorced\t2584\n97\tNever married\t45\n19\tSeparated\t17\n99\tDivorced\t8\n35\tMarried\t11982\n49\tSeparated\t779\n50\tNever married\t6131\n79\tNever married\t452\n51\tMarried\t15391\n83\tNever married\t315\n76\tWidow\t3572\n28\tMarried\t3631\n45\tSeparated\t696\n96\tDivorced\t18\n17\tMarried\t10\n24\tWidow\t4\n54\tMarried\t17647\n36\tSeparated\t482\n24\tSeparated\t106\n53\tMarried\t16013\n97\tDivorced\t29\n77\tDivorced\t1143\n58\tDivorced\t5796\n79\tDivorced\t658\n36\tWidow\t50\n88\tNever married\t154\n49\tWidow\t398\n45\tNever married\t7090\n57\tMarried\t17863\n85\tWidow\t1378\n89\tSeparated\t1\n26\tMarried\t3868\n68\tWidow\t1079\n19\tDivorced\t12\n58\tNever married\t4728\n86\tSeparated\t10\n77\tMarried\t5596\n8\tNever married\t3259\n57\tSeparated\t589\n37\tSeparated\t502\n82\tSeparated\t28\n48\tMarried\t14329\n87\tMarried\t472\n64\tWidow\t1775\n61\tWidow\t1092\n35\tWidow\t66\n83\tMarried\t2990\n63\tMarried\t13516\n21\tNever married\t14857\n48\tWidow\t198\n49\tNever married\t6115\n56\tNever married\t4484\n38\tNever married\t9164\n51\tWidow\t360\n24\tMarried\t3021\n16\tNever married\t10944\n59\tNever married\t2652\n15\tNever married\t8905\n91\tDivorced\t57\n48\tNever married\t7568\n94\tSeparated\t3\n70\tMarried\t8689\n25\tNever married\t15899\n72\tNever married\t915\n55\tMarried\t18115\n30\tNever married\t11908\n29\tWidow\t30\n100\tDivorced\t10\n64\tDivorced\t3635\n42\tDivorced\t2205\n41\tWidow\t105\n26\tNever married\t16992\n55\tSeparated\t701\n19\tMarried\t511\n83\tDivorced\t453\n98\tMarried\t146\n37\tWidow\t59\n102\tWidow\t39\n26\tSeparated\t157\n72\tMarried\t10358\n47\tWidow\t196\n102\tMarried\t15\n43\tDivorced\t2168\n70\tWidow\t1977\n21\tDivorced\t8\n23\tWidow\t1\n62\tMarried\t14383\n59\tMarried\t16549\n59\tSeparated\t411\n69\tMarried\t8526\n100\tNever married\t19\n95\tSeparated\t2\n78\tWidow\t2059\n20\tNever married\t15351\n86\tMarried\t1202\n26\tDivorced\t173\n29\tMarried\t8616\n31\tMarried\t8680\n53\tNever married\t6327\n65\tNever married\t1354\n93\tSeparated\t3\n37\tDivorced\t1370\n23\tNever married\t17255\n67\tWidow\t1247\n88\tMarried\t935\n65\tSeparated\t246\n84\tWidow\t2008\n83\tSeparated\t35\n43\tMarried\t10718\n58\tWidow\t789\n81\tMarried\t3294\n40\tSeparated\t563\n89\tNever married\t160\n94\tNever married\t57\n27\tWidow\t12\n66\tMarried\t10564\n102\tNever married\t1\n43\tNever married\t7027\n97\tWidow\t579\n92\tNever married\t53\n98\tSeparated\t1\n52\tDivorced\t4834\n87\tNever married\t73\n56\tDivorced\t5446\n98\tWidow\t450\n81\tSeparated\t23\n52\tMarried\t15345\n41\tSeparated\t619\n33\tNever married\t13493\n90\tWidow\t849\n31\tNever married\t13738\n39\tWidow\t69\n20\tWidow\t1\n19\tNever married\t13576\n77\tNever married\t519\n42\tSeparated\t594\n40\tWidow\t78\n16\tDivorced\t1\n44\tMarried\t12736\n73\tNever married\t820\n84\tSeparated\t7\n82\tWidow\t2465\n94\tDivorced\t27\n63\tWidow\t937\n"
           }
         ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d7",
+            "http://10.5.0.6:4040/jobs/job?id\u003d8",
+            "http://10.5.0.6:4040/jobs/job?id\u003d9",
+            "http://10.5.0.6:4040/jobs/job?id\u003d10",
+            "http://10.5.0.6:4040/jobs/job?id\u003d11"
+          ],
+          "interpreterSettingId": "spark"
+        }
       },
       "apps": [],
       "jobName": "paragraph_1533117550820_746846349",
       "id": "20180727-135426_1794137245",
       "dateCreated": "2018-08-01 09:59:10.820",
-      "dateStarted": "2018-08-04 12:48:43.170",
-      "dateFinished": "2018-08-04 12:48:46.610",
+      "dateStarted": "2018-08-09 12:05:38.326",
+      "dateFinished": "2018-08-09 12:05:41.051",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nThose we demographics only. But we want to know more about their bying habbits.\nHow much they buy?\nHow much they spend? \nWhat do they buy?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:46.708",
+      "dateUpdated": "2018-08-09 12:05:41.127",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1162,21 +1588,29 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThose we demographics only. But we want to know more about their bying habbits.\u003cbr/\u003eHow much they buy?\u003cbr/\u003eHow much they spend?\u003cbr/\u003eWhat do they buy?\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
       "apps": [],
       "jobName": "paragraph_1533126395619_-1536635498",
       "id": "20180801-122635_101901758",
       "dateCreated": "2018-08-01 12:26:35.619",
-      "dateStarted": "2018-08-04 12:48:46.819",
-      "dateFinished": "2018-08-04 12:48:46.831",
+      "dateStarted": "2018-08-09 12:05:41.226",
+      "dateFinished": "2018-08-09 12:05:41.241",
       "status": "FINISHED",
-      "errorMessage": "",
       "progressUpdateIntervalMs": 500
     },
     {
       "title": "Loading orders ...",
       "text": "// Load Transactions\nval pushdown_query \u003d \"(SELECT count(t.order_id) orders, SUM(t.price), SUM(t.discounted_price) Amount, t.customer_id,  c.customer_nm, c.sex, c.age, ms.ms_type FROM transactions as t INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN maritalstatuses ms ON ms.ms_id \u003d c.ms_id GROUP BY  t.customer_id, c.customer_nm, c.sex, c.age, ms.ms_type ORDER BY orders desc) as t\"\nval df_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_orders.createOrReplaceTempView(\"transactions\")\ndf_orders.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:46.919",
+      "dateUpdated": "2018-08-09 12:05:41.318",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1210,15 +1644,15 @@
       "jobName": "paragraph_1533119033774_-1792010973",
       "id": "20180801-102353_795574613",
       "dateCreated": "2018-08-01 10:23:53.774",
-      "dateStarted": "2018-08-04 12:48:47.018",
-      "dateFinished": "2018-08-04 12:48:48.103",
+      "dateStarted": "2018-08-09 12:05:41.437",
+      "dateFinished": "2018-08-09 12:05:42.252",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nBut lets start with the biggest question. \n**Q:**Who spends more men or women ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:48.134",
+      "dateUpdated": "2018-08-09 12:05:42.338",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1251,8 +1685,8 @@
       "jobName": "paragraph_1533127136266_-1528064023",
       "id": "20180801-123856_489038421",
       "dateCreated": "2018-08-01 12:38:56.267",
-      "dateStarted": "2018-08-04 12:48:48.236",
-      "dateFinished": "2018-08-04 12:48:48.244",
+      "dateStarted": "2018-08-09 12:05:42.433",
+      "dateFinished": "2018-08-09 12:05:42.454",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1260,7 +1694,7 @@
       "title": "Orders Distribution by Sex",
       "text": "%sql\nSELECT SUM(orders) as Orders, sexname(sex) Sex FROM transactions group by sexName(sex)  ORDER by Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:48:48.336",
+      "dateUpdated": "2018-08-09 12:05:42.529",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1344,12 +1778,24 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d12"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533117550839_672305718",
       "id": "20180730-133456_361425748",
       "dateCreated": "2018-08-01 09:59:10.839",
-      "dateStarted": "2018-08-04 12:48:48.399",
-      "dateFinished": "2018-08-04 12:49:04.358",
+      "dateStarted": "2018-08-09 12:05:42.621",
+      "dateFinished": "2018-08-09 12:05:56.156",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1357,7 +1803,7 @@
       "title": "Top Buyers Distribution by Sex",
       "text": "%sql\nSELECT * FROM (SELECT max(orders) as Orders, customer_nm ,customer_id, sexname(sex) as Sex, age, ms_type  FROM transactions group by customer_nm, customer_id, Sex, age, ms_type order by Orders desc limit 10) x order by x.Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:04.454",
+      "dateUpdated": "2018-08-09 12:05:56.228",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1451,19 +1897,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d13"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533117550842_1876574702",
       "id": "20180730-125045_1914095396",
       "dateCreated": "2018-08-01 09:59:10.842",
-      "dateStarted": "2018-08-04 12:49:04.542",
-      "dateFinished": "2018-08-04 12:49:28.424",
+      "dateStarted": "2018-08-09 12:05:56.315",
+      "dateFinished": "2018-08-09 12:06:16.487",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nIt looks like women buy more.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:28.457",
+      "dateUpdated": "2018-08-09 12:06:16.571",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -1496,15 +1954,15 @@
       "jobName": "paragraph_1533127245434_1564947495",
       "id": "20180801-124045_109483302",
       "dateCreated": "2018-08-01 12:40:45.434",
-      "dateStarted": "2018-08-04 12:49:28.559",
-      "dateFinished": "2018-08-04 12:49:28.573",
+      "dateStarted": "2018-08-09 12:06:16.825",
+      "dateFinished": "2018-08-09 12:06:16.871",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nBut men lead the cart of most orders per person.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:28.657",
+      "dateUpdated": "2018-08-09 12:06:16.891",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -1537,15 +1995,15 @@
       "jobName": "paragraph_1533127296043_1006665845",
       "id": "20180801-124136_268623677",
       "dateCreated": "2018-08-01 12:41:36.043",
-      "dateStarted": "2018-08-04 12:49:28.794",
-      "dateFinished": "2018-08-04 12:49:28.809",
+      "dateStarted": "2018-08-09 12:06:17.043",
+      "dateFinished": "2018-08-09 12:06:17.085",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n**Q:**But do the young read more than seniores ? \nLets find out.",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:28.889",
+      "dateUpdated": "2018-08-09 12:06:17.139",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1578,15 +2036,15 @@
       "jobName": "paragraph_1533127584842_878866392",
       "id": "20180801-124624_825159555",
       "dateCreated": "2018-08-01 12:46:24.843",
-      "dateStarted": "2018-08-04 12:49:28.969",
-      "dateFinished": "2018-08-04 12:49:28.989",
+      "dateStarted": "2018-08-09 12:06:17.312",
+      "dateFinished": "2018-08-09 12:06:17.344",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:29.065",
+      "dateUpdated": "2018-08-09 12:06:17.411",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1617,7 +2075,7 @@
       "title": "Order Distribution by Age",
       "text": "%sql\nSELECT age,sum(orders) as Orders, AVG(amount) as `Cart Amount`, sexname(sex) Sex FROM transactions group by age,sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:22.515",
+      "dateUpdated": "2018-08-09 12:16:02.967",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1722,23 +2180,39 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "age\tOrders\tCart Amount\tSex\n71\t76973\t110.966367\tMale\n58\t170372\t108.830301\tFemale\n85\t14730\t110.653964\tFemale\n101\t330\t108.827333\tFemale\n45\t129086\t109.794006\tMale\n62\t125657\t110.059232\tFemale\n61\t135711\t109.664341\tFemale\n77\t55726\t111.156700\tFemale\n91\t6404\t102.066874\tFemale\n24\t87083\t109.178492\tMale\n77\t49466\t107.910039\tMale\n30\t116409\t109.061997\tFemale\n84\t20880\t108.359896\tFemale\n96\t3222\t105.857467\tMale\n14\t43632\t110.034109\tMale\n18\t77426\t109.231111\tFemale\n31\t134807\t111.417227\tFemale\n78\t47015\t109.631587\tFemale\n83\t35141\t110.071309\tFemale\n100\t1564\t123.327874\tMale\n10\t19326\t112.970667\tFemale\n34\t126099\t108.741798\tMale\n23\t101909\t109.521257\tFemale\n48\t150928\t109.492428\tFemale\n15\t46789\t109.627773\tMale\n40\t119136\t112.227786\tFemale\n57\t165294\t108.994111\tFemale\n48\t143093\t110.462033\tMale\n102\t252\t91.441481\tMale\n42\t128659\t109.920359\tFemale\n26\t120008\t108.791114\tFemale\n37\t120875\t109.849190\tMale\n97\t4906\t108.898929\tFemale\n12\t28914\t108.189880\tFemale\n70\t77416\t110.776546\tFemale\n25\t113686\t109.801803\tFemale\n49\t161530\t110.464231\tFemale\n67\t81789\t108.712221\tFemale\n76\t74120\t109.181145\tMale\n19\t72608\t108.203808\tMale\n73\t80613\t110.424587\tFemale\n61\t126370\t108.177024\tMale\n16\t63636\t109.828078\tFemale\n33\t121622\t111.235612\tMale\n38\t119635\t108.974096\tFemale\n81\t40609\t111.983561\tFemale\n82\t37557\t113.206523\tFemale\n66\t91890\t110.701114\tFemale\n58\t157645\t109.670637\tMale\n70\t70912\t108.759592\tMale\n96\t3696\t110.382012\tFemale\n11\t24893\t107.233394\tFemale\n86\t17929\t114.837931\tMale\n69\t71466\t113.326331\tMale\n90\t7059\t114.079526\tMale\n28\t116132\t109.704348\tFemale\n32\t111594\t109.219060\tMale\n51\t146245\t109.605946\tMale\n50\t155125\t109.094343\tFemale\n46\t139304\t109.449047\tMale\n53\t151639\t110.632022\tMale\n67\t73866\t108.617424\tMale\n20\t83528\t109.967468\tMale\n12\t26140\t108.519265\tMale\n9\t20288\t105.980755\tFemale\n64\t124963\t109.911314\tFemale\n30\t108263\t110.565479\tMale\n19\t82082\t110.723592\tFemale\n47\t146901\t108.999292\tFemale\n29\t130972\t110.146091\tFemale\n43\t118928\t110.213614\tFemale\n59\t145888\t110.669175\tFemale\n78\t44334\t109.728229\tMale\n51\t157840\t109.873116\tFemale\n89\t13790\t111.341496\tMale\n34\t140002\t109.725868\tFemale\n64\t113909\t109.621122\tMale\n100\t1394\t101.940286\tFemale\n87\t7121\t111.614364\tMale\n17\t66620\t111.079256\tMale\n40\t108301\t110.445115\tMale\n42\t117356\t109.954268\tMale\n65\t103574\t108.450511\tMale\n68\t74319\t110.492899\tFemale\n94\t3960\t112.366201\tMale\n50\t145523\t109.394018\tMale\n71\t84085\t109.903600\tFemale\n31\t123382\t109.359278\tMale\n29\t122003\t109.851377\tMale\n91\t6607\t115.455087\tMale\n17\t73300\t110.110759\tFemale\n20\t92409\t111.791361\tFemale\n63\t113159\t109.310599\tMale\n102\t303\t102.037143\tFemale\n41\t114610\t109.639596\tMale\n14\t47851\t108.100755\tFemale\n72\t88799\t109.360939\tFemale\n60\t119519\t112.797039\tMale\n44\t135042\t110.402414\tFemale\n84\t21170\t114.262301\tMale\n22\t95049\t110.170307\tFemale\n9\t20367\t108.581630\tMale\n36\t123035\t108.957704\tMale\n25\t102710\t109.393181\tMale\n82\t32792\t109.996218\tMale\n54\t158513\t110.320172\tMale\n39\t105455\t109.383817\tMale\n33\t130599\t109.294479\tFemale\n43\t107414\t110.301818\tMale\n101\t401\t89.060233\tMale\n81\t37214\t111.238276\tMale\n35\t131088\t109.465638\tMale\n52\t153765\t108.811283\tFemale\n28\t107730\t109.625451\tMale\n73\t75723\t111.657340\tMale\n46\t145980\t109.715449\tFemale\n24\t94584\t109.009480\tFemale\n10\t17924\t107.909032\tMale\n69\t75903\t109.782856\tFemale\n47\t136259\t110.433218\tMale\n21\t80503\t109.883485\tMale\n87\t7046\t104.159820\tFemale\n88\t13877\t112.150849\tMale\n36\t137427\t111.939895\tFemale\n80\t40532\t108.445241\tMale\n27\t127414\t110.281358\tFemale\n60\t125082\t109.063434\tFemale\n56\t148683\t109.147064\tMale\n8\t19485\t114.334202\tFemale\n83\t33848\t111.661636\tMale\n49\t148588\t108.988835\tMale\n63\t118349\t110.468306\tFemale\n74\t92859\t108.387820\tFemale\n62\t119240\t109.297963\tMale\n38\t111093\t110.125167\tMale\n44\t125609\t109.820434\tMale\n98\t3563\t107.621433\tFemale\n55\t171696\t109.362655\tFemale\n88\t14070\t109.909352\tFemale\n75\t81021\t109.029088\tMale\n92\t4891\t103.897953\tFemale\n90\t7437\t113.247681\tFemale\n68\t66634\t110.526637\tMale\n54\t166362\t109.969420\tFemale\n35\t141456\t110.184605\tFemale\n39\t116154\t108.679265\tFemale\n8\t16858\t106.780275\tMale\n85\t13609\t107.752449\tMale\n23\t94005\t110.948625\tMale\n27\t119361\t110.200857\tMale\n95\t3392\t109.001374\tMale\n99\t1498\t135.309727\tFemale\n15\t50489\t109.135137\tFemale\n93\t4610\t106.160962\tFemale\n57\t157620\t109.320699\tMale\n98\t3297\t106.239421\tMale\n59\t133861\t108.833642\tMale\n66\t83460\t111.336319\tMale\n16\t56131\t109.102030\tMale\n11\t23085\t107.451201\tMale\n45\t144267\t111.695684\tFemale\n53\t159974\t108.508585\tFemale\n32\t123951\t111.435269\tFemale\n65\t110016\t107.536689\tFemale\n55\t157496\t109.543723\tMale\n75\t86520\t109.025105\tFemale\n95\t3801\t115.947057\tFemale\n93\t4306\t106.672506\tMale\n79\t47139\t110.209395\tMale\n56\t161460\t110.654057\tFemale\n76\t80465\t108.747812\tFemale\n21\t88027\t109.231159\tFemale\n72\t86111\t110.237546\tMale\n37\t130768\t109.383379\tFemale\n26\t110446\t108.756020\tMale\n89\t14531\t107.676025\tFemale\n80\t43683\t109.401992\tFemale\n13\t37769\t111.117229\tMale\n52\t145410\t110.812983\tMale\n94\t4933\t114.802098\tFemale\n18\t70788\t110.636525\tMale\n41\t122513\t109.153767\tFemale\n92\t4909\t114.581560\tMale\n86\t19147\t112.546033\tFemale\n99\t1172\t120.039574\tMale\n79\t51194\t111.252743\tFemale\n74\t86370\t109.331208\tMale\n13\t40013\t111.704068\tFemale\n22\t88773\t111.307069\tMale\n97\t4453\t114.576071\tMale\n"
+            "data": "age\tOrders\tCart Amount\tSex\n58\t170372\t108.830301\tFemale\n71\t76973\t110.966367\tMale\n85\t14730\t110.653964\tFemale\n101\t330\t108.827333\tFemale\n45\t129086\t109.794006\tMale\n77\t55726\t111.156700\tFemale\n61\t135711\t109.664341\tFemale\n62\t125657\t110.059232\tFemale\n91\t6404\t102.066874\tFemale\n77\t49466\t107.910039\tMale\n24\t87083\t109.178492\tMale\n30\t116409\t109.061997\tFemale\n84\t20880\t108.359896\tFemale\n96\t3222\t105.857467\tMale\n14\t43632\t110.034109\tMale\n18\t77426\t109.231111\tFemale\n78\t47015\t109.631587\tFemale\n31\t134807\t111.417227\tFemale\n83\t35141\t110.071309\tFemale\n100\t1564\t123.327874\tMale\n10\t19326\t112.970667\tFemale\n34\t126099\t108.741798\tMale\n23\t101909\t109.521257\tFemale\n48\t150928\t109.492428\tFemale\n15\t46789\t109.627773\tMale\n40\t119136\t112.227786\tFemale\n57\t165294\t108.994111\tFemale\n48\t143093\t110.462033\tMale\n102\t252\t91.441481\tMale\n42\t128659\t109.920359\tFemale\n26\t120008\t108.791114\tFemale\n37\t120875\t109.849190\tMale\n97\t4906\t108.898929\tFemale\n70\t77416\t110.776546\tFemale\n12\t28914\t108.189880\tFemale\n25\t113686\t109.801803\tFemale\n49\t161530\t110.464231\tFemale\n67\t81789\t108.712221\tFemale\n76\t74120\t109.181145\tMale\n19\t72608\t108.203808\tMale\n61\t126370\t108.177024\tMale\n16\t63636\t109.828078\tFemale\n73\t80613\t110.424587\tFemale\n38\t119635\t108.974096\tFemale\n33\t121622\t111.235612\tMale\n81\t40609\t111.983561\tFemale\n82\t37557\t113.206523\tFemale\n66\t91890\t110.701114\tFemale\n58\t157645\t109.670637\tMale\n70\t70912\t108.759592\tMale\n96\t3696\t110.382012\tFemale\n11\t24893\t107.233394\tFemale\n86\t17929\t114.837931\tMale\n69\t71466\t113.326331\tMale\n90\t7059\t114.079526\tMale\n28\t116132\t109.704348\tFemale\n32\t111594\t109.219060\tMale\n51\t146245\t109.605946\tMale\n50\t155125\t109.094343\tFemale\n46\t139304\t109.449047\tMale\n67\t73866\t108.617424\tMale\n53\t151639\t110.632022\tMale\n20\t83528\t109.967468\tMale\n9\t20288\t105.980755\tFemale\n12\t26140\t108.519265\tMale\n64\t124963\t109.911314\tFemale\n19\t82082\t110.723592\tFemale\n30\t108263\t110.565479\tMale\n47\t146901\t108.999292\tFemale\n43\t118928\t110.213614\tFemale\n29\t130972\t110.146091\tFemale\n59\t145888\t110.669175\tFemale\n78\t44334\t109.728229\tMale\n51\t157840\t109.873116\tFemale\n89\t13790\t111.341496\tMale\n64\t113909\t109.621122\tMale\n34\t140002\t109.725868\tFemale\n100\t1394\t101.940286\tFemale\n87\t7121\t111.614364\tMale\n17\t66620\t111.079256\tMale\n40\t108301\t110.445115\tMale\n42\t117356\t109.954268\tMale\n65\t103574\t108.450511\tMale\n68\t74319\t110.492899\tFemale\n94\t3960\t112.366201\tMale\n50\t145523\t109.394018\tMale\n71\t84085\t109.903600\tFemale\n31\t123382\t109.359278\tMale\n91\t6607\t115.455087\tMale\n29\t122003\t109.851377\tMale\n17\t73300\t110.110759\tFemale\n20\t92409\t111.791361\tFemale\n63\t113159\t109.310599\tMale\n102\t303\t102.037143\tFemale\n41\t114610\t109.639596\tMale\n14\t47851\t108.100755\tFemale\n72\t88799\t109.360939\tFemale\n60\t119519\t112.797039\tMale\n44\t135042\t110.402414\tFemale\n84\t21170\t114.262301\tMale\n22\t95049\t110.170307\tFemale\n9\t20367\t108.581630\tMale\n36\t123035\t108.957704\tMale\n25\t102710\t109.393181\tMale\n82\t32792\t109.996218\tMale\n54\t158513\t110.320172\tMale\n39\t105455\t109.383817\tMale\n43\t107414\t110.301818\tMale\n33\t130599\t109.294479\tFemale\n101\t401\t89.060233\tMale\n81\t37214\t111.238276\tMale\n52\t153765\t108.811283\tFemale\n35\t131088\t109.465638\tMale\n28\t107730\t109.625451\tMale\n46\t145980\t109.715449\tFemale\n73\t75723\t111.657340\tMale\n24\t94584\t109.009480\tFemale\n10\t17924\t107.909032\tMale\n69\t75903\t109.782856\tFemale\n47\t136259\t110.433218\tMale\n21\t80503\t109.883485\tMale\n87\t7046\t104.159820\tFemale\n88\t13877\t112.150849\tMale\n36\t137427\t111.939895\tFemale\n80\t40532\t108.445241\tMale\n27\t127414\t110.281358\tFemale\n60\t125082\t109.063434\tFemale\n56\t148683\t109.147064\tMale\n8\t19485\t114.334202\tFemale\n83\t33848\t111.661636\tMale\n49\t148588\t108.988835\tMale\n63\t118349\t110.468306\tFemale\n74\t92859\t108.387820\tFemale\n62\t119240\t109.297963\tMale\n38\t111093\t110.125167\tMale\n44\t125609\t109.820434\tMale\n98\t3563\t107.621433\tFemale\n55\t171696\t109.362655\tFemale\n75\t81021\t109.029088\tMale\n88\t14070\t109.909352\tFemale\n92\t4891\t103.897953\tFemale\n90\t7437\t113.247681\tFemale\n68\t66634\t110.526637\tMale\n54\t166362\t109.969420\tFemale\n39\t116154\t108.679265\tFemale\n35\t141456\t110.184605\tFemale\n8\t16858\t106.780275\tMale\n85\t13609\t107.752449\tMale\n27\t119361\t110.200857\tMale\n23\t94005\t110.948625\tMale\n99\t1498\t135.309727\tFemale\n95\t3392\t109.001374\tMale\n15\t50489\t109.135137\tFemale\n93\t4610\t106.160962\tFemale\n57\t157620\t109.320699\tMale\n98\t3297\t106.239421\tMale\n59\t133861\t108.833642\tMale\n66\t83460\t111.336319\tMale\n16\t56131\t109.102030\tMale\n11\t23085\t107.451201\tMale\n45\t144267\t111.695684\tFemale\n53\t159974\t108.508585\tFemale\n32\t123951\t111.435269\tFemale\n65\t110016\t107.536689\tFemale\n55\t157496\t109.543723\tMale\n75\t86520\t109.025105\tFemale\n95\t3801\t115.947057\tFemale\n93\t4306\t106.672506\tMale\n79\t47139\t110.209395\tMale\n56\t161460\t110.654057\tFemale\n76\t80465\t108.747812\tFemale\n21\t88027\t109.231159\tFemale\n72\t86111\t110.237546\tMale\n37\t130768\t109.383379\tFemale\n26\t110446\t108.756020\tMale\n89\t14531\t107.676025\tFemale\n80\t43683\t109.401992\tFemale\n52\t145410\t110.812983\tMale\n13\t37769\t111.117229\tMale\n94\t4933\t114.802098\tFemale\n41\t122513\t109.153767\tFemale\n18\t70788\t110.636525\tMale\n92\t4909\t114.581560\tMale\n86\t19147\t112.546033\tFemale\n99\t1172\t120.039574\tMale\n79\t51194\t111.252743\tFemale\n74\t86370\t109.331208\tMale\n22\t88773\t111.307069\tMale\n13\t40013\t111.704068\tFemale\n97\t4453\t114.576071\tMale\n"
           }
         ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d14",
+            "http://10.5.0.6:4040/jobs/job?id\u003d15",
+            "http://10.5.0.6:4040/jobs/job?id\u003d16",
+            "http://10.5.0.6:4040/jobs/job?id\u003d17",
+            "http://10.5.0.6:4040/jobs/job?id\u003d18"
+          ],
+          "interpreterSettingId": "spark"
+        }
       },
       "apps": [],
       "jobName": "paragraph_1533117550837_1316059750",
       "id": "20180728-025641_1739767145",
       "dateCreated": "2018-08-01 09:59:10.837",
-      "dateStarted": "2018-08-04 12:49:29.219",
-      "dateFinished": "2018-08-04 12:49:47.654",
+      "dateStarted": "2018-08-09 12:06:17.679",
+      "dateFinished": "2018-08-09 12:06:32.524",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \nLets focus on our top customers and try to profile them in order to answer the following question:\n\n**Q:**What are the reading preferencess of our top customers?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:47.725",
+      "dateUpdated": "2018-08-09 12:06:32.548",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1758,29 +2232,21 @@
         "params": {},
         "forms": {}
       },
-      "results": {
-        "code": "SUCCESS",
-        "msg": [
-          {
-            "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLets focus on our top customers and try to profile them in order to answer the following question:\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eQ:\u003c/strong\u003eWhat are the reading preferencess of our top customers?\u003c/p\u003e\n\u003c/div\u003e"
-          }
-        ]
-      },
       "apps": [],
       "jobName": "paragraph_1533130335958_1845622524",
       "id": "20180801-133215_1474859950",
       "dateCreated": "2018-08-01 13:32:15.958",
-      "dateStarted": "2018-08-04 12:49:47.805",
-      "dateFinished": "2018-08-04 12:49:47.834",
+      "dateStarted": "2018-08-09 12:06:32.703",
+      "dateFinished": "2018-08-09 12:06:32.719",
       "status": "FINISHED",
+      "errorMessage": "",
       "progressUpdateIntervalMs": 500
     },
     {
       "title": "Loading Top Users ...",
       "text": "// Load Top users Transactions\nval pushdown_query \u003d \"(SELECT c.customer_id,c.customer_nm,b.category, SUM(discounted_price) disc_price FROM bookstore.transactions AS t  INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN books b ON b.book_id \u003d t.book_id WHERE c.customer_id IN (60,274,2727,168,5,13,30,75,1743,2) GROUP BY  c.customer_id,c.customer_nm,b.category) as o\"\nval df_top_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_top_orders.createOrReplaceTempView(\"top_transactions\")\ndf_top_orders.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:49:47.904",
+      "dateUpdated": "2018-08-09 12:06:32.792",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1814,15 +2280,15 @@
       "jobName": "paragraph_1533129234038_-970124989",
       "id": "20180801-131354_704222410",
       "dateCreated": "2018-08-01 13:13:54.038",
-      "dateStarted": "2018-08-04 12:49:47.964",
-      "dateFinished": "2018-08-04 12:49:48.927",
+      "dateStarted": "2018-08-09 12:06:32.894",
+      "dateFinished": "2018-08-09 12:06:33.987",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql \nSELECT * FROM top_transactions order by customer_id,category",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:22.669",
+      "dateUpdated": "2018-08-09 12:16:03.130",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -1921,19 +2387,31 @@
           }
         ]
       },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d19"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
       "apps": [],
       "jobName": "paragraph_1533130147619_-159469675",
       "id": "20180801-132907_936203382",
       "dateCreated": "2018-08-01 13:29:07.619",
-      "dateStarted": "2018-08-04 12:49:49.061",
-      "dateFinished": "2018-08-04 12:49:50.198",
+      "dateStarted": "2018-08-09 12:06:34.144",
+      "dateFinished": "2018-08-09 12:06:35.077",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql \nSELECT customer_nm Name, category Category, disc_price `USD Spent` FROM top_transactions WHERE customer_id IN (${Customer\u003d5,5(Briana Brown)|274(Carol Anderson)|30(Gregory Beasley)|60(Jessica Turner)|2(Johnny Williams)|1743(Patrick Wright)|13(Ronald Johnson)|75(Ryan Estrada)|2727(Shannon Ferguson)|168(Stacy Moore)})",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:17:22.798",
+      "dateUpdated": "2018-08-09 12:16:03.259",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -2017,7 +2495,7 @@
       },
       "settings": {
         "params": {
-          "Customer": "1743",
+          "Customer": "13",
           "formName": "2"
         },
         "forms": {
@@ -2076,23 +2554,35 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "Name\tCategory\tUSD Spent\nPatrick Wright\tChildren Classics\t91.62\nPatrick Wright\tHorror\t37.97\nPatrick Wright\tMystery\t105.57\nPatrick Wright\tRomance\t74.14\nPatrick Wright\tHumor\t18.94\nPatrick Wright\tClassics\t83.05\nPatrick Wright\tDrama\t92.24\nPatrick Wright\tSci-fi\t192.48\nPatrick Wright\tFantasy\t317.18\n"
+            "data": "Name\tCategory\tUSD Spent\nRonald Johnson\tRomance\t126.09\nRonald Johnson\tHorror\t80.06\nRonald Johnson\tChildren Classics\t166.45\nRonald Johnson\tClassics\t17.98\nRonald Johnson\tNon-fiction\t13.49\nRonald Johnson\tHumor\t23.85\nRonald Johnson\tFantasy\t381.95\nRonald Johnson\tDrama\t61.32\nRonald Johnson\tSci-fi\t326.54\nRonald Johnson\tMystery\t104.41\n"
           }
         ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://10.5.0.6:4040/jobs/job?id\u003d20"
+          ],
+          "interpreterSettingId": "spark"
+        }
       },
       "apps": [],
       "jobName": "paragraph_1533117550843_-1572477692",
       "id": "20180730-154044_674099208",
       "dateCreated": "2018-08-01 09:59:10.843",
-      "dateStarted": "2018-08-04 12:51:29.863",
-      "dateFinished": "2018-08-04 12:51:30.772",
+      "dateStarted": "2018-08-09 12:06:35.313",
+      "dateFinished": "2018-08-09 12:06:36.576",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:52:13.605",
+      "dateUpdated": "2018-08-09 12:06:36.602",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2133,7 +2623,7 @@
     {
       "text": "%md\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 12:52:19.120",
+      "dateUpdated": "2018-08-09 12:06:36.695",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2154,11 +2644,14 @@
       "progressUpdateIntervalMs": 500
     }
   ],
-  "name": "MariaDB AX Sandbox/Scala Bookstore Analytics",
+  "name": "MariaDB AX Sandbox/Bookstore Analytics with Scala and Spark",
   "id": "2DJWZWXV4",
   "noteParams": {},
   "noteForms": {},
-  "angularObjects": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "spark:shared_process": []
+  },
   "config": {
     "isZeppelinNotebookCronEnable": false
   },

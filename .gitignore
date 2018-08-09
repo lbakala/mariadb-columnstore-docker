@@ -52,3 +52,4 @@ Temporary Items
 # Big Csv files 
 *.csv
 *.zip
+*.tar

@@ -1,6 +1,5 @@
 FROM apache/zeppelin:0.8.0
-RUN echo "deb http://httpredir.debian.org/debian jessie-backports main contrib non-free" >> /etc/apt/sources.list \
-RUN apt-get update &&\
+RUN apt-get update && \
     apt-get install vim -y \
     && apt-get install curl -y \
     && wget https://archive.apache.org/dist/spark/spark-2.2.0/spark-2.2.0-bin-hadoop2.7.tgz \
