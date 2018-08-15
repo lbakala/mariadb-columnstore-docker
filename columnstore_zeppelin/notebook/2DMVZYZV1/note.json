@@ -1,0 +1,70 @@
+{
+  "paragraphs": [
+    {
+      "text": "%python\nfrom pyspark import SparkContext\nfrom pyspark.sql import DataFrameReader, SQLContext\nurl \u003d \u0027jdbc:mysql://columnstore:3306/test\u0027\nproperties \u003d {\u0027user\u0027: \u0027root\u0027, \u0027driver\u0027: \u0027org.mariadb.jdbc.Driver\u0027}\nsc \u003d SparkContext(\"local\", \"test\")\nsqlContext \u003d SQLContext(sc)\ndf \u003d DataFrameReader(sqlContext).jdbc(url\u003d\u0027%s\u0027 % url, table\u003d\u0027results\u0027, properties\u003dproperties)\ndf.show()\n\ndf \u003d DataFrameReader(sqlContext).jdbc(url\u003d\u0027%s\u0027 % url, \n    table\u003d\u0027( select year, sum(closed_roll_assess_land_value) sum_land_value from property_tax group by year) pt\u0027,\n                                      properties\u003dproperties)",
+      "user": "anonymous",
+      "dateUpdated": "2018-07-30 18:19:26.082",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Traceback (most recent call last):\n  File \"/tmp/zeppelin_python-2888470169490092649.py\", line 320, in \u003cmodule\u003e\n    raise Exception(traceback.format_exc())\nException: Traceback (most recent call last):\n  File \"/tmp/zeppelin_python-2888470169490092649.py\", line 308, in \u003cmodule\u003e\n    exec(code, _zcUserQueryNameSpace)\n  File \"\u003cstdin\u003e\", line 1, in \u003cmodule\u003e\nImportError: No module named pyspark\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1532611265087_1975220521",
+      "id": "20180726-132105_1607509347",
+      "dateCreated": "2018-07-26 13:21:05.087",
+      "dateStarted": "2018-07-30 18:19:26.100",
+      "dateFinished": "2018-07-30 18:19:29.452",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1532611285964_-2086822054",
+      "id": "20180726-132125_1600403703",
+      "dateCreated": "2018-07-26 13:21:25.964",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "~Trash/Python MariDB connector",
+  "id": "2DMVZYZV1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "python:shared_process": [],
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
