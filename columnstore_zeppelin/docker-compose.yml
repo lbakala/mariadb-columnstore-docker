@@ -23,6 +23,7 @@ services:
       - um2_etc:/usr/local/mariadb/columnstore/etc
       - um2_mysql:/usr/local/mariadb/columnstore/mysql/db
       - um2_local:/usr/local/mariadb/columnstore/local
+      - ./multi_node_um2:/docker-entrypoint-initdb.d
     networks:
       mcsnet:
         ipv4_address: 10.5.0.3
@@ -59,7 +60,7 @@ services:
   zeppelin:
     hostname: zeppelin
     build: ../columnstore_zeppelin
-  
+
     ports:
       - "8080:8080"
     depends_on:
@@ -93,4 +94,3 @@ networks:
      config:
        - subnet: 10.5.0.0/16
          gateway: 10.5.0.1
-
