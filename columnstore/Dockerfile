@@ -12,13 +12,13 @@ RUN export USER=root && \
     yum clean all && \
     rm -rf /var/cache/yum && \
     /usr/bin/systemd-machine-id-setup && \
-    chown -R mysql:mysql /usr/local/mariadb/columnstore/mysql && \
     ln -s /usr/local/mariadb/columnstore/lib/libcalmysql.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/libcalmysql.so && \
     ln -s /usr/local/mariadb/columnstore/lib/libudf_mysql.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/libudf_mysql.so && \
     ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_tables.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_tables.so && \
     ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_columns.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_columns.so && \
     ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_extents.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_extents.so && \
-    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_files.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_files.so
+    ln -s /usr/local/mariadb/columnstore/lib/is_columnstore_files.so.1.0.0 /usr/local/mariadb/columnstore/mysql/lib/plugin/is_columnstore_files.so && \
+    chown -R mysql:mysql /usr/local/mariadb/columnstore/mysql
 
 COPY service /etc/service/
 COPY dbinit runit_bootstrap wait_for_columnstore_active /usr/sbin/
