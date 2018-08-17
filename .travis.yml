@@ -3,6 +3,7 @@ services: docker
 env:
   - VERSION=columnstore
   - VERSION=columnstore_jupyter
+  - VERSION=columnstore_zeppelin
 
 install:
   - git clone https://github.com/mariadb-corporation/mariadb-docker-images ~/mariadb-docker-images

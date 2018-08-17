@@ -43,9 +43,9 @@ if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
     while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
         if [ ! -z $CS_DEBUG ]; then
             echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): create table test error: $STATUS"
-        f
+        fi
         echo "$STATUS" | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master."
-        if [ 1 -eq $? ]; then
+        if [ 0 -eq $? ]; then
             echo "Not um1 so assuming system ready"
             exit 0
         fi
