@@ -1,8 +1,8 @@
 #!/bin/sh
 mkdir -p /tmp/bookstore-csv
 if [ ! -f "/docker-entrypoint-initdb.d/sandboxdata.tar" ]; then
-  echo "Getting the bookstore data ..."
-  curl https://downloads.mariadb.com/sample-data/books5000.tar --output /docker-entrypoint-initdb.d/sandboxdata.tar
+  echo "Getting the bookstore sandbox archive ..."
+  curl https://downloads.mariadb.com/sample-data/books5001.tar --output /docker-entrypoint-initdb.d/sandboxdata.tar
 fi
 
 echo "Extracting bookstore files ..."
@@ -16,7 +16,7 @@ echo "Creating tables ..."
 sed -i 's/%DB%/bookstore/g'  /tmp/bookstore-csv/01_load_ax_init.sql
 /usr/local/mariadb/columnstore/mysql/bin/mysql -u root < /tmp/bookstore-csv/01_load_ax_init.sql
 
-echo "loading bookstore files ..."
+echo "Loading bookstore data ..."
 for i in *.mcs.csv.gz; do
     table=$(echo $i | cut -f 1 -d '.')
     zcat  $table.mcs.csv.gz | /usr/local/mariadb/columnstore/bin/cpimport -s ',' -E "'" bookstore $table

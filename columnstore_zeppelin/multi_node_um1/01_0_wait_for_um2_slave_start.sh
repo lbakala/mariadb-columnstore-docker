@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "Waiting for UM2 to respond"
 
 MAX_TRIES=36
 if [ ! -z "$CS_WAIT_ATTEMPTS" ]; then
