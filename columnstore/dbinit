@@ -25,7 +25,7 @@ wait_for_procmon()
 # hack to ensure server-id is set to unique value per vm because my.cnf is
 # not in a good location for a volume
 SERVER_ID=$(hostname -i | cut -d "." -f 4)
-sed -i "s/server-id =.*/server-id = $SERVER_ID/" /usr/local/mariadb/columnstore/mysql/my.cnf 
+sed -i "s/server-id =.*/server-id = $SERVER_ID/" /usr/local/mariadb/columnstore/mysql/my.cnf
 
 # Initialize CS only once.
 if [ -e $FLAG ]; then
@@ -77,13 +77,29 @@ else
             if [[ $f == *.sql ]];then
                 echo "Run $f at $(date)"
                 $MCSMYCMD -vvv $DBNAME < $f 2>&1
+                if [ 1 -eq $? ]; then
+                    echo "Script $f failed, aborting setup"
+                    exit 1
+                fi
             elif [[ $f == *.sql.gz ]];then
                 echo "Run $f at $(date)"
                 zcat $f | $MCSMYCMD -vvv $DBNAME 2>&1
+                if [ 1 -eq $? ]; then
+                    echo "Script $f failed, aborting setup"
+                    exit 1
+                fi
             elif [[ $f == *.sh ]]; then
                 chmod 755 $f
                 echo "Run $f at $(date)"
-                /bin/sh -x $f 2>&1
+                if [ -z $CS_DEBUG ]; then
+                    /bin/sh $f 2>&1
+                else
+                    /bin/sh -x $f 2>&1
+                fi
+                if [ 1 -eq $? ]; then
+                    echo "Script $f failed, aborting setup"
+                    exit 1
+                fi
             fi;
         done;
         echo "Container initialization complete at $(date)"

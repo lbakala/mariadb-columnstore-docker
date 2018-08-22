@@ -39,14 +39,19 @@ fi
 if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
     echo "Waiting for system catalog to be fully created"
     ATTEMPT=1
-    STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;")
+    STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;" 2>&1)
     while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
         if [ ! -z $CS_DEBUG ]; then
             echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): create table test error: $STATUS"
         fi
+        echo "$STATUS" | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master."
+        if [ 0 -eq $? ]; then
+            echo "Not um1 so assuming system ready"
+            exit 0
+        fi
         sleep 2
         ATTEMPT=$(($ATTEMPT+1))
-        STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;")
+        STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;" 2>&1)
     done
     /usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest;"
     if [ $ATTEMPT -ge $MAX_TRIES ]; then
