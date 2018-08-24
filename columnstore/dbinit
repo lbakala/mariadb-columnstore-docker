@@ -27,6 +27,13 @@ wait_for_procmon()
 SERVER_ID=$(hostname -i | cut -d "." -f 4)
 sed -i "s/server-id =.*/server-id = $SERVER_ID/" /usr/local/mariadb/columnstore/mysql/my.cnf
 
+# hack to make master-dist rsync.sh script do nothing as it fails otherwise
+# in non distributed on windows and mac (occassionally on ubuntu).
+# Replicating the db directories is a no-op here anyway
+mv /usr/local/mariadb/columnstore/bin/rsync.sh /usr/local/mariadb/columnstore/bin/rsync.sh.bkp
+touch /usr/local/mariadb/columnstore/bin/rsync.sh
+chmod a+x /usr/local/mariadb/columnstore/bin/rsync.sh
+
 # Initialize CS only once.
 if [ -e $FLAG ]; then
     echo "Container already initialized at $(date)"
