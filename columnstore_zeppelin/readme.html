@@ -216,44 +216,119 @@ code.language-yaml {
       <div class="mume markdown-preview   ">
       <h1 class="mume-header" id="mariadb-ax-columnstore-sandbox-with-zeppelin-notebooks">MariaDB AX Columnstore Sandbox with Zeppelin Notebooks</h1>
 
-<h2 class="mume-header" id="building">Building</h2>
+<div class="code-chunk" data-id="code-chunk-id-0" data-cmd="toc"><div class="input-div"><div class="btn-group"><div class="run-btn btn"><span>▶︎</span></div><div class="run-all-btn btn">all</div></div><div class="status">running...</div></div><div class="output-div"></div></div><ul>
+<li><a href="#mariadb-ax-columnstore-sandbox-with-zeppelin-notebooks">MariaDB AX Columnstore Sandbox with Zeppelin Notebooks</a>
+<ul>
+<li><a href="#installing-prerequisites">Installing prerequisites</a>
+<ul>
+<li><a href="#install-docker">Install Docker</a></li>
+<li><a href="#install-docker-compose">Install Docker Compose</a></li>
+<li><a href="#get-the-mariadb-ax-sandbox">Get the MariaDB AX sandbox</a></li>
+<li><a href="#build-columnstore">Build columnstore</a></li>
+<li><a href="#build-zeppelin-instance-optional">Build Zeppelin instance (optional)</a></li>
+<li><a href="#bring-the-whole-cluster-up">Bring the whole cluster up</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li><a href="#zeppelin-guide">Zeppelin Guide</a>
+<ul>
+<li><a href="#what-is-zeppelin">What is Zeppelin</a></li>
+<li><a href="#start-mariadb-ax-sandbox-bookstore-analytics">Start MariaDB AX Sandbox - Bookstore Analytics</a></li>
+</ul>
+</li>
+<li><a href="#useful-links">Useful Links</a></li>
+</ul>
+</li>
+</ul>
+<h2 class="mume-header" id="installing-prerequisites">Installing prerequisites</h2>
+
+<h3 class="mume-header" id="install-docker">Install Docker</h3>
 
 <ul>
-<li>Install docker: <a href="https://docs.docker.com/engine/installation/">https://docs.docker.com/engine/installation/</a></li>
+<li>Install docker following this link:<br>
+<a href="https://docs.docker.com/engine/installation/">https://docs.docker.com/engine/installation/</a></li>
 </ul>
-<p>The space requirement for the docker images is around 4GB</p>
+<h3 class="mume-header" id="install-docker-compose">Install Docker Compose</h3>
+
+<ul>
+<li>Install docker compose following this link:<br>
+<a href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></li>
+</ul>
+<h3 class="mume-header" id="get-the-mariadb-ax-sandbox">Get the MariaDB AX sandbox</h3>
+
+<p>Checkout the images from <a href="https://github.com/mariadb-corporation/mariadb-columnstore-docker">GitHub</a></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash"><span class="token function">cd</span> /working_directory
+<span class="token function">git</span> clone https://github.com/mariadb-corporation/mariadb-columnstore-docker.git
+</pre><p>The space requirement for the docker images is around 4GB disk space.<br>
+The docker application should have minimum 4GB RAM Memmory allocated in order for those 5 machines to work properly.</p>
 <p>Make sure you are in columnstore_zeppelin folder</p>
-<pre data-role="codeBlock" data-info="sh" class="language-bash">$ <span class="token function">cd</span> columnstore_zeppelin
+<pre data-role="codeBlock" data-info="bash" class="language-bash"><span class="token function">cd</span> columnstore_zeppelin
 </pre><h3 class="mume-header" id="build-columnstore">Build columnstore</h3>
 
-<pre data-role="codeBlock" data-info="sh" class="language-bash">$ docker build -t mariadb/columnstore:latest <span class="token punctuation">..</span>/columnstore
-</pre><h3 class="mume-header" id="build-zeppelin-instance">Build Zeppelin instance.</h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash">docker build -t mariadb/columnstore:latest <span class="token punctuation">..</span>/columnstore
+</pre><h3 class="mume-header" id="build-zeppelin-instance-optional">Build Zeppelin instance (optional)</h3>
 
-<pre data-role="codeBlock" data-info="sh" class="language-bash">$ docker build -t mariadb/columnstore_zeppelin:latest <span class="token punctuation">..</span>/columnstore_zeppelin
+<pre data-role="codeBlock" data-info="bash" class="language-bash">docker build -t mariadb/columnstore_zeppelin:latest <span class="token punctuation">..</span>/columnstore_zeppelin
 </pre><h3 class="mume-header" id="bring-the-whole-cluster-up">Bring the whole cluster up</h3>
 
-<p>The command to bring the whole cluster us is:</p>
-<pre data-role="codeBlock" data-info="sh" class="language-bash">$ docker-compose up --build
+<p>The command is starting a columnstore cluster with 4 nodes 2UM and 2PM modules:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash">docker-compose up --build
 </pre><p>It can take up to 10 min before the cluster starts and the data is ingested.</p>
+<p>The following log entry marks the end of the load.<br>
+<strong><code>&quot;Container initialization complete at ...&quot;</code></strong></p>
 <p>The status of data ingest can be tracked in the UM1 container log file.</p>
-<pre data-role="codeBlock" data-info="sh" class="language-bash">$ docker logs -f columnstore_zeppelin_um1_1
-</pre><p>Open Zeppelin from this link<br>
-<a href="http://localhost:8080">http://localhost:8080</a></p>
-<p>Database can be accessed directly with:</p>
-<pre data-role="codeBlock" data-info="sql" class="language-sql">$ mysql <span class="token operator">-</span>h127<span class="token punctuation">.</span><span class="token number">0.0</span><span class="token number">.1</span> <span class="token operator">-</span>uzeppelin_user <span class="token operator">-</span>pzeppelin_pass bookstore
+<pre data-role="codeBlock" data-info="bash" class="language-bash">docker logs -f columnstore_zeppelin_um1_1
+</pre><p>The Bookstore Sandbox Database can be accessed directly with following command:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash">mysql -h127.0.0.1 -uzeppelin_user -pzeppelin_pass bookstore
 </pre><h3 class="mume-header" id="troubleshooting">Troubleshooting</h3>
 
 <p>In case you run a service on 3306,3307 or 8080 the ports configuration in docker-compose.yml should be changed.<br>
-You might encounter the following error</p>
-<pre data-role="codeBlock" data-info="" class="language-"><code>ERROR: Encountered errors while bringing up the project.
-</code></pre><p>i.e. if we have another MariaDB server running on port 3306<br>
+You might encounter the following error<br>
+<code>ERROR: Encountered errors while bringing up the project.</code></p>
+<p>i.e. if we have another MariaDB server running on port 3306<br>
 The following configuration</p>
-<pre data-role="codeBlock" data-info="" class="language-"><code>    ports:
-      - &quot;3306:3306&quot;
-</code></pre><p>Should be altered like this:</p>
-<pre data-role="codeBlock" data-info="" class="language-"><code>    ports:
-      - &quot;3308:3306&quot;
-</code></pre><p>Assuming 3308 is ubnbound on our machine.</p>
+<pre data-role="codeBlock" data-info="yaml" class="language-yaml">    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"3306:3306"</span>
+</pre><p>Should be altered like this:</p>
+<pre data-role="codeBlock" data-info="yaml" class="language-yaml">    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"3308:3306"</span>
+</pre><p>Assuming 3308 is unbound on our machine.</p>
+<h2 class="mume-header" id="zeppelin-guide">Zeppelin Guide</h2>
+
+<h3 class="mume-header" id="what-is-zeppelin">What is Zeppelin</h3>
+
+<p>A open web-based notebook that enables interactive data analytics</p>
+<p>Apache Zeppelin brings data ingestion, data exploration, visualization, sharing and collaboration features to Hadoop and Spark.</p>
+<p>Zeppelin allows data engineers, data scientist and data analysts be more productive by developing, organizing, executing, and sharing data code and visualizing results without referring to the command line or needing the cluster details.<br>
+Notebooks allow these users not only to execute but to interactively work with long workflows.</p>
+<p>We use Zeppelin to allow data scientists to play with the sandbox data stored in MariaDB AX cluster.</p>
+<h3 class="mume-header" id="start-mariadb-ax-sandbox-bookstore-analytics">Start MariaDB AX Sandbox - Bookstore Analytics</h3>
+
+<p>After the installation is completed you can navigate to <a href="http://localhost:8080/">http://localhost:8080/</a> and will be presented with the Zeppelin home page</p>
+<p><img src="./readmeimg/img1.jpg" alt="Img 1"></p>
+<p>In the lower right section is the Notebook section. There you can find <strong>MariaDB AX Sandbox Folder</strong><br>
+Click top open.</p>
+<p><img src="./readmeimg/img2.jpg" alt="Img 2"></p>
+<p>Choose <strong>Bookstore Analytics with Scala and Spark</strong></p>
+<p><img src="./readmeimg/img3.jpg" alt="Img 3"></p>
+<p>When you open iot for first time you will be presented with the interpreter bindings.<br>
+Press <strong>Save</strong> to save those bindings.</p>
+<p><img src="./readmeimg/img4.jpg" alt="Img 4"><br>
+You are ready to us Zeppelin with MAriaDB AX Sandbox Data</p>
+<p>You can follow this link to get more information about the <a href="https://zeppelin.apache.org/docs/0.8.0/quickstart/explore_ui.html#note-layout">Zeppelin user interface</a>.</p>
+<p>You can start with &quot;Run All Paragraphs&quot; ...<br>
+<img src="./readmeimg/img5.1.jpg" alt="Img 5.1"><br>
+after confirmation  all scripts will be executed and the results presented.<br>
+<img src="./readmeimg/img5.2.jpg" alt="Img 5.2"></p>
+<p>You can also follow the tutorial and run the individual paragraphs one by one pressing <img src="./readmeimg/run.jpg" alt="run"> on each paragraph.</p>
+<p>Follow the screen instructions.</p>
+<h2 class="mume-header" id="useful-links">Useful Links</h2>
+
+<p><a href="https://docs.docker.com/engine/reference/commandline/cli/">Docker Commands</a><br>
+<a href="https://docs.docker.com/compose/reference/overview/">Docker Compose Commands</a><br>
+<a href="https://zeppelin.apache.org/docs/0.8.0/quickstart/explore_ui.html">Zeppelin UI Guide</a><br>
+<a href="https://zeppelin.apache.org/docs/0.8.0/quickstart/tutorial.html">Zeppelin Tutorial</a><br>
+<a href="https://zeppelin.apache.org/docs/0.8.0/interpreter/jdbc.html#mariadb">Zeppelin with MariaDB and JDBC</a></p>
 
       </div>
       

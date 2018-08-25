@@ -15,18 +15,18 @@ RUN mkdir -p /tmp/bookstore && \
 	mkdir -p /tmp/bookstore/csv && \
 	apt-get update && \
 	apt-get -y install curl && \
-	curl https://downloads.mariadb.com/sample-data/smallsb.tar --output /tmp/bookstore/csv/bookstore.tar && \
+	curl https://downloads.mariadb.com/sample-data/books5000light.tar --output /tmp/bookstore/csv/bookstore.tar && \
 	tar -vxf /tmp/bookstore/csv/bookstore.tar --directory /tmp/bookstore/csv/ && \
 	cd /tmp/bookstore/csv/ && \
 	gunzip -v *.gz && \
-	sed -i 's/%CSV%/\/tmp\/bookstore\/csv\//g' /tmp/bookstore/csv/load_tx_template.sql && \
-	sed -i 's/%DB%/bookstore/g' /tmp/bookstore/csv/load_tx_template.sql && \
-	cp /tmp/bookstore/csv/load_tx_template.sql /docker-entrypoint-initdb.d/load_tx_data.sql
+	sed -i 's/%CSV%/\/tmp\/bookstore\/csv\//g' /tmp/bookstore/csv/*.sql && \
+	sed -i 's/%DB%/bookstore/g' /tmp/bookstore/csv/*.sql
 
 RUN /bin/bash -c "/usr/bin/mysqld_safe --skip-grant-tables &" && \
 	sleep 10 && \
-	mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/bookstore/csv/load_tx_template.sql &&\
-	ls -la /var/lib/mysql/bookstore && \
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/bookstore/csv/01_load_tx_init.sql &&\
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/bookstore/csv/02_load_tx_ldi.sql &&\
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/bookstore/csv/03_load_tx_verify.sql &&\
 	killall mysqld_safe && \
 	cp -a /var/lib/mysql /tmp/mysql
 
