@@ -2,9 +2,9 @@
   "paragraphs": [
     {
       "title": "Prepare database connection ...",
-      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\n//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\n\nval jdbcHostname \u003d \"columnstore\"\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"zeppelin_user\"\nval jdbcPassword \u003d\"zeppelin_pass\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\n// Regiter the function\nsqlcontext.udf.register(\"sexName\", sexName _)",
+      "text": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\n\n//You can make user-defined function (UDF)and use it in a query\ndef sexName(s:String) : String \u003d {\n    if(s.toUpperCase\u003d\u003d\u0027M\u0027.toString.toUpperCase)\n        \"Male\"\n    else\n        \"Female\"\n}\n\n\nval jdbcHostname \u003d \"{{columnstore_host_nm}}\".replace(\"{\",\"\").replace(\"}\",\"\")\n\nval jdbcPort \u003d 3306\nval jdbcDatabase \u003d\"bookstore\"\nval jdbcUsername \u003d \"zeppelin_user\"\nval jdbcPassword \u003d\"zeppelin_pass\"\nval driverClass \u003d \"org.mariadb.jdbc.Driver\"\n// Create the JDBC URL without passing in the user and password parameters.\nval jdbcUrl \u003d s\"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}\"\n\n// Create a Properties() object to hold the parameters.\nval connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", s\"${jdbcUsername}\")\nconnectionProperties.put(\"password\", s\"${jdbcPassword}\")\nconnectionProperties.setProperty(\"Driver\", driverClass)\nconnectionProperties.setProperty(\"fetchSize\",\"10000\")\nval sqlcontext \u003d new org.apache.spark.sql.SQLContext(sc)\n\n// Regiter the function\nsqlcontext.udf.register(\"sexName\", sexName _)",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:11.847",
+      "dateUpdated": "2018-09-03 10:31:16.304",
       "config": {
         "tableHide": true,
         "editorSetting": {
@@ -30,7 +30,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nsexName: (s: String)String\njdbcHostname: String \u003d columnstore\njdbcPort: Int \u003d 3306\njdbcDatabase: String \u003d bookstore\njdbcUsername: String \u003d zeppelin_user\njdbcPassword: String \u003d zeppelin_pass\ndriverClass: String \u003d org.mariadb.jdbc.Driver\njdbcUrl: String \u003d jdbc:mysql://columnstore:3306/bookstore\nconnectionProperties: java.util.Properties \u003d {}\nres7: Object \u003d null\nres8: Object \u003d null\nres9: Object \u003d null\nres10: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlcontext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@68cd87a6\nres12: org.apache.spark.sql.expressions.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType,Some(List(StringType)))\n"
+            "data": "import java.util.Properties\nimport org.apache.spark.sql.SQLContext\nsexName: (s: String)String\njdbcHostname: String \u003d columnstore_host_nm\njdbcPort: Int \u003d 3306\njdbcDatabase: String \u003d bookstore\njdbcUsername: String \u003d zeppelin_user\njdbcPassword: String \u003d zeppelin_pass\ndriverClass: String \u003d org.mariadb.jdbc.Driver\njdbcUrl: String \u003d jdbc:mysql://columnstore_host_nm:3306/bookstore\nconnectionProperties: java.util.Properties \u003d {}\nres75: Object \u003d null\nres76: Object \u003d null\nres77: Object \u003d null\nres78: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlcontext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@2e61eb28\nres80: org.apache.spark.sql.expressions.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType,Some(List(StringType)))\n"
           }
         ]
       },
@@ -38,8 +38,8 @@
       "jobName": "paragraph_1533117550815_427109915",
       "id": "20180727-131658_1120553468",
       "dateCreated": "2018-08-01 09:59:10.815",
-      "dateStarted": "2018-08-30 17:42:12.450",
-      "dateFinished": "2018-08-30 17:42:43.420",
+      "dateStarted": "2018-09-03 10:27:59.779",
+      "dateFinished": "2018-09-03 10:28:03.115",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -47,7 +47,7 @@
       "title": "Fetch database information ...",
       "text": "// Load data info\nval pushdown_query \u003d \"(SELECT \u0027transactions:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactions UNION ALL SELECT \u0027loyaltypoints:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM loyaltypoints UNION ALL SELECT \u0027customers:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM customers UNION ALL SELECT \u0027cards:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM cards UNION ALL SELECT \u0027emails:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM emails UNION ALL SELECT \u0027addresses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM addresses UNION ALL SELECT \u0027phones:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM phones UNION ALL SELECT \u0027books:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM books UNION ALL SELECT \u0027maritalstatuses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM maritalstatuses UNION ALL SELECT \u0027transactiontypes:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactiontypes ) ts\"\nval df_stats \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_stats.createOrReplaceTempView(\"stats\")\ndf_stats.printSchema()\ndf_stats.show()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:43.490",
+      "dateUpdated": "2018-09-03 10:31:16.377",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -73,7 +73,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "pushdown_query: String \u003d (SELECT \u0027transactions:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactions UNION ALL SELECT \u0027loyaltypoints:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM loyaltypoints UNION ALL SELECT \u0027customers:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM customers UNION ALL SELECT \u0027cards:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM cards UNION ALL SELECT \u0027emails:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM emails UNION ALL SELECT \u0027addresses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM addresses UNION ALL SELECT \u0027phones:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM phones UNION ALL SELECT \u0027books:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM books UNION ALL SELECT \u0027maritalstatuses:\u0027 AS `Table Name`, count(*) AS `N...df_stats: org.apache.spark.sql.DataFrame \u003d [Table Name: string, Number of Rows: bigint]\nroot\n |-- Table Name: string (nullable \u003d false)\n |-- Number of Rows: long (nullable \u003d false)\n\n+-----------------+--------------+\n|       Table Name|Number of Rows|\n+-----------------+--------------+\n|   loyaltypoints:|        923008|\n|    transactions:|      11279171|\n|       customers:|       2005397|\n|           books:|          5001|\n|           cards:|       1604661|\n| maritalstatuses:|             5|\n|transactiontypes:|             3|\n|          emails:|       2566571|\n|          phones:|       2427033|\n|       addresses:|       2666749|\n+-----------------+--------------+\n\n"
+            "data": "pushdown_query: String \u003d (SELECT \u0027transactions:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM transactions UNION ALL SELECT \u0027loyaltypoints:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM loyaltypoints UNION ALL SELECT \u0027customers:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM customers UNION ALL SELECT \u0027cards:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM cards UNION ALL SELECT \u0027emails:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM emails UNION ALL SELECT \u0027addresses:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM addresses UNION ALL SELECT \u0027phones:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM phones UNION ALL SELECT \u0027books:\u0027 AS `Table Name`, count(*) AS `Number of Rows` FROM books UNION ALL SELECT \u0027maritalstatuses:\u0027 AS `Table Name`, count(*) AS `N...df_stats: org.apache.spark.sql.DataFrame \u003d [Table Name: string, Number of Rows: bigint]\nroot\n |-- Table Name: string (nullable \u003d false)\n |-- Number of Rows: long (nullable \u003d false)\n\n+-----------------+--------------+\n|       Table Name|Number of Rows|\n+-----------------+--------------+\n|transactiontypes:|             3|\n|           books:|          5001|\n| maritalstatuses:|             5|\n|       customers:|       2005397|\n|           cards:|       1604661|\n|   loyaltypoints:|        923008|\n|          phones:|       2427033|\n|    transactions:|      11279171|\n|       addresses:|       2666749|\n|          emails:|       2566571|\n+-----------------+--------------+\n\n"
           }
         ]
       },
@@ -84,7 +84,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d0"
+            "http://10.5.0.6:4040/jobs/job?id\u003d44"
           ],
           "interpreterSettingId": "spark"
         }
@@ -93,15 +93,15 @@
       "jobName": "paragraph_1533553065021_654471107",
       "id": "20180806-105745_1945139528",
       "dateCreated": "2018-08-06 10:57:45.021",
-      "dateStarted": "2018-08-30 17:42:43.866",
-      "dateFinished": "2018-08-30 17:42:51.973",
+      "dateStarted": "2018-09-03 10:28:03.375",
+      "dateFinished": "2018-09-03 10:28:05.503",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n# Bookstore Analytics Sandbox\n### Overview\n#### Online Bookstore Data\nThis sandbox is based on procedural generated sandbox representing data for a typical online bookstore. \nIn the exapmles below we will try to answer the tipical questions every business user has at some point when his business catch some speed. \nLike \"How am I doing?\", \"What can be improved?\" etc. \n\n#### System Info\nThe data is loaded in a **MariaDB AX** an enterprise open source solution for modern data warehousing. Fast, powerful and scalable analytics solution on commodity hardware or cloud infrastructure.\n\nFirst lets check the data we have:",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:52.012",
+      "dateUpdated": "2018-09-03 10:31:16.430",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -134,15 +134,15 @@
       "jobName": "paragraph_1533117616131_1324110488",
       "id": "20180801-100016_643917199",
       "dateCreated": "2018-08-01 10:00:16.131",
-      "dateStarted": "2018-08-30 17:42:52.343",
-      "dateFinished": "2018-08-30 17:42:54.356",
+      "dateStarted": "2018-09-03 10:28:05.693",
+      "dateFinished": "2018-09-03 10:28:05.711",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql\nselect `Table Name`, `Number of Rows` from stats ORDER BY 2 DESC",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:54.371",
+      "dateUpdated": "2018-09-03 10:31:16.492",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -241,7 +241,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d1"
+            "http://10.5.0.6:4040/jobs/job?id\u003d45"
           ],
           "interpreterSettingId": "spark"
         }
@@ -250,15 +250,15 @@
       "jobName": "paragraph_1533555103848_586257524",
       "id": "20180806-113143_503473269",
       "dateCreated": "2018-08-06 11:31:43.849",
-      "dateStarted": "2018-08-30 17:42:54.557",
-      "dateFinished": "2018-08-30 17:42:57.147",
+      "dateStarted": "2018-09-03 10:28:05.862",
+      "dateFinished": "2018-09-03 10:28:06.557",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \n### Books\nIn this first part we will focus mainly on our main commodity - the books. We want to know what we offer to our customers and how can be improved. \n\nLets start by answering our first question.\n\n**Q:**How many books do we sell?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:57.224",
+      "dateUpdated": "2018-09-03 10:31:16.545",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -292,8 +292,8 @@
       "jobName": "paragraph_1533123769455_-1333669099",
       "id": "20180801-114249_1496710644",
       "dateCreated": "2018-08-01 11:42:49.455",
-      "dateStarted": "2018-08-30 17:42:57.427",
-      "dateFinished": "2018-08-30 17:42:57.479",
+      "dateStarted": "2018-09-03 10:28:06.651",
+      "dateFinished": "2018-09-03 10:28:06.663",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -301,7 +301,7 @@
       "title": "Loading books ...",
       "text": "// Load Books\nval pushdown_query \u003d \"(select * from books) b\"\nval df_books \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_books.createOrReplaceTempView(\"books\")\ndf_books.printSchema()\ndf_books.count()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:57.526",
+      "dateUpdated": "2018-09-03 10:31:16.602",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -327,7 +327,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "pushdown_query: String \u003d (select * from books) b\ndf_books: org.apache.spark.sql.DataFrame \u003d [book_id: decimal(20,0), cover_price: decimal(7,2) ... 4 more fields]\nroot\n |-- book_id: decimal(20,0) (nullable \u003d false)\n |-- cover_price: decimal(7,2) (nullable \u003d false)\n |-- isbn: string (nullable \u003d false)\n |-- bookname: string (nullable \u003d false)\n |-- category: string (nullable \u003d false)\n |-- discount: decimal(7,2) (nullable \u003d false)\n\nres22: Long \u003d 5001\n"
+            "data": "pushdown_query: String \u003d (select * from books) b\ndf_books: org.apache.spark.sql.DataFrame \u003d [book_id: decimal(20,0), cover_price: decimal(7,2) ... 4 more fields]\nroot\n |-- book_id: decimal(20,0) (nullable \u003d false)\n |-- cover_price: decimal(7,2) (nullable \u003d false)\n |-- isbn: string (nullable \u003d false)\n |-- bookname: string (nullable \u003d false)\n |-- category: string (nullable \u003d false)\n |-- discount: decimal(7,2) (nullable \u003d false)\n\nres90: Long \u003d 5001\n"
           }
         ]
       },
@@ -338,7 +338,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d2"
+            "http://10.5.0.6:4040/jobs/job?id\u003d46"
           ],
           "interpreterSettingId": "spark"
         }
@@ -347,15 +347,15 @@
       "jobName": "paragraph_1533118872933_-527614215",
       "id": "20180801-102112_512639291",
       "dateCreated": "2018-08-01 10:21:12.933",
-      "dateStarted": "2018-08-30 17:42:57.746",
-      "dateFinished": "2018-08-30 17:42:59.967",
+      "dateStarted": "2018-09-03 10:28:06.815",
+      "dateFinished": "2018-09-03 10:28:07.773",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%spark\nprintln(\"%html \u003cdiv class\u003d\\\"markdown-body\\\"\u003e\u003cp\u003eThis was easy qustion \"+df_books.count()+\"\u003c/p\u003e\u003c/div\u003e\")",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:42:59.977",
+      "dateUpdated": "2018-09-03 10:31:16.641",
       "config": {
         "colWidth": 12.0,
         "fontSize": 12.0,
@@ -391,7 +391,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d3"
+            "http://10.5.0.6:4040/jobs/job?id\u003d47"
           ],
           "interpreterSettingId": "spark"
         }
@@ -400,15 +400,15 @@
       "jobName": "paragraph_1535101406507_143600721",
       "id": "20180824-090326_497557552",
       "dateCreated": "2018-08-24 09:03:26.507",
-      "dateStarted": "2018-08-30 17:43:00.238",
-      "dateFinished": "2018-08-30 17:43:01.207",
+      "dateStarted": "2018-09-03 10:28:07.933",
+      "dateFinished": "2018-09-03 10:28:08.354",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nLets try something harder. \t\n\n**Q:**We are trying to position our online bookstore towards Fantasy and Sci-Fi theme, but we are also trying to provide good variety of books as well.\nDid we achieve those goals?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:01.226",
+      "dateUpdated": "2018-09-03 10:31:16.681",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -441,8 +441,8 @@
       "jobName": "paragraph_1533124253554_-1846011550",
       "id": "20180801-115053_1051666037",
       "dateCreated": "2018-08-01 11:50:53.554",
-      "dateStarted": "2018-08-30 17:43:01.546",
-      "dateFinished": "2018-08-30 17:43:01.598",
+      "dateStarted": "2018-09-03 10:28:08.551",
+      "dateFinished": "2018-09-03 10:28:08.560",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -450,7 +450,7 @@
       "title": "Total number of books in Our Bookstore",
       "text": "%sql\nselect category as `Category`, count(*) `Total Books` from books group by category ORDER BY `Total Books` DESC",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:01.626",
+      "dateUpdated": "2018-09-03 10:31:16.736",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -602,7 +602,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d4"
+            "http://10.5.0.6:4040/jobs/job?id\u003d48"
           ],
           "interpreterSettingId": "spark"
         }
@@ -611,15 +611,15 @@
       "jobName": "paragraph_1533119179922_752831926",
       "id": "20180801-102619_1580800426",
       "dateCreated": "2018-08-01 10:26:19.922",
-      "dateStarted": "2018-08-30 17:43:01.802",
-      "dateFinished": "2018-08-30 17:43:04.947",
+      "dateStarted": "2018-09-03 10:28:08.760",
+      "dateFinished": "2018-09-03 10:28:09.803",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nIt looks like we are spot on targeting our audience.",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:05.046",
+      "dateUpdated": "2018-09-03 10:31:16.810",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -652,15 +652,15 @@
       "jobName": "paragraph_1533124143374_-14588352",
       "id": "20180801-114903_393077580",
       "dateCreated": "2018-08-01 11:49:03.374",
-      "dateStarted": "2018-08-30 17:43:05.452",
-      "dateFinished": "2018-08-30 17:43:05.486",
+      "dateStarted": "2018-09-03 10:28:09.905",
+      "dateFinished": "2018-09-03 10:28:09.925",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nLets check some titles from our catalog.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:05.540",
+      "dateUpdated": "2018-09-03 10:31:16.887",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -693,15 +693,15 @@
       "jobName": "paragraph_1533815012232_1443941754",
       "id": "20180809-114332_2041881029",
       "dateCreated": "2018-08-09 11:43:32.232",
-      "dateStarted": "2018-08-30 17:43:05.726",
-      "dateFinished": "2018-08-30 17:43:05.762",
+      "dateStarted": "2018-09-03 10:28:10.057",
+      "dateFinished": "2018-09-03 10:28:10.061",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql\nselect category,bookname from books",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:05.816",
+      "dateUpdated": "2018-09-03 10:31:17.025",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -811,7 +811,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d5"
+            "http://10.5.0.6:4040/jobs/job?id\u003d49"
           ],
           "interpreterSettingId": "spark"
         }
@@ -820,15 +820,15 @@
       "jobName": "paragraph_1533734882585_-1080173944",
       "id": "20180808-132802_1631161718",
       "dateCreated": "2018-08-08 13:28:02.585",
-      "dateStarted": "2018-08-30 17:43:05.965",
-      "dateFinished": "2018-08-30 17:43:07.417",
+      "dateStarted": "2018-09-03 10:28:10.248",
+      "dateFinished": "2018-09-03 10:28:10.406",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nNow something more tangable.\n\n**Q:**Are we making good profit from our focus categories ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:07.442",
+      "dateUpdated": "2018-09-03 10:31:17.113",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -861,8 +861,8 @@
       "jobName": "paragraph_1533123893587_1706144804",
       "id": "20180801-114453_131041062",
       "dateCreated": "2018-08-01 11:44:53.587",
-      "dateStarted": "2018-08-30 17:43:07.700",
-      "dateFinished": "2018-08-30 17:43:07.716",
+      "dateStarted": "2018-09-03 10:28:10.513",
+      "dateFinished": "2018-09-03 10:28:10.521",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -870,7 +870,7 @@
       "title": "Profitability Potential by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Avg. Price in USD`, count(*) as Items from books group by category order by `Avg. Price in USD`",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.680",
+      "dateUpdated": "2018-09-03 10:31:17.177",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1035,7 +1035,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d6"
+            "http://10.5.0.6:4040/jobs/job?id\u003d50"
           ],
           "interpreterSettingId": "spark"
         }
@@ -1044,15 +1044,15 @@
       "jobName": "paragraph_1533117550818_605625810",
       "id": "20180727-155104_1393367914",
       "dateCreated": "2018-08-01 09:59:10.818",
-      "dateStarted": "2018-08-30 17:43:08.077",
-      "dateFinished": "2018-08-30 17:43:11.230",
+      "dateStarted": "2018-09-03 10:28:10.685",
+      "dateFinished": "2018-09-03 10:28:12.174",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nI looks like **Fantasy** and **Sci-Fi** books have good potential for profit, if they sell. ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:11.303",
+      "dateUpdated": "2018-09-03 10:31:17.246",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1085,15 +1085,15 @@
       "jobName": "paragraph_1533120989660_-80871865",
       "id": "20180801-105629_1798545765",
       "dateCreated": "2018-08-01 10:56:29.661",
-      "dateStarted": "2018-08-30 17:43:11.500",
-      "dateFinished": "2018-08-30 17:43:11.524",
+      "dateStarted": "2018-09-03 10:28:12.397",
+      "dateFinished": "2018-09-03 10:28:12.409",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nNow lets check if we provide enough variety in those categories. We are targeting **Sci-Fi** and **Fantasy** fans. Our catalog should be as complete as possible.\n**Q:**Do we provide enough variety ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:11.598",
+      "dateUpdated": "2018-09-03 10:31:17.288",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1126,8 +1126,8 @@
       "jobName": "paragraph_1533124749016_270825197",
       "id": "20180801-115909_1683741481",
       "dateCreated": "2018-08-01 11:59:09.016",
-      "dateStarted": "2018-08-30 17:43:11.787",
-      "dateFinished": "2018-08-30 17:43:11.810",
+      "dateStarted": "2018-09-03 10:28:12.593",
+      "dateFinished": "2018-09-03 10:28:12.606",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1135,7 +1135,7 @@
       "title": "Variety by Genre",
       "text": "%sql\nselect  category, avg(cover_price) as `Profitability Potential`, count(*) as Items from books group by category order by Items ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.770",
+      "dateUpdated": "2018-09-03 10:31:17.334",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -1242,7 +1242,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d7"
+            "http://10.5.0.6:4040/jobs/job?id\u003d51"
           ],
           "interpreterSettingId": "spark"
         }
@@ -1251,15 +1251,15 @@
       "jobName": "paragraph_1533117550819_603861426",
       "id": "20180730-075735_302224287",
       "dateCreated": "2018-08-01 09:59:10.819",
-      "dateStarted": "2018-08-30 17:43:12.025",
-      "dateFinished": "2018-08-30 17:43:14.082",
+      "dateStarted": "2018-09-03 10:28:12.838",
+      "dateFinished": "2018-09-03 10:28:14.270",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \n    The variety chart shows that we have covered **Sci-Fi** and **Fantasy** fans but also we have substential variety **Romance** and **Children** books.\nWe might want to explore the profitability potential those two categories. \nLets get back and click *settings* above and deselect *items* the chart now presents the profitability potential of those books. \nIt looks like  **Romance** and **Children** are not very profitable, but **Classics** are. \n\nAs a result from this quick anlysis we already can make a decision for improvement in the future. Like how our customers like the new changes?; are they going to buy those books? etc.\n\nLet try to identify who our customers are in the next section. ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:14.137",
+      "dateUpdated": "2018-09-03 10:31:17.396",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1292,15 +1292,15 @@
       "jobName": "paragraph_1533125061581_1211657390",
       "id": "20180801-120421_1033634006",
       "dateCreated": "2018-08-01 12:04:21.582",
-      "dateStarted": "2018-08-30 17:43:14.352",
-      "dateFinished": "2018-08-30 17:43:14.389",
+      "dateStarted": "2018-09-03 10:28:14.446",
+      "dateFinished": "2018-09-03 10:28:14.460",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n### Customers\nIn this section we will try to identify who our customers are ? what are their preferences? how likely is for them to buy somethin out of their main focus. \n\nLets try to make a demographical profile of our customers. \n\n**Q:**Who is our customer ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:14.451",
+      "dateUpdated": "2018-09-03 10:31:17.458",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1333,8 +1333,8 @@
       "jobName": "paragraph_1533125807100_-594332642",
       "id": "20180801-121647_1961203969",
       "dateCreated": "2018-08-01 12:16:47.100",
-      "dateStarted": "2018-08-30 17:43:14.632",
-      "dateFinished": "2018-08-30 17:43:14.645",
+      "dateStarted": "2018-09-03 10:28:14.629",
+      "dateFinished": "2018-09-03 10:28:14.640",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1342,7 +1342,7 @@
       "title": "Loading customers ...",
       "text": "// Load Customers\nval pushdown_query\u003d\"(select c.*, ms.ms_type FROM customers c INNER JOIN maritalstatuses ms on ms.ms_id\u003dc.ms_id) as q\"\nval df_customers \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_customers.createOrReplaceTempView(\"customers\")\ndf_customers.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:14.727",
+      "dateUpdated": "2018-09-03 10:31:17.502",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1376,8 +1376,8 @@
       "jobName": "paragraph_1533118971475_1061980290",
       "id": "20180801-102251_1563285806",
       "dateCreated": "2018-08-01 10:22:51.476",
-      "dateStarted": "2018-08-30 17:43:14.967",
-      "dateFinished": "2018-08-30 17:43:16.395",
+      "dateStarted": "2018-09-03 10:28:14.780",
+      "dateFinished": "2018-09-03 10:28:15.554",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1385,7 +1385,7 @@
       "title": "Customer Profile",
       "text": "%sql\nselect  age, ms_type, count(1) as cnt from customers group by age, ms_type",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.865",
+      "dateUpdated": "2018-09-03 10:31:17.553",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -1483,7 +1483,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "age\tms_type\tcnt\n76\tMarried\t11623\n101\tDivorced\t3\n85\tSeparated\t8\n57\tWidow\t1091\n25\tDivorced\t226\n30\tSeparated\t434\n66\tNever married\t1572\n73\tDivorced\t2847\n79\tMarried\t6101\n27\tDivorced\t255\n85\tDivorced\t166\n47\tDivorced\t5357\n69\tWidow\t2870\n42\tNever married\t11023\n89\tMarried\t849\n22\tDivorced\t17\n60\tDivorced\t5993\n54\tWidow\t1101\n82\tNever married\t462\n46\tNever married\t10193\n31\tWidow\t41\n91\tWidow\t1184\n98\tNever married\t58\n92\tSeparated\t1\n44\tDivorced\t4801\n48\tSeparated\t1071\n61\tMarried\t22234\n52\tWidow\t550\n46\tDivorced\t5230\n67\tSeparated\t241\n87\tDivorced\t91\n75\tWidow\t5427\n72\tSeparated\t212\n88\tSeparated\t13\n33\tMarried\t12077\n12\tNever married\t7385\n14\tNever married\t11910\n67\tMarried\t13336\n63\tNever married\t3191\n90\tDivorced\t69\n87\tSeparated\t6\n73\tMarried\t13089\n40\tNever married\t9939\n61\tNever married\t3522\n56\tMarried\t24123\n94\tWidow\t725\n91\tNever married\t92\n34\tNever married\t15006\n47\tMarried\t20105\n71\tWidow\t3139\n65\tDivorced\t4780\n56\tWidow\t1024\n34\tWidow\t88\n20\tSeparated\t27\n50\tMarried\t21835\n74\tMarried\t13861\n99\tWidow\t191\n62\tSeparated\t510\n40\tDivorced\t2858\n74\tSeparated\t155\n22\tSeparated\t38\n87\tWidow\t966\n27\tMarried\t5774\n80\tSeparated\t43\n100\tWidow\t288\n28\tSeparated\t190\n75\tSeparated\t157\n47\tNever married\t10454\n17\tNever married\t18240\n85\tMarried\t1338\n51\tNever married\t8871\n88\tDivorced\t189\n95\tDivorced\t30\n35\tSeparated\t762\n60\tSeparated\t509\n15\tMarried\t6\n44\tWidow\t257\n77\tSeparated\t76\n94\tMarried\t247\n80\tWidow\t4211\n24\tDivorced\t206\n55\tNever married\t6661\n32\tNever married\t17500\n93\tWidow\t822\n22\tMarried\t722\n33\tSeparated\t442\n101\tWidow\t83\n101\tMarried\t27\n18\tMarried\t8\n67\tDivorced\t3350\n29\tSeparated\t513\n69\tDivorced\t2797\n72\tWidow\t3416\n82\tDivorced\t628\n46\tMarried\t19725\n72\tDivorced\t3353\n32\tMarried\t11348\n61\tDivorced\t6611\n80\tNever married\t561\n38\tSeparated\t658\n23\tDivorced\t23\n55\tDivorced\t8322\n96\tWidow\t602\n48\tDivorced\t5451\n86\tDivorced\t232\n65\tMarried\t18913\n51\tDivorced\t7161\n81\tWidow\t3845\n27\tNever married\t25679\n86\tWidow\t2446\n79\tWidow\t5062\n63\tSeparated\t541\n102\tDivorced\t5\n74\tNever married\t1189\n11\tNever married\t6477\n55\tWidow\t1103\n81\tNever married\t545\n71\tMarried\t13502\n29\tNever married\t19008\n84\tDivorced\t272\n21\tMarried\t730\n57\tNever married\t6579\n20\tMarried\t700\n44\tSeparated\t1008\n52\tSeparated\t1004\n23\tSeparated\t37\n90\tNever married\t122\n69\tSeparated\t153\n43\tWidow\t122\n21\tSeparated\t34\n34\tSeparated\t738\n73\tSeparated\t181\n21\tWidow\t5\n37\tNever married\t14134\n33\tDivorced\t967\n30\tDivorced\t902\n38\tMarried\t14576\n54\tSeparated\t958\n22\tWidow\t3\n29\tDivorced\t1020\n89\tDivorced\t122\n28\tWidow\t16\n68\tDivorced\t3054\n66\tWidow\t1932\n22\tNever married\t22873\n76\tSeparated\t135\n67\tNever married\t1393\n64\tSeparated\t350\n35\tNever married\t15378\n74\tDivorced\t2701\n30\tMarried\t10950\n49\tMarried\t22591\n68\tSeparated\t196\n50\tSeparated\t1016\n60\tNever married\t3283\n58\tMarried\t25757\n62\tWidow\t1495\n71\tDivorced\t3081\n31\tSeparated\t461\n97\tMarried\t273\n92\tWidow\t965\n40\tMarried\t14973\n59\tWidow\t1721\n71\tNever married\t1221\n78\tMarried\t6863\n45\tDivorced\t5214\n13\tNever married\t9917\n89\tWidow\t2545\n25\tMarried\t5147\n49\tDivorced\t7028\n25\tSeparated\t183\n60\tMarried\t20431\n38\tDivorced\t1776\n27\tSeparated\t257\n90\tMarried\t452\n26\tWidow\t11\n41\tDivorced\t3158\n23\tMarried\t809\n41\tMarried\t16124\n39\tNever married\t10001\n39\tDivorced\t2890\n62\tNever married\t3261\n59\tDivorced\t6980\n66\tSeparated\t246\n41\tNever married\t10775\n91\tSeparated\t1\n70\tSeparated\t159\n62\tDivorced\t6026\n54\tNever married\t6695\n76\tDivorced\t2251\n30\tWidow\t40\n28\tDivorced\t229\n51\tSeparated\t1074\n80\tDivorced\t778\n18\tNever married\t19353\n78\tNever married\t581\n32\tWidow\t40\n88\tWidow\t1877\n70\tNever married\t1113\n92\tDivorced\t41\n42\tWidow\t140\n95\tNever married\t60\n77\tWidow\t3382\n65\tWidow\t2415\n16\tMarried\t7\n90\tSeparated\t3\n64\tMarried\t20743\n84\tMarried\t2055\n53\tSeparated\t1115\n61\tSeparated\t542\n39\tMarried\t15391\n75\tMarried\t12695\n38\tWidow\t100\n39\tSeparated\t816\n84\tNever married\t312\n42\tMarried\t16406\n34\tDivorced\t2039\n36\tMarried\t16063\n69\tNever married\t1093\n36\tNever married\t14609\n43\tSeparated\t805\n57\tDivorced\t8024\n95\tMarried\t195\n44\tNever married\t9606\n74\tWidow\t5943\n78\tDivorced\t1387\n25\tWidow\t17\n56\tSeparated\t852\n31\tDivorced\t923\n86\tNever married\t265\n99\tMarried\t66\n20\tDivorced\t20\n32\tSeparated\t436\n14\tMarried\t8\n36\tDivorced\t2034\n93\tNever married\t82\n35\tDivorced\t2219\n68\tMarried\t11845\n19\tWidow\t4\n58\tSeparated\t913\n64\tNever married\t2132\n33\tWidow\t47\n50\tDivorced\t6812\n96\tNever married\t65\n101\tNever married\t3\n63\tDivorced\t5837\n28\tNever married\t23330\n54\tDivorced\t7994\n71\tSeparated\t189\n52\tNever married\t8693\n75\tNever married\t1116\n93\tDivorced\t45\n47\tSeparated\t1055\n50\tWidow\t480\n99\tNever married\t15\n79\tSeparated\t47\n78\tSeparated\t78\n82\tMarried\t4434\n10\tNever married\t4567\n93\tMarried\t230\n46\tWidow\t280\n100\tMarried\t90\n98\tDivorced\t39\n95\tWidow\t645\n24\tNever married\t18921\n96\tMarried\t200\n53\tDivorced\t7179\n18\tDivorced\t1\n75\tDivorced\t2524\n92\tMarried\t308\n45\tMarried\t19138\n80\tMarried\t5202\n68\tNever married\t1289\n9\tNever married\t5581\n37\tMarried\t15767\n76\tNever married\t977\n32\tDivorced\t871\n34\tMarried\t16629\n70\tDivorced\t2821\n91\tMarried\t385\n85\tNever married\t208\n81\tDivorced\t730\n83\tWidow\t3604\n53\tWidow\t509\n46\tSeparated\t1084\n45\tWidow\t293\n73\tWidow\t2881\n66\tDivorced\t3882\n60\tWidow\t1470\n97\tNever married\t74\n19\tSeparated\t30\n99\tDivorced\t11\n35\tMarried\t17167\n49\tSeparated\t992\n50\tNever married\t8597\n79\tNever married\t685\n51\tMarried\t22346\n76\tWidow\t4987\n83\tNever married\t501\n45\tSeparated\t1089\n28\tMarried\t5153\n96\tDivorced\t31\n24\tWidow\t11\n17\tMarried\t9\n54\tMarried\t25363\n36\tSeparated\t740\n24\tSeparated\t188\n53\tMarried\t23083\n97\tDivorced\t35\n77\tDivorced\t1581\n36\tWidow\t102\n79\tDivorced\t973\n58\tDivorced\t8267\n88\tNever married\t198\n49\tWidow\t606\n57\tMarried\t25419\n45\tNever married\t9971\n85\tWidow\t1911\n89\tSeparated\t4\n26\tMarried\t5398\n68\tWidow\t1506\n19\tDivorced\t14\n58\tNever married\t6867\n86\tSeparated\t12\n77\tMarried\t8019\n8\tNever married\t4543\n57\tSeparated\t936\n37\tSeparated\t728\n82\tSeparated\t43\n48\tMarried\t20451\n64\tWidow\t2702\n61\tWidow\t1584\n87\tMarried\t652\n35\tWidow\t87\n83\tMarried\t4392\n21\tNever married\t21271\n63\tMarried\t19328\n48\tWidow\t277\n38\tNever married\t13200\n56\tNever married\t6391\n49\tNever married\t8596\n51\tWidow\t535\n24\tMarried\t4292\n16\tNever married\t15770\n59\tNever married\t3730\n15\tNever married\t12986\n91\tDivorced\t64\n48\tNever married\t10937\n94\tSeparated\t1\n70\tMarried\t12425\n25\tNever married\t22568\n72\tNever married\t1286\n55\tMarried\t25992\n30\tNever married\t16952\n100\tDivorced\t9\n29\tWidow\t45\n64\tDivorced\t5368\n42\tDivorced\t3100\n41\tWidow\t150\n26\tNever married\t24175\n19\tMarried\t627\n55\tSeparated\t892\n83\tDivorced\t676\n98\tMarried\t201\n37\tWidow\t77\n102\tWidow\t64\n26\tSeparated\t230\n72\tMarried\t14679\n47\tWidow\t264\n102\tMarried\t25\n70\tWidow\t2732\n43\tDivorced\t2909\n21\tDivorced\t18\n23\tWidow\t1\n62\tMarried\t20791\n59\tMarried\t23697\n59\tSeparated\t602\n69\tMarried\t12209\n100\tNever married\t24\n78\tWidow\t2984\n20\tNever married\t21859\n86\tMarried\t1634\n26\tDivorced\t245\n31\tMarried\t12759\n53\tNever married\t9019\n29\tMarried\t12273\n65\tNever married\t1997\n93\tSeparated\t1\n37\tDivorced\t1948\n23\tNever married\t24606\n67\tWidow\t1726\n88\tMarried\t1377\n84\tWidow\t2894\n65\tSeparated\t327\n83\tSeparated\t39\n43\tMarried\t15309\n81\tMarried\t4879\n58\tWidow\t1132\n40\tSeparated\t808\n89\tNever married\t200\n94\tNever married\t60\n27\tWidow\t21\n66\tMarried\t15126\n102\tNever married\t5\n43\tNever married\t10178\n97\tWidow\t811\n92\tNever married\t97\n98\tSeparated\t1\n52\tDivorced\t6914\n87\tNever married\t95\n56\tDivorced\t7640\n98\tWidow\t584\n81\tSeparated\t25\n52\tMarried\t21968\n41\tSeparated\t829\n99\tSeparated\t1\n33\tNever married\t18963\n90\tWidow\t1170\n31\tNever married\t19748\n39\tWidow\t105\n20\tWidow\t4\n19\tNever married\t19466\n42\tSeparated\t833\n77\tNever married\t662\n40\tWidow\t132\n44\tMarried\t18283\n73\tNever married\t1154\n84\tSeparated\t10\n82\tWidow\t3503\n94\tDivorced\t34\n63\tWidow\t1349\n"
+            "data": "age\tms_type\tcnt\n76\tMarried\t11623\n101\tDivorced\t3\n85\tSeparated\t8\n25\tDivorced\t226\n57\tWidow\t1091\n30\tSeparated\t434\n66\tNever married\t1572\n73\tDivorced\t2847\n79\tMarried\t6101\n85\tDivorced\t166\n27\tDivorced\t255\n69\tWidow\t2870\n47\tDivorced\t5357\n42\tNever married\t11023\n89\tMarried\t849\n22\tDivorced\t17\n60\tDivorced\t5993\n54\tWidow\t1101\n82\tNever married\t462\n46\tNever married\t10193\n91\tWidow\t1184\n31\tWidow\t41\n98\tNever married\t58\n92\tSeparated\t1\n61\tMarried\t22234\n48\tSeparated\t1071\n44\tDivorced\t4801\n52\tWidow\t550\n46\tDivorced\t5230\n87\tDivorced\t91\n67\tSeparated\t241\n75\tWidow\t5427\n72\tSeparated\t212\n88\tSeparated\t13\n12\tNever married\t7385\n14\tNever married\t11910\n33\tMarried\t12077\n67\tMarried\t13336\n63\tNever married\t3191\n90\tDivorced\t69\n87\tSeparated\t6\n56\tMarried\t24123\n73\tMarried\t13089\n40\tNever married\t9939\n61\tNever married\t3522\n94\tWidow\t725\n91\tNever married\t92\n47\tMarried\t20105\n34\tNever married\t15006\n65\tDivorced\t4780\n71\tWidow\t3139\n56\tWidow\t1024\n34\tWidow\t88\n20\tSeparated\t27\n74\tMarried\t13861\n50\tMarried\t21835\n62\tSeparated\t510\n99\tWidow\t191\n40\tDivorced\t2858\n74\tSeparated\t155\n22\tSeparated\t38\n87\tWidow\t966\n27\tMarried\t5774\n80\tSeparated\t43\n100\tWidow\t288\n28\tSeparated\t190\n75\tSeparated\t157\n47\tNever married\t10454\n17\tNever married\t18240\n85\tMarried\t1338\n51\tNever married\t8871\n88\tDivorced\t189\n95\tDivorced\t30\n35\tSeparated\t762\n60\tSeparated\t509\n15\tMarried\t6\n44\tWidow\t257\n94\tMarried\t247\n77\tSeparated\t76\n80\tWidow\t4211\n24\tDivorced\t206\n55\tNever married\t6661\n32\tNever married\t17500\n22\tMarried\t722\n33\tSeparated\t442\n93\tWidow\t822\n101\tWidow\t83\n101\tMarried\t27\n18\tMarried\t8\n67\tDivorced\t3350\n69\tDivorced\t2797\n29\tSeparated\t513\n72\tWidow\t3416\n82\tDivorced\t628\n46\tMarried\t19725\n72\tDivorced\t3353\n32\tMarried\t11348\n61\tDivorced\t6611\n38\tSeparated\t658\n80\tNever married\t561\n23\tDivorced\t23\n55\tDivorced\t8322\n96\tWidow\t602\n48\tDivorced\t5451\n86\tDivorced\t232\n81\tWidow\t3845\n65\tMarried\t18913\n51\tDivorced\t7161\n27\tNever married\t25679\n79\tWidow\t5062\n86\tWidow\t2446\n63\tSeparated\t541\n102\tDivorced\t5\n74\tNever married\t1189\n11\tNever married\t6477\n81\tNever married\t545\n55\tWidow\t1103\n71\tMarried\t13502\n29\tNever married\t19008\n57\tNever married\t6579\n52\tSeparated\t1004\n44\tSeparated\t1008\n21\tMarried\t730\n20\tMarried\t700\n84\tDivorced\t272\n23\tSeparated\t37\n90\tNever married\t122\n43\tWidow\t122\n69\tSeparated\t153\n21\tSeparated\t34\n34\tSeparated\t738\n73\tSeparated\t181\n21\tWidow\t5\n37\tNever married\t14134\n30\tDivorced\t902\n33\tDivorced\t967\n38\tMarried\t14576\n54\tSeparated\t958\n22\tWidow\t3\n29\tDivorced\t1020\n89\tDivorced\t122\n28\tWidow\t16\n68\tDivorced\t3054\n66\tWidow\t1932\n22\tNever married\t22873\n67\tNever married\t1393\n76\tSeparated\t135\n64\tSeparated\t350\n35\tNever married\t15378\n30\tMarried\t10950\n74\tDivorced\t2701\n49\tMarried\t22591\n68\tSeparated\t196\n50\tSeparated\t1016\n58\tMarried\t25757\n71\tDivorced\t3081\n60\tNever married\t3283\n97\tMarried\t273\n31\tSeparated\t461\n62\tWidow\t1495\n40\tMarried\t14973\n59\tWidow\t1721\n92\tWidow\t965\n71\tNever married\t1221\n78\tMarried\t6863\n13\tNever married\t9917\n89\tWidow\t2545\n45\tDivorced\t5214\n25\tMarried\t5147\n49\tDivorced\t7028\n25\tSeparated\t183\n60\tMarried\t20431\n27\tSeparated\t257\n38\tDivorced\t1776\n90\tMarried\t452\n26\tWidow\t11\n41\tDivorced\t3158\n23\tMarried\t809\n39\tNever married\t10001\n62\tNever married\t3261\n39\tDivorced\t2890\n41\tMarried\t16124\n59\tDivorced\t6980\n66\tSeparated\t246\n41\tNever married\t10775\n91\tSeparated\t1\n70\tSeparated\t159\n62\tDivorced\t6026\n54\tNever married\t6695\n76\tDivorced\t2251\n30\tWidow\t40\n28\tDivorced\t229\n80\tDivorced\t778\n51\tSeparated\t1074\n18\tNever married\t19353\n78\tNever married\t581\n32\tWidow\t40\n88\tWidow\t1877\n92\tDivorced\t41\n70\tNever married\t1113\n95\tNever married\t60\n42\tWidow\t140\n65\tWidow\t2415\n77\tWidow\t3382\n16\tMarried\t7\n90\tSeparated\t3\n64\tMarried\t20743\n84\tMarried\t2055\n53\tSeparated\t1115\n61\tSeparated\t542\n39\tMarried\t15391\n75\tMarried\t12695\n39\tSeparated\t816\n84\tNever married\t312\n38\tWidow\t100\n42\tMarried\t16406\n36\tMarried\t16063\n69\tNever married\t1093\n34\tDivorced\t2039\n36\tNever married\t14609\n57\tDivorced\t8024\n43\tSeparated\t805\n95\tMarried\t195\n78\tDivorced\t1387\n44\tNever married\t9606\n74\tWidow\t5943\n25\tWidow\t17\n56\tSeparated\t852\n31\tDivorced\t923\n99\tMarried\t66\n86\tNever married\t265\n20\tDivorced\t20\n32\tSeparated\t436\n14\tMarried\t8\n36\tDivorced\t2034\n93\tNever married\t82\n68\tMarried\t11845\n35\tDivorced\t2219\n19\tWidow\t4\n64\tNever married\t2132\n58\tSeparated\t913\n33\tWidow\t47\n50\tDivorced\t6812\n96\tNever married\t65\n101\tNever married\t3\n63\tDivorced\t5837\n28\tNever married\t23330\n54\tDivorced\t7994\n71\tSeparated\t189\n52\tNever married\t8693\n75\tNever married\t1116\n47\tSeparated\t1055\n50\tWidow\t480\n93\tDivorced\t45\n78\tSeparated\t78\n79\tSeparated\t47\n99\tNever married\t15\n82\tMarried\t4434\n10\tNever married\t4567\n93\tMarried\t230\n46\tWidow\t280\n98\tDivorced\t39\n100\tMarried\t90\n95\tWidow\t645\n24\tNever married\t18921\n53\tDivorced\t7179\n96\tMarried\t200\n18\tDivorced\t1\n75\tDivorced\t2524\n92\tMarried\t308\n45\tMarried\t19138\n80\tMarried\t5202\n68\tNever married\t1289\n9\tNever married\t5581\n37\tMarried\t15767\n76\tNever married\t977\n32\tDivorced\t871\n34\tMarried\t16629\n70\tDivorced\t2821\n85\tNever married\t208\n91\tMarried\t385\n83\tWidow\t3604\n81\tDivorced\t730\n53\tWidow\t509\n46\tSeparated\t1084\n45\tWidow\t293\n73\tWidow\t2881\n66\tDivorced\t3882\n60\tWidow\t1470\n97\tNever married\t74\n19\tSeparated\t30\n99\tDivorced\t11\n35\tMarried\t17167\n49\tSeparated\t992\n50\tNever married\t8597\n79\tNever married\t685\n51\tMarried\t22346\n76\tWidow\t4987\n83\tNever married\t501\n28\tMarried\t5153\n45\tSeparated\t1089\n96\tDivorced\t31\n17\tMarried\t9\n24\tWidow\t11\n54\tMarried\t25363\n36\tSeparated\t740\n24\tSeparated\t188\n53\tMarried\t23083\n97\tDivorced\t35\n77\tDivorced\t1581\n58\tDivorced\t8267\n79\tDivorced\t973\n36\tWidow\t102\n88\tNever married\t198\n49\tWidow\t606\n57\tMarried\t25419\n45\tNever married\t9971\n85\tWidow\t1911\n89\tSeparated\t4\n26\tMarried\t5398\n68\tWidow\t1506\n19\tDivorced\t14\n58\tNever married\t6867\n86\tSeparated\t12\n8\tNever married\t4543\n77\tMarried\t8019\n37\tSeparated\t728\n57\tSeparated\t936\n82\tSeparated\t43\n48\tMarried\t20451\n87\tMarried\t652\n61\tWidow\t1584\n64\tWidow\t2702\n35\tWidow\t87\n83\tMarried\t4392\n63\tMarried\t19328\n21\tNever married\t21271\n48\tWidow\t277\n49\tNever married\t8596\n56\tNever married\t6391\n38\tNever married\t13200\n51\tWidow\t535\n24\tMarried\t4292\n16\tNever married\t15770\n59\tNever married\t3730\n15\tNever married\t12986\n91\tDivorced\t64\n48\tNever married\t10937\n94\tSeparated\t1\n70\tMarried\t12425\n25\tNever married\t22568\n72\tNever married\t1286\n30\tNever married\t16952\n55\tMarried\t25992\n29\tWidow\t45\n100\tDivorced\t9\n42\tDivorced\t3100\n64\tDivorced\t5368\n41\tWidow\t150\n26\tNever married\t24175\n55\tSeparated\t892\n83\tDivorced\t676\n19\tMarried\t627\n37\tWidow\t77\n98\tMarried\t201\n102\tWidow\t64\n26\tSeparated\t230\n72\tMarried\t14679\n47\tWidow\t264\n102\tMarried\t25\n43\tDivorced\t2909\n70\tWidow\t2732\n21\tDivorced\t18\n23\tWidow\t1\n62\tMarried\t20791\n59\tMarried\t23697\n59\tSeparated\t602\n69\tMarried\t12209\n100\tNever married\t24\n78\tWidow\t2984\n20\tNever married\t21859\n86\tMarried\t1634\n26\tDivorced\t245\n31\tMarried\t12759\n29\tMarried\t12273\n53\tNever married\t9019\n65\tNever married\t1997\n93\tSeparated\t1\n37\tDivorced\t1948\n23\tNever married\t24606\n67\tWidow\t1726\n84\tWidow\t2894\n88\tMarried\t1377\n65\tSeparated\t327\n83\tSeparated\t39\n43\tMarried\t15309\n81\tMarried\t4879\n40\tSeparated\t808\n58\tWidow\t1132\n89\tNever married\t200\n94\tNever married\t60\n27\tWidow\t21\n66\tMarried\t15126\n102\tNever married\t5\n43\tNever married\t10178\n97\tWidow\t811\n92\tNever married\t97\n98\tSeparated\t1\n52\tDivorced\t6914\n87\tNever married\t95\n56\tDivorced\t7640\n98\tWidow\t584\n81\tSeparated\t25\n52\tMarried\t21968\n41\tSeparated\t829\n99\tSeparated\t1\n33\tNever married\t18963\n90\tWidow\t1170\n31\tNever married\t19748\n39\tWidow\t105\n20\tWidow\t4\n19\tNever married\t19466\n42\tSeparated\t833\n77\tNever married\t662\n40\tWidow\t132\n44\tMarried\t18283\n73\tNever married\t1154\n84\tSeparated\t10\n82\tWidow\t3503\n94\tDivorced\t34\n63\tWidow\t1349\n"
           }
         ]
       },
@@ -1494,11 +1494,11 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d8",
-            "http://10.5.0.6:4040/jobs/job?id\u003d9",
-            "http://10.5.0.6:4040/jobs/job?id\u003d10",
-            "http://10.5.0.6:4040/jobs/job?id\u003d11",
-            "http://10.5.0.6:4040/jobs/job?id\u003d12"
+            "http://10.5.0.6:4040/jobs/job?id\u003d52",
+            "http://10.5.0.6:4040/jobs/job?id\u003d53",
+            "http://10.5.0.6:4040/jobs/job?id\u003d54",
+            "http://10.5.0.6:4040/jobs/job?id\u003d55",
+            "http://10.5.0.6:4040/jobs/job?id\u003d56"
           ],
           "interpreterSettingId": "spark"
         }
@@ -1507,15 +1507,15 @@
       "jobName": "paragraph_1533117550820_746846349",
       "id": "20180727-135426_1794137245",
       "dateCreated": "2018-08-01 09:59:10.820",
-      "dateStarted": "2018-08-30 17:43:16.695",
-      "dateFinished": "2018-08-30 17:43:21.069",
+      "dateStarted": "2018-09-03 10:28:15.728",
+      "dateFinished": "2018-09-03 10:28:18.378",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nThose we demographics only. But we want to know more about their bying habbits.\nHow much they buy?\nHow much they spend? \nWhat do they buy?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:21.081",
+      "dateUpdated": "2018-09-03 10:31:17.598",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1548,8 +1548,8 @@
       "jobName": "paragraph_1533126395619_-1536635498",
       "id": "20180801-122635_101901758",
       "dateCreated": "2018-08-01 12:26:35.619",
-      "dateStarted": "2018-08-30 17:43:21.271",
-      "dateFinished": "2018-08-30 17:43:21.290",
+      "dateStarted": "2018-09-03 10:28:18.586",
+      "dateFinished": "2018-09-03 10:28:18.592",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1557,7 +1557,7 @@
       "title": "Loading orders ...",
       "text": "// Load Transactions\nval pushdown_query \u003d \"(SELECT count(t.order_id) orders, SUM(t.price), SUM(t.discounted_price) Amount, t.customer_id,  c.customer_nm, c.sex, c.age, ms.ms_type FROM transactions as t INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN maritalstatuses ms ON ms.ms_id \u003d c.ms_id GROUP BY  t.customer_id, c.customer_nm, c.sex, c.age, ms.ms_type ORDER BY orders desc) as t\"\nval df_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_orders.createOrReplaceTempView(\"transactions\")\ndf_orders.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:21.369",
+      "dateUpdated": "2018-09-03 10:31:17.650",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1591,15 +1591,15 @@
       "jobName": "paragraph_1533119033774_-1792010973",
       "id": "20180801-102353_795574613",
       "dateCreated": "2018-08-01 10:23:53.774",
-      "dateStarted": "2018-08-30 17:43:21.536",
-      "dateFinished": "2018-08-30 17:43:23.089",
+      "dateStarted": "2018-09-03 10:28:18.762",
+      "dateFinished": "2018-09-03 10:28:19.464",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nBut lets start with the biggest question. \n**Q:**Who spends more men or women ?",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:23.152",
+      "dateUpdated": "2018-09-03 10:31:17.693",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1632,8 +1632,8 @@
       "jobName": "paragraph_1533127136266_-1528064023",
       "id": "20180801-123856_489038421",
       "dateCreated": "2018-08-01 12:38:56.267",
-      "dateStarted": "2018-08-30 17:43:23.393",
-      "dateFinished": "2018-08-30 17:43:23.425",
+      "dateStarted": "2018-09-03 10:28:19.578",
+      "dateFinished": "2018-09-03 10:28:19.591",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1641,7 +1641,7 @@
       "title": "Orders Distribution by Sex",
       "text": "%sql\nSELECT SUM(orders) as Orders, sexname(sex) Sex FROM transactions group by sexName(sex)  ORDER by Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:23.468",
+      "dateUpdated": "2018-09-03 10:31:17.736",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1732,7 +1732,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d13"
+            "http://10.5.0.6:4040/jobs/job?id\u003d57"
           ],
           "interpreterSettingId": "spark"
         }
@@ -1741,8 +1741,8 @@
       "jobName": "paragraph_1533117550839_672305718",
       "id": "20180730-133456_361425748",
       "dateCreated": "2018-08-01 09:59:10.839",
-      "dateStarted": "2018-08-30 17:43:23.921",
-      "dateFinished": "2018-08-30 17:43:38.783",
+      "dateStarted": "2018-09-03 10:28:19.824",
+      "dateFinished": "2018-09-03 10:28:28.908",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -1750,7 +1750,7 @@
       "title": "Top Buyers Distribution by Sex",
       "text": "%sql\nSELECT * FROM (SELECT max(orders) as Orders, customer_nm ,customer_id, sexname(sex) as Sex, age, ms_type  FROM transactions group by customer_nm, customer_id, Sex, age, ms_type order by Orders desc limit 10) x order by x.Sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:43:38.868",
+      "dateUpdated": "2018-09-03 10:31:17.786",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -1851,7 +1851,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d14"
+            "http://10.5.0.6:4040/jobs/job?id\u003d58"
           ],
           "interpreterSettingId": "spark"
         }
@@ -1860,15 +1860,15 @@
       "jobName": "paragraph_1533117550842_1876574702",
       "id": "20180730-125045_1914095396",
       "dateCreated": "2018-08-01 09:59:10.842",
-      "dateStarted": "2018-08-30 17:43:39.051",
-      "dateFinished": "2018-08-30 17:44:06.788",
+      "dateStarted": "2018-09-03 10:28:29.047",
+      "dateFinished": "2018-09-03 10:28:47.498",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nIt looks like women buy more.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:06.888",
+      "dateUpdated": "2018-09-03 10:31:17.856",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -1901,15 +1901,15 @@
       "jobName": "paragraph_1533127245434_1564947495",
       "id": "20180801-124045_109483302",
       "dateCreated": "2018-08-01 12:40:45.434",
-      "dateStarted": "2018-08-30 17:44:07.014",
-      "dateFinished": "2018-08-30 17:44:07.026",
+      "dateStarted": "2018-09-03 10:28:47.624",
+      "dateFinished": "2018-09-03 10:28:47.629",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nBut men lead the cart of most orders per person.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:07.114",
+      "dateUpdated": "2018-09-03 10:31:17.913",
       "config": {
         "colWidth": 6.0,
         "fontSize": 9.0,
@@ -1942,15 +1942,15 @@
       "jobName": "paragraph_1533127296043_1006665845",
       "id": "20180801-124136_268623677",
       "dateCreated": "2018-08-01 12:41:36.043",
-      "dateStarted": "2018-08-30 17:44:07.247",
-      "dateFinished": "2018-08-30 17:44:07.276",
+      "dateStarted": "2018-09-03 10:28:47.812",
+      "dateFinished": "2018-09-03 10:28:47.820",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n**Q:**But do the young read more than seniores ? \nLets find out.",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:07.347",
+      "dateUpdated": "2018-09-03 10:31:17.964",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -1983,15 +1983,15 @@
       "jobName": "paragraph_1533127584842_878866392",
       "id": "20180801-124624_825159555",
       "dateCreated": "2018-08-01 12:46:24.843",
-      "dateStarted": "2018-08-30 17:44:07.506",
-      "dateFinished": "2018-08-30 17:44:07.526",
+      "dateStarted": "2018-09-03 10:28:47.989",
+      "dateFinished": "2018-09-03 10:28:48.006",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:07.606",
+      "dateUpdated": "2018-09-03 10:31:18.059",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2022,7 +2022,7 @@
       "title": "Order Distribution by Age",
       "text": "%sql\nSELECT age,sum(orders) as Orders, AVG(amount) as `Cart Amount`, sexname(sex) Sex FROM transactions group by age,sex\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.956",
+      "dateUpdated": "2018-09-03 10:31:18.104",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -2127,7 +2127,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "age\tOrders\tCart Amount\tSex\n71\t57418\t55.432830\tMale\n58\t124966\t55.104991\tFemale\n85\t10878\t54.662629\tFemale\n101\t361\t61.067500\tFemale\n62\t94452\t55.326828\tFemale\n61\t102016\t55.311741\tFemale\n45\t96706\t55.558978\tMale\n77\t39741\t54.435695\tFemale\n91\t5096\t56.149549\tFemale\n24\t63410\t54.915956\tMale\n77\t36755\t55.121792\tMale\n30\t84688\t54.761012\tFemale\n84\t16302\t55.280962\tFemale\n96\t2517\t56.373645\tMale\n14\t32479\t55.150974\tMale\n31\t98891\t55.067322\tFemale\n18\t56283\t54.944721\tFemale\n78\t34230\t54.298548\tFemale\n83\t26901\t54.704185\tFemale\n100\t1146\t56.318232\tMale\n10\t13528\t54.317778\tFemale\n23\t75204\t54.776590\tFemale\n34\t94075\t55.033049\tMale\n48\t110488\t54.892720\tFemale\n15\t35339\t55.532616\tMale\n57\t124693\t55.352966\tFemale\n48\t103732\t55.062584\tMale\n40\t84942\t54.894066\tFemale\n102\t246\t49.592917\tMale\n42\t91015\t54.254395\tFemale\n26\t87991\t55.159480\tFemale\n37\t88137\t55.284705\tMale\n97\t3497\t56.476373\tFemale\n70\t56523\t55.855303\tFemale\n12\t21255\t54.770479\tFemale\n49\t116616\t55.132473\tFemale\n67\t58345\t54.700056\tFemale\n25\t82758\t55.005347\tFemale\n76\t54105\t55.221614\tMale\n19\t53857\t54.778162\tMale\n73\t58661\t55.051278\tFemale\n61\t92181\t54.900568\tMale\n16\t45905\t54.861232\tFemale\n33\t87376\t54.616771\tMale\n38\t88045\t54.303717\tFemale\n81\t29319\t54.606570\tFemale\n82\t26546\t54.926599\tFemale\n66\t66104\t54.851808\tFemale\n58\t117227\t55.371033\tMale\n70\t51984\t54.683330\tMale\n96\t2506\t52.734815\tFemale\n11\t19095\t55.822587\tFemale\n86\t12729\t56.199514\tMale\n69\t51521\t55.704326\tMale\n90\t4944\t53.990702\tMale\n32\t81695\t54.982440\tMale\n28\t85259\t55.306014\tFemale\n51\t108743\t55.207221\tMale\n46\t97690\t54.893964\tMale\n50\t113974\t55.182674\tFemale\n53\t110066\t54.816120\tMale\n67\t53712\t54.739195\tMale\n20\t61319\t55.175090\tMale\n12\t20194\t55.077000\tMale\n9\t16742\t55.556166\tFemale\n30\t79712\t55.065136\tMale\n64\t91482\t55.199398\tFemale\n19\t59116\t54.818113\tFemale\n47\t108916\t55.220435\tFemale\n43\t85068\t55.052562\tFemale\n29\t96193\t54.878760\tFemale\n59\t107174\t54.955893\tFemale\n78\t32055\t54.713289\tMale\n51\t116399\t55.126430\tFemale\n89\t10286\t57.141260\tMale\n64\t84351\t54.841945\tMale\n34\t99789\t55.060287\tFemale\n100\t1302\t59.788169\tFemale\n87\t5098\t56.468610\tMale\n17\t48905\t54.418267\tMale\n40\t76352\t54.598766\tMale\n42\t85056\t54.942353\tMale\n68\t52297\t55.019759\tFemale\n65\t77428\t55.255499\tMale\n94\t2832\t56.839738\tMale\n50\t104024\t55.368922\tMale\n71\t61761\t55.053980\tFemale\n29\t88111\t55.050022\tMale\n31\t92245\t55.047508\tMale\n91\t4744\t55.820083\tMale\n17\t53340\t55.168833\tFemale\n20\t65952\t54.623260\tFemale\n63\t81912\t55.083491\tMale\n102\t301\t59.137255\tFemale\n14\t34867\t55.416609\tFemale\n41\t83584\t55.068595\tMale\n72\t67037\t54.594258\tFemale\n60\t86078\t55.611526\tMale\n44\t99207\t55.166680\tFemale\n84\t14888\t54.560908\tMale\n22\t69146\t55.501325\tFemale\n9\t14960\t55.698707\tMale\n36\t90266\t55.024921\tMale\n25\t75346\t55.029725\tMale\n39\t78749\t55.232133\tMale\n82\t24027\t54.677864\tMale\n54\t112254\t54.707360\tMale\n43\t79565\t55.114992\tMale\n33\t94894\t55.361364\tFemale\n101\t329\t59.477857\tMale\n81\t27155\t55.511710\tMale\n52\t114110\t55.068627\tFemale\n35\t96346\t55.408509\tMale\n28\t77599\t55.022749\tMale\n46\t107551\t55.193563\tFemale\n73\t54812\t55.353937\tMale\n24\t68954\t55.130812\tFemale\n10\t12016\t54.623676\tMale\n69\t56178\t55.024296\tFemale\n47\t100168\t54.721589\tMale\n21\t59538\t55.095519\tMale\n87\t4950\t52.193265\tFemale\n88\t10238\t54.939555\tMale\n36\t97951\t54.853342\tFemale\n80\t29322\t55.672563\tMale\n27\t94515\t55.411087\tFemale\n60\t91967\t54.272836\tFemale\n8\t12848\t55.032266\tFemale\n56\t108509\t54.933097\tMale\n83\t24773\t55.049270\tMale\n49\t107733\t55.202122\tMale\n63\t88438\t55.324185\tFemale\n74\t70283\t55.219415\tFemale\n62\t86036\t54.952269\tMale\n38\t81517\t55.054154\tMale\n44\t91150\t54.852819\tMale\n98\t2630\t57.255912\tFemale\n75\t60184\t55.681645\tMale\n55\t124901\t54.385015\tFemale\n88\t10470\t56.604643\tFemale\n90\t5277\t55.214330\tFemale\n92\t4254\t56.175896\tFemale\n68\t48613\t55.680813\tMale\n54\t124461\t55.231112\tFemale\n39\t85930\t55.302360\tFemale\n35\t104799\t55.722187\tFemale\n8\t12544\t55.186345\tMale\n85\t9552\t55.378270\tMale\n23\t67628\t54.873932\tMale\n27\t86136\t55.383308\tMale\n95\t2513\t56.374270\tMale\n99\t717\t52.805923\tFemale\n15\t37815\t54.505188\tFemale\n93\t3633\t57.562265\tFemale\n57\t112743\t55.149152\tMale\n98\t2460\t57.079626\tMale\n59\t100025\t55.233402\tMale\n66\t61390\t54.633854\tMale\n11\t17867\t56.219794\tMale\n16\t42331\t54.469240\tMale\n45\t104554\t54.919650\tFemale\n32\t88549\t55.596017\tFemale\n53\t119983\t55.274734\tFemale\n65\t82600\t55.054713\tFemale\n55\t115621\t55.288323\tMale\n75\t63605\t55.099384\tFemale\n95\t2733\t54.888309\tFemale\n93\t3057\t54.645642\tMale\n79\t34699\t55.352529\tMale\n56\t116895\t55.411253\tFemale\n76\t58231\t55.137675\tFemale\n21\t64612\t55.028185\tFemale\n72\t61639\t54.950393\tMale\n37\t96072\t55.386171\tFemale\n26\t82390\t55.880609\tMale\n89\t10925\t54.854902\tFemale\n80\t31313\t54.349005\tFemale\n52\t106264\t55.067306\tMale\n13\t27713\t56.554113\tMale\n94\t3144\t54.922574\tFemale\n41\t91066\t55.113800\tFemale\n18\t51538\t53.916281\tMale\n92\t3671\t54.840364\tMale\n86\t13201\t54.845639\tFemale\n99\t826\t52.622078\tMale\n79\t37932\t54.769418\tFemale\n74\t64627\t55.561126\tMale\n22\t63411\t54.361394\tMale\n13\t28884\t55.255462\tFemale\n97\t3369\t57.305904\tMale\n"
+            "data": "age\tOrders\tCart Amount\tSex\n58\t124966\t55.104991\tFemale\n71\t57418\t55.432830\tMale\n85\t10878\t54.662629\tFemale\n101\t361\t61.067500\tFemale\n61\t102016\t55.311741\tFemale\n45\t96706\t55.558978\tMale\n77\t39741\t54.435695\tFemale\n62\t94452\t55.326828\tFemale\n91\t5096\t56.149549\tFemale\n24\t63410\t54.915956\tMale\n77\t36755\t55.121792\tMale\n30\t84688\t54.761012\tFemale\n84\t16302\t55.280962\tFemale\n96\t2517\t56.373645\tMale\n14\t32479\t55.150974\tMale\n31\t98891\t55.067322\tFemale\n18\t56283\t54.944721\tFemale\n83\t26901\t54.704185\tFemale\n78\t34230\t54.298548\tFemale\n100\t1146\t56.318232\tMale\n10\t13528\t54.317778\tFemale\n23\t75204\t54.776590\tFemale\n34\t94075\t55.033049\tMale\n48\t110488\t54.892720\tFemale\n15\t35339\t55.532616\tMale\n57\t124693\t55.352966\tFemale\n48\t103732\t55.062584\tMale\n40\t84942\t54.894066\tFemale\n102\t246\t49.592917\tMale\n42\t91015\t54.254395\tFemale\n26\t87991\t55.159480\tFemale\n37\t88137\t55.284705\tMale\n97\t3497\t56.476373\tFemale\n70\t56523\t55.855303\tFemale\n12\t21255\t54.770479\tFemale\n49\t116616\t55.132473\tFemale\n25\t82758\t55.005347\tFemale\n67\t58345\t54.700056\tFemale\n76\t54105\t55.221614\tMale\n19\t53857\t54.778162\tMale\n61\t92181\t54.900568\tMale\n73\t58661\t55.051278\tFemale\n16\t45905\t54.861232\tFemale\n38\t88045\t54.303717\tFemale\n33\t87376\t54.616771\tMale\n81\t29319\t54.606570\tFemale\n82\t26546\t54.926599\tFemale\n66\t66104\t54.851808\tFemale\n58\t117227\t55.371033\tMale\n70\t51984\t54.683330\tMale\n96\t2506\t52.734815\tFemale\n11\t19095\t55.822587\tFemale\n86\t12729\t56.199514\tMale\n69\t51521\t55.704326\tMale\n90\t4944\t53.990702\tMale\n28\t85259\t55.306014\tFemale\n32\t81695\t54.982440\tMale\n51\t108743\t55.207221\tMale\n50\t113974\t55.182674\tFemale\n46\t97690\t54.893964\tMale\n53\t110066\t54.816120\tMale\n67\t53712\t54.739195\tMale\n9\t16742\t55.556166\tFemale\n20\t61319\t55.175090\tMale\n12\t20194\t55.077000\tMale\n30\t79712\t55.065136\tMale\n64\t91482\t55.199398\tFemale\n19\t59116\t54.818113\tFemale\n47\t108916\t55.220435\tFemale\n29\t96193\t54.878760\tFemale\n43\t85068\t55.052562\tFemale\n59\t107174\t54.955893\tFemale\n78\t32055\t54.713289\tMale\n51\t116399\t55.126430\tFemale\n89\t10286\t57.141260\tMale\n34\t99789\t55.060287\tFemale\n64\t84351\t54.841945\tMale\n100\t1302\t59.788169\tFemale\n87\t5098\t56.468610\tMale\n17\t48905\t54.418267\tMale\n40\t76352\t54.598766\tMale\n42\t85056\t54.942353\tMale\n65\t77428\t55.255499\tMale\n68\t52297\t55.019759\tFemale\n94\t2832\t56.839738\tMale\n50\t104024\t55.368922\tMale\n71\t61761\t55.053980\tFemale\n29\t88111\t55.050022\tMale\n31\t92245\t55.047508\tMale\n91\t4744\t55.820083\tMale\n17\t53340\t55.168833\tFemale\n20\t65952\t54.623260\tFemale\n63\t81912\t55.083491\tMale\n102\t301\t59.137255\tFemale\n41\t83584\t55.068595\tMale\n14\t34867\t55.416609\tFemale\n72\t67037\t54.594258\tFemale\n60\t86078\t55.611526\tMale\n44\t99207\t55.166680\tFemale\n84\t14888\t54.560908\tMale\n22\t69146\t55.501325\tFemale\n9\t14960\t55.698707\tMale\n36\t90266\t55.024921\tMale\n25\t75346\t55.029725\tMale\n82\t24027\t54.677864\tMale\n39\t78749\t55.232133\tMale\n54\t112254\t54.707360\tMale\n43\t79565\t55.114992\tMale\n33\t94894\t55.361364\tFemale\n101\t329\t59.477857\tMale\n81\t27155\t55.511710\tMale\n52\t114110\t55.068627\tFemale\n35\t96346\t55.408509\tMale\n28\t77599\t55.022749\tMale\n46\t107551\t55.193563\tFemale\n73\t54812\t55.353937\tMale\n24\t68954\t55.130812\tFemale\n10\t12016\t54.623676\tMale\n69\t56178\t55.024296\tFemale\n47\t100168\t54.721589\tMale\n21\t59538\t55.095519\tMale\n87\t4950\t52.193265\tFemale\n88\t10238\t54.939555\tMale\n36\t97951\t54.853342\tFemale\n80\t29322\t55.672563\tMale\n27\t94515\t55.411087\tFemale\n60\t91967\t54.272836\tFemale\n56\t108509\t54.933097\tMale\n8\t12848\t55.032266\tFemale\n83\t24773\t55.049270\tMale\n63\t88438\t55.324185\tFemale\n49\t107733\t55.202122\tMale\n74\t70283\t55.219415\tFemale\n62\t86036\t54.952269\tMale\n38\t81517\t55.054154\tMale\n44\t91150\t54.852819\tMale\n98\t2630\t57.255912\tFemale\n55\t124901\t54.385015\tFemale\n88\t10470\t56.604643\tFemale\n75\t60184\t55.681645\tMale\n92\t4254\t56.175896\tFemale\n90\t5277\t55.214330\tFemale\n68\t48613\t55.680813\tMale\n54\t124461\t55.231112\tFemale\n35\t104799\t55.722187\tFemale\n39\t85930\t55.302360\tFemale\n8\t12544\t55.186345\tMale\n85\t9552\t55.378270\tMale\n27\t86136\t55.383308\tMale\n23\t67628\t54.873932\tMale\n95\t2513\t56.374270\tMale\n99\t717\t52.805923\tFemale\n15\t37815\t54.505188\tFemale\n93\t3633\t57.562265\tFemale\n57\t112743\t55.149152\tMale\n98\t2460\t57.079626\tMale\n59\t100025\t55.233402\tMale\n66\t61390\t54.633854\tMale\n11\t17867\t56.219794\tMale\n16\t42331\t54.469240\tMale\n45\t104554\t54.919650\tFemale\n53\t119983\t55.274734\tFemale\n32\t88549\t55.596017\tFemale\n65\t82600\t55.054713\tFemale\n55\t115621\t55.288323\tMale\n75\t63605\t55.099384\tFemale\n95\t2733\t54.888309\tFemale\n93\t3057\t54.645642\tMale\n79\t34699\t55.352529\tMale\n76\t58231\t55.137675\tFemale\n56\t116895\t55.411253\tFemale\n21\t64612\t55.028185\tFemale\n72\t61639\t54.950393\tMale\n37\t96072\t55.386171\tFemale\n26\t82390\t55.880609\tMale\n89\t10925\t54.854902\tFemale\n80\t31313\t54.349005\tFemale\n13\t27713\t56.554113\tMale\n52\t106264\t55.067306\tMale\n94\t3144\t54.922574\tFemale\n18\t51538\t53.916281\tMale\n41\t91066\t55.113800\tFemale\n92\t3671\t54.840364\tMale\n86\t13201\t54.845639\tFemale\n99\t826\t52.622078\tMale\n79\t37932\t54.769418\tFemale\n74\t64627\t55.561126\tMale\n22\t63411\t54.361394\tMale\n13\t28884\t55.255462\tFemale\n97\t3369\t57.305904\tMale\n"
           }
         ]
       },
@@ -2138,11 +2138,11 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d15",
-            "http://10.5.0.6:4040/jobs/job?id\u003d16",
-            "http://10.5.0.6:4040/jobs/job?id\u003d17",
-            "http://10.5.0.6:4040/jobs/job?id\u003d18",
-            "http://10.5.0.6:4040/jobs/job?id\u003d19"
+            "http://10.5.0.6:4040/jobs/job?id\u003d59",
+            "http://10.5.0.6:4040/jobs/job?id\u003d60",
+            "http://10.5.0.6:4040/jobs/job?id\u003d61",
+            "http://10.5.0.6:4040/jobs/job?id\u003d62",
+            "http://10.5.0.6:4040/jobs/job?id\u003d63"
           ],
           "interpreterSettingId": "spark"
         }
@@ -2151,15 +2151,15 @@
       "jobName": "paragraph_1533117550837_1316059750",
       "id": "20180728-025641_1739767145",
       "dateCreated": "2018-08-01 09:59:10.837",
-      "dateStarted": "2018-08-30 17:44:07.867",
-      "dateFinished": "2018-08-30 17:44:24.662",
+      "dateStarted": "2018-09-03 10:28:48.266",
+      "dateFinished": "2018-09-03 10:28:59.254",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md \nLets focus on our top customers and try to profile them in order to answer the following question:\n\n**Q:**What are the reading preferencess of our top customers?\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:24.692",
+      "dateUpdated": "2018-09-03 10:31:18.148",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2192,8 +2192,8 @@
       "jobName": "paragraph_1533130335958_1845622524",
       "id": "20180801-133215_1474859950",
       "dateCreated": "2018-08-01 13:32:15.958",
-      "dateStarted": "2018-08-30 17:44:24.857",
-      "dateFinished": "2018-08-30 17:44:24.873",
+      "dateStarted": "2018-09-03 10:28:59.375",
+      "dateFinished": "2018-09-03 10:28:59.385",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -2201,7 +2201,7 @@
       "title": "Loading Top Users ...",
       "text": "// Load Top users Transactions\nval pushdown_query \u003d \"(SELECT c.customer_id,c.customer_nm, b.category, SUM(discounted_price) ammount_spent FROM bookstore.transactions AS t  INNER JOIN customers c ON c.customer_id \u003d t.customer_id INNER JOIN books b ON b.book_id \u003d t.book_id WHERE c.customer_id IN (SELECT o.customer_id FROM ((SELECT c.customer_id, sum(t.discounted_price), DENSE_RANK() OVER (ORDER BY sum(t.discounted_price) DESC) AS drank FROM bookstore.transactions AS t  INNER JOIN customers c ON c.customer_id \u003d t.customer_id GROUP BY  c.customer_id) AS o) WHERE drank \u003c 11) GROUP BY  c.customer_id,c.customer_nm,b.category ) AS r\"\nval df_top_orders \u003d spark.read.jdbc(url\u003djdbcUrl, table\u003dpushdown_query, properties\u003dconnectionProperties)\ndf_top_orders.createOrReplaceTempView(\"top_transactions\")\ndf_top_orders.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:24.956",
+      "dateUpdated": "2018-09-03 10:31:18.190",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2235,15 +2235,15 @@
       "jobName": "paragraph_1533129234038_-970124989",
       "id": "20180801-131354_704222410",
       "dateCreated": "2018-08-01 13:13:54.038",
-      "dateStarted": "2018-08-30 17:44:25.136",
-      "dateFinished": "2018-08-30 17:44:26.639",
+      "dateStarted": "2018-09-03 10:28:59.527",
+      "dateFinished": "2018-09-03 10:29:00.318",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql \nSELECT * FROM top_transactions order by ammount_spent desc,customer_id,category",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:52.027",
+      "dateUpdated": "2018-09-03 10:31:18.258",
       "config": {
         "editorSetting": {
           "language": "sql",
@@ -2356,7 +2356,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d20"
+            "http://10.5.0.6:4040/jobs/job?id\u003d64"
           ],
           "interpreterSettingId": "spark"
         }
@@ -2365,15 +2365,15 @@
       "jobName": "paragraph_1533130147619_-159469675",
       "id": "20180801-132907_936203382",
       "dateCreated": "2018-08-01 13:29:07.619",
-      "dateStarted": "2018-08-30 17:44:26.852",
-      "dateFinished": "2018-08-30 17:44:39.103",
+      "dateStarted": "2018-09-03 10:29:00.422",
+      "dateFinished": "2018-09-03 10:29:09.621",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%sql\nSELECT * FROM top_transactions order by ammount_spent desc",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:52.116",
+      "dateUpdated": "2018-09-03 10:31:18.317",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2481,7 +2481,7 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d21"
+            "http://10.5.0.6:4040/jobs/job?id\u003d65"
           ],
           "interpreterSettingId": "spark"
         }
@@ -2490,15 +2490,15 @@
       "jobName": "paragraph_1535109198706_701731585",
       "id": "20180824-111318_1039193563",
       "dateCreated": "2018-08-24 11:13:18.706",
-      "dateStarted": "2018-08-30 17:44:39.476",
-      "dateFinished": "2018-08-30 17:44:50.367",
+      "dateStarted": "2018-09-03 10:29:09.795",
+      "dateFinished": "2018-09-03 10:29:17.973",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nThe analysis above allows us to make real life decisions for our Online Bookstore.\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:50.390",
+      "dateUpdated": "2018-09-03 10:31:18.407",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2531,8 +2531,8 @@
       "jobName": "paragraph_1533129554922_1106192781",
       "id": "20180801-131914_1950129089",
       "dateCreated": "2018-08-01 13:19:14.922",
-      "dateStarted": "2018-08-30 17:44:50.642",
-      "dateFinished": "2018-08-30 17:44:50.708",
+      "dateStarted": "2018-09-03 10:29:18.203",
+      "dateFinished": "2018-09-03 10:29:18.245",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -2540,7 +2540,7 @@
       "title": "Sandbox",
       "text": "%md\nYou can use the preloaded data frame to play with the data. ",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:50.742",
+      "dateUpdated": "2018-09-03 10:31:18.458",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2574,15 +2574,15 @@
       "jobName": "paragraph_1535114865767_1537555046",
       "id": "20180824-124745_1942778053",
       "dateCreated": "2018-08-24 12:47:45.768",
-      "dateStarted": "2018-08-30 17:44:50.894",
-      "dateFinished": "2018-08-30 17:44:50.908",
+      "dateStarted": "2018-09-03 10:29:18.397",
+      "dateFinished": "2018-09-03 10:29:18.407",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nYou can click **Show/hide Code** button on the top of this page to see code in all paragraphs.",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:50.993",
+      "dateUpdated": "2018-09-03 10:31:18.507",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2615,15 +2615,15 @@
       "jobName": "paragraph_1535115012964_-185597575",
       "id": "20180824-125012_94842298",
       "dateCreated": "2018-08-24 12:50:12.964",
-      "dateStarted": "2018-08-30 17:44:51.118",
-      "dateFinished": "2018-08-30 17:44:51.130",
+      "dateStarted": "2018-09-03 10:29:18.545",
+      "dateFinished": "2018-09-03 10:29:18.552",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nTest paragraph",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.212",
+      "dateUpdated": "2018-09-03 10:31:18.558",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -2635,7 +2635,8 @@
           "completionKey": "TAB",
           "completionSupport": false
         },
-        "editorMode": "ace/mode/markdown"
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -2654,21 +2655,28 @@
       "jobName": "paragraph_1535115081906_2023845615",
       "id": "20180824-125121_193992711",
       "dateCreated": "2018-08-24 12:51:21.906",
-      "dateStarted": "2018-08-30 17:44:51.332",
-      "dateFinished": "2018-08-30 17:44:51.341",
+      "dateStarted": "2018-09-03 10:29:18.693",
+      "dateFinished": "2018-09-03 10:29:18.697",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-30 17:44:51.433",
+      "dateUpdated": "2018-09-03 10:31:18.602",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
         "results": {},
-        "editorSetting": {}
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true
       },
       "settings": {
         "params": {},

@@ -3,7 +3,7 @@
     {
       "text": "%md\n## JDBC vs API Write Benchmark\nImport needed packets and set connections up",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:41.064",
+      "dateUpdated": "2018-09-03 10:38:04.331",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -36,15 +36,15 @@
       "jobName": "paragraph_1532518385940_955654848",
       "id": "20180724-154057_1976865111",
       "dateCreated": "2018-07-25 11:33:05.940",
-      "dateStarted": "2018-08-04 13:23:41.125",
-      "dateFinished": "2018-08-04 13:23:41.144",
+      "dateStarted": "2018-09-03 10:38:04.356",
+      "dateFinished": "2018-09-03 10:38:04.368",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "import com.mariadb.columnstore.api.ColumnStoreDriver\nimport com.mariadb.columnstore.api.connector.ColumnStoreExporter\nimport java.util.Properties\nimport org.apache.spark.sql.{SQLContext,DataFrame}\nimport org.apache.spark.sql.functions.{rand, randn, sha1, sha2, md5}\nimport java.sql.{DriverManager,Connection,Date,Timestamp,PreparedStatement,ResultSet,SQLException}\n\nval url \u003d \"jdbc:mysql://10.5.0.2:3306\"\n\nvar connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", \"zeppelin_user\")\nconnectionProperties.put(\"password\", \"zeppelin_pass\")\nconnectionProperties.put(\"driver\", \"org.mariadb.jdbc.Driver\")\n\nval sqlContext \u003d new SQLContext(sc)\nimport sqlContext.implicits._\n\n// SampleDataframe size parameter:\nval asciiRange \u003d 128\nval randRange \u003d 1000\nval hashRange \u003d 1000",
+      "text": "import com.mariadb.columnstore.api.ColumnStoreDriver\nimport com.mariadb.columnstore.api.connector.ColumnStoreExporter\nimport java.util.Properties\nimport org.apache.spark.sql.{SQLContext,DataFrame}\nimport org.apache.spark.sql.functions.{rand, randn, sha1, sha2, md5}\nimport java.sql.{DriverManager,Connection,Date,Timestamp,PreparedStatement,ResultSet,SQLException}\n\nval url \u003d \"jdbc:mysql://{{columnstore_host_nm}}:3306/test\".replace(\"{\",\"\").replace(\"}\",\"\")\n\nvar connectionProperties \u003d new Properties()\nconnectionProperties.put(\"user\", \"zeppelin_user\")\nconnectionProperties.put(\"password\", \"zeppelin_pass\")\nconnectionProperties.put(\"driver\", \"org.mariadb.jdbc.Driver\")\n\nval sqlContext \u003d new SQLContext(sc)\nimport sqlContext.implicits._\n\n// SampleDataframe size parameter:\nval asciiRange \u003d 128\nval randRange \u003d 1000\nval hashRange \u003d 1000",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:41.224",
+      "dateUpdated": "2018-09-03 10:38:04.455",
       "config": {
         "editorSetting": {
           "language": "scala",
@@ -57,7 +57,7 @@
         "fontSize": 9.0,
         "results": {},
         "enabled": true,
-        "tableHide": false,
+        "tableHide": true,
         "editorHide": true
       },
       "settings": {
@@ -69,7 +69,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "import com.mariadb.columnstore.api.ColumnStoreDriver\nimport com.mariadb.columnstore.api.connector.ColumnStoreExporter\nimport java.util.Properties\nimport org.apache.spark.sql.{SQLContext, DataFrame}\nimport org.apache.spark.sql.functions.{rand, randn, sha1, sha2, md5}\nimport java.sql.{DriverManager, Connection, Date, Timestamp, PreparedStatement, ResultSet, SQLException}\nurl: String \u003d jdbc:mysql://10.5.0.2:3306\nconnectionProperties: java.util.Properties \u003d {}\nres77: Object \u003d null\nres78: Object \u003d null\nres79: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlContext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@36849467\nimport sqlContext.implicits._\nasciiRange: Int \u003d 128\nrandRange: Int \u003d 1000\nhashRange: Int \u003d 1000\n"
+            "data": "import com.mariadb.columnstore.api.ColumnStoreDriver\nimport com.mariadb.columnstore.api.connector.ColumnStoreExporter\nimport java.util.Properties\nimport org.apache.spark.sql.{SQLContext, DataFrame}\nimport org.apache.spark.sql.functions.{rand, randn, sha1, sha2, md5}\nimport java.sql.{DriverManager, Connection, Date, Timestamp, PreparedStatement, ResultSet, SQLException}\nurl: String \u003d jdbc:mysql://columnstore_host_nm:3306/test\nconnectionProperties: java.util.Properties \u003d {}\nres157: Object \u003d null\nres158: Object \u003d null\nres159: Object \u003d null\nwarning: there was one deprecation warning; re-run with -deprecation for details\nsqlContext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@1e795d09\nimport sqlContext.implicits._\nasciiRange: Int \u003d 128\nrandRange: Int \u003d 1000\nhashRange: Int \u003d 1000\n"
           }
         ]
       },
@@ -77,15 +77,15 @@
       "jobName": "paragraph_1532518385943_-2008194264",
       "id": "20180724-154135_937012168",
       "dateCreated": "2018-07-25 11:33:05.943",
-      "dateStarted": "2018-08-04 13:23:41.276",
-      "dateFinished": "2018-08-04 13:23:44.857",
+      "dateStarted": "2018-09-03 10:38:04.477",
+      "dateFinished": "2018-09-03 10:38:07.183",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nPrepare the database",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:44.896",
+      "dateUpdated": "2018-09-03 10:38:07.199",
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -118,15 +118,15 @@
       "jobName": "paragraph_1532518385944_-1362367209",
       "id": "20180724-154204_590917616",
       "dateCreated": "2018-07-25 11:33:05.944",
-      "dateStarted": "2018-08-04 13:23:44.951",
-      "dateFinished": "2018-08-04 13:23:44.985",
+      "dateStarted": "2018-09-03 10:38:07.239",
+      "dateFinished": "2018-09-03 10:38:07.245",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "var connection: Connection \u003d null\ntry {\n      connection \u003d DriverManager.getConnection(url, connectionProperties)\n      val statement \u003d connection.createStatement\n      statement.executeQuery(\"\"\"DROP DATABASE IF EXISTS benchmark\"\"\")\n      statement.executeQuery(\"\"\"CREATE DATABASE IF NOT EXISTS benchmark\"\"\")\n    } catch {\n      case e: Exception \u003d\u003e e.printStackTrace()\n    } finally {\n      connection.close()\n    }",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:45.035",
+      "dateUpdated": "2018-09-03 10:38:07.337",
       "config": {
         "tableHide": true,
         "editorSetting": {
@@ -151,7 +151,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "connection: java.sql.Connection \u003d null\nres82: Any \u003d org.mariadb.jdbc.internal.com.read.resultset.SelectResultSet@5472c816\n"
+            "data": "connection: java.sql.Connection \u003d null\nres162: Any \u003d org.mariadb.jdbc.internal.com.read.resultset.SelectResultSet@670fbd96\n"
           }
         ]
       },
@@ -159,15 +159,15 @@
       "jobName": "paragraph_1532518385945_-40375672",
       "id": "20180724-154755_2000804815",
       "dateCreated": "2018-07-25 11:33:05.945",
-      "dateStarted": "2018-08-04 13:23:45.079",
-      "dateFinished": "2018-08-04 13:23:45.860",
+      "dateStarted": "2018-09-03 10:38:07.366",
+      "dateFinished": "2018-09-03 10:38:07.779",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nCreate the sample dataframes to insert",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:45.877",
+      "dateUpdated": "2018-09-03 10:38:07.878",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -200,15 +200,15 @@
       "jobName": "paragraph_1532600337319_-1063166967",
       "id": "20180726-101857_1062876388",
       "dateCreated": "2018-07-26 10:18:57.319",
-      "dateStarted": "2018-08-04 13:23:45.957",
-      "dateFinished": "2018-08-04 13:23:45.979",
+      "dateStarted": "2018-09-03 10:38:07.905",
+      "dateFinished": "2018-09-03 10:38:07.909",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "val asciiDF \u003d sc.makeRDD(0 until asciiRange).map(i \u003d\u003e (i.toChar.toString, i)).toDF(\"ascii_representation\", \"number\").cache()\nasciiDF.count()\nasciiDF.printSchema()\nval randDF \u003d sqlContext.range(0, randRange).withColumn(\"uniform\", rand(seed\u003d23)).withColumn(\"normal\", randn(seed\u003d42)).cache()\nrandDF.count()\nrandDF.printSchema()\nval tmpDF \u003d sc.makeRDD(0 until hashRange).map(i \u003d\u003e (i, i.toString)).toDF(\"number\", \"string\")\ntmpDF.registerTempTable(\"tempDF\")\nval hashDF \u003d sqlContext.sql(\"SELECT number, sha2(string,256) AS sha256, sha2(string,512) AS sha512, md5(string) AS md5 FROM tempDF\").cache()\nhashDF.count()\nhashDF.printSchema()\n\nval asciiDF \u003d sc.makeRDD(0 until asciiRange).map(i \u003d\u003e (i.toChar.toString, i)).toDF(\"ascii_representation\", \"number\").cache()\nasciiDF.count()\nasciiDF.printSchema()\nval randDF \u003d sqlContext.range(0, randRange).withColumn(\"uniform\", rand(seed\u003d23)).withColumn(\"normal\", randn(seed\u003d42)).cache()\nrandDF.count()\nrandDF.printSchema()\nval tmpDF \u003d sc.makeRDD(0 until hashRange).map(i \u003d\u003e (i, i.toString)).toDF(\"number\", \"string\")\ntmpDF.registerTempTable(\"tempDF\")\nval hashDF \u003d sqlContext.sql(\"SELECT number, sha2(string,256) AS sha256, sha2(string,512) AS sha512, md5(string) AS md5 FROM tempDF\").cache()\nhashDF.count()\nhashDF.printSchema()",
+      "text": "val asciiDF \u003d sc.makeRDD(0 until asciiRange).map(i \u003d\u003e (i.toChar.toString, i)).toDF(\"ascii_representation\", \"number\").cache()\nasciiDF.count()\nasciiDF.printSchema()\n\nval randDF \u003d sqlContext.range(0, randRange).withColumn(\"uniform\", rand(seed\u003d23)).withColumn(\"normal\", randn(seed\u003d42)).cache()\nrandDF.count()\nrandDF.printSchema()\nval tmpDF \u003d sc.makeRDD(0 until hashRange).map(i \u003d\u003e (i, i.toString)).toDF(\"number\", \"string\")\ntmpDF.registerTempTable(\"tempDF\")\nval hashDF \u003d sqlContext.sql(\"SELECT number, sha2(string,256) AS sha256, sha2(string,512) AS sha512, md5(string) AS md5 FROM tempDF\").cache()\nhashDF.count()\nhashDF.printSchema()\n\nval asciiDF \u003d sc.makeRDD(0 until asciiRange).map(i \u003d\u003e (i.toChar.toString, i)).toDF(\"ascii_representation\", \"number\").cache()\nasciiDF.count()\nasciiDF.printSchema()\nval randDF \u003d sqlContext.range(0, randRange).withColumn(\"uniform\", rand(seed\u003d23)).withColumn(\"normal\", randn(seed\u003d42)).cache()\nrandDF.count()\nrandDF.printSchema()\nval tmpDF \u003d sc.makeRDD(0 until hashRange).map(i \u003d\u003e (i, i.toString)).toDF(\"number\", \"string\")\ntmpDF.registerTempTable(\"tempDF\")\nval hashDF \u003d sqlContext.sql(\"SELECT number, sha2(string,256) AS sha256, sha2(string,512) AS sha512, md5(string) AS md5 FROM tempDF\").cache()\nhashDF.count()\nhashDF.printSchema()",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:35.074",
+      "dateUpdated": "2018-09-03 10:38:08.001",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -221,7 +221,7 @@
           "completionSupport": true
         },
         "editorMode": "ace/mode/scala",
-        "editorHide": false,
+        "editorHide": true,
         "tableHide": false
       },
       "settings": {
@@ -233,7 +233,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "asciiDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [ascii_representation: string, number: int]\nres84: Long \u003d 128\nroot\n |-- ascii_representation: string (nullable \u003d true)\n |-- number: integer (nullable \u003d false)\n\nrandDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [id: bigint, uniform: double ... 1 more field]\nres86: Long \u003d 1000\nroot\n |-- id: long (nullable \u003d false)\n |-- uniform: double (nullable \u003d false)\n |-- normal: double (nullable \u003d false)\n\ntmpDF: org.apache.spark.sql.DataFrame \u003d [number: int, string: string]\nwarning: there was one deprecation warning; re-run with -deprecation for details\nhashDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [number: int, sha256: string ... 2 more fields]\nres89: Long \u003d 1000\nroot\n |-- number: integer (nullable \u003d false)\n |-- sha256: string (nullable \u003d true)\n |-- sha512: string (nullable \u003d true)\n |-- md5: string (nullable \u003d true)\n\nasciiDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [ascii_representation: string, number: int]\nres91: Long \u003d 128\nroot\n |-- ascii_representation: string (nullable \u003d true)\n |-- number: integer (nullable \u003d false)\n\nrandDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [id: bigint, uniform: double ... 1 more field]\nres93: Long \u003d 1000\nroot\n |-- id: long (nullable \u003d false)\n |-- uniform: double (nullable \u003d false)\n |-- normal: double (nullable \u003d false)\n\ntmpDF: org.apache.spark.sql.DataFrame \u003d [number: int, string: string]\nwarning: there was one deprecation warning; re-run with -deprecation for details\nhashDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [number: int, sha256: string ... 2 more fields]\nres96: Long \u003d 1000\nroot\n |-- number: integer (nullable \u003d false)\n |-- sha256: string (nullable \u003d true)\n |-- sha512: string (nullable \u003d true)\n |-- md5: string (nullable \u003d true)\n\n"
+            "data": "asciiDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [ascii_representation: string, number: int]\nres164: Long \u003d 128\nroot\n |-- ascii_representation: string (nullable \u003d true)\n |-- number: integer (nullable \u003d false)\n\nrandDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [id: bigint, uniform: double ... 1 more field]\nres166: Long \u003d 1000\nroot\n |-- id: long (nullable \u003d false)\n |-- uniform: double (nullable \u003d false)\n |-- normal: double (nullable \u003d false)\n\ntmpDF: org.apache.spark.sql.DataFrame \u003d [number: int, string: string]\nwarning: there was one deprecation warning; re-run with -deprecation for details\nhashDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [number: int, sha256: string ... 2 more fields]\nres169: Long \u003d 1000\nroot\n |-- number: integer (nullable \u003d false)\n |-- sha256: string (nullable \u003d true)\n |-- sha512: string (nullable \u003d true)\n |-- md5: string (nullable \u003d true)\n\nasciiDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [ascii_representation: string, number: int]\nres171: Long \u003d 128\nroot\n |-- ascii_representation: string (nullable \u003d true)\n |-- number: integer (nullable \u003d false)\n\nrandDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [id: bigint, uniform: double ... 1 more field]\nres173: Long \u003d 1000\nroot\n |-- id: long (nullable \u003d false)\n |-- uniform: double (nullable \u003d false)\n |-- normal: double (nullable \u003d false)\n\ntmpDF: org.apache.spark.sql.DataFrame \u003d [number: int, string: string]\nwarning: there was one deprecation warning; re-run with -deprecation for details\nhashDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [number: int, sha256: string ... 2 more fields]\nres176: Long \u003d 1000\nroot\n |-- number: integer (nullable \u003d false)\n |-- sha256: string (nullable \u003d true)\n |-- sha512: string (nullable \u003d true)\n |-- md5: string (nullable \u003d true)\n\n"
           }
         ]
       },
@@ -244,12 +244,12 @@
           "tooltip": "View in Spark web UI",
           "group": "spark",
           "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d19",
-            "http://10.5.0.6:4040/jobs/job?id\u003d20",
-            "http://10.5.0.6:4040/jobs/job?id\u003d21",
-            "http://10.5.0.6:4040/jobs/job?id\u003d22",
-            "http://10.5.0.6:4040/jobs/job?id\u003d23",
-            "http://10.5.0.6:4040/jobs/job?id\u003d24"
+            "http://10.5.0.6:4040/jobs/job?id\u003d77",
+            "http://10.5.0.6:4040/jobs/job?id\u003d78",
+            "http://10.5.0.6:4040/jobs/job?id\u003d79",
+            "http://10.5.0.6:4040/jobs/job?id\u003d80",
+            "http://10.5.0.6:4040/jobs/job?id\u003d81",
+            "http://10.5.0.6:4040/jobs/job?id\u003d82"
           ],
           "interpreterSettingId": "spark"
         }
@@ -258,15 +258,15 @@
       "jobName": "paragraph_1532600380996_-465015033",
       "id": "20180726-101940_611366499",
       "dateCreated": "2018-07-26 10:19:40.996",
-      "dateStarted": "2018-08-04 13:23:46.095",
-      "dateFinished": "2018-08-04 13:23:51.603",
+      "dateStarted": "2018-09-03 10:38:08.043",
+      "dateFinished": "2018-09-03 10:38:13.108",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nBenchmark the insertion",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:23:51.698",
+      "dateUpdated": "2018-09-03 10:38:13.192",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -299,15 +299,15 @@
       "jobName": "paragraph_1532600350362_430988966",
       "id": "20180726-101910_1588942506",
       "dateCreated": "2018-07-26 10:19:10.362",
-      "dateStarted": "2018-08-04 13:23:51.731",
-      "dateFinished": "2018-08-04 13:23:51.742",
+      "dateStarted": "2018-09-03 10:38:13.211",
+      "dateFinished": "2018-09-03 10:38:13.221",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "def createColumnStoreAPITable(name: String, schema: String) : Unit \u003d {\n  var connection: Connection \u003d null\n  try {\n      connection \u003d DriverManager.getConnection(\"jdbc:mysql://10.5.0.2:3306/benchmark\", connectionProperties)\n      val statement \u003d connection.createStatement\n      statement.executeQuery(\"CREATE TABLE IF NOT EXISTS \" + name + \" (\" + schema + \") engine\u003dcolumnstore\")\n  } catch {\n      case e: Exception \u003d\u003e e.printStackTrace()\n  } finally {\n      connection.close()\n  }   \n}\n\ndef benchmark(name: String, dataframe: DataFrame, schema: String) \u003d {\n    var t \u003d System.nanoTime()\n    dataframe.write.option(\"createTableOptions\", \"ENGINE\u003dinnodb\").\n    option(\"createTableColumnTypes\", schema).option(\"mode\",\"overwrite\").jdbc(url, \"benchmark.jdbc_innodb_\"+name, connectionProperties)\n    val jdbc_innodb_time \u003d System.nanoTime() - t\n    t \u003d System.nanoTime()\n    dataframe.write.option(\"numPartitions\", 1).option(\"createTableOptions\", \"ENGINE\u003dcolumnstore\").\n    option(\"createTableColumnTypes\", schema).option(\"mode\",\"overwrite\").jdbc(url, \"benchmark.jdbc_columnstore_\"+name, connectionProperties)\n    val jdbc_columnstore_time \u003d System.nanoTime() - t\n    t \u003d System.nanoTime()\n    createColumnStoreAPITable(\"api_columnstore_\"+name, schema)\n    ColumnStoreExporter.export(\"benchmark\", \"api_columnstore_\"+name, dataframe)\n    val api_columnstore_time \u003d System.nanoTime() - t\n    (jdbc_innodb_time, jdbc_columnstore_time, api_columnstore_time)\n}\n\nval ascii_benchmark \u003d benchmark(\"ascii\", asciiDF, \"ascii_representation CHAR(1), number INT\")\nval rand_benchmark \u003d benchmark(\"rand\", randDF, \"id BIGINT, uniform DOUBLE, normal DOUBLE\")\nval hash_benchmark \u003d benchmark(\"hash\", hashDF, \"number BIGINT, sha256 VARCHAR(64), sha512 VARCHAR(128), md5 VARCHAR(32)\")",
+      "text": "def createColumnStoreAPITable(name: String, schema: String) : Unit \u003d {\n  var connection: Connection \u003d null\n  try {\n      connection \u003d DriverManager.getConnection(\"jdbc:mysql://{{columnstore_host_nm}}:3306/benchmark\".replace(\"{\",\"\").replace(\"}\",\"\"), connectionProperties)\n      val statement \u003d connection.createStatement\n      statement.executeQuery(\"CREATE TABLE IF NOT EXISTS \" + name + \" (\" + schema + \") engine\u003dcolumnstore\")\n  } catch {\n      case e: Exception \u003d\u003e e.printStackTrace()\n  } finally {\n      connection.close()\n  }   \n}\n\ndef benchmark(name: String, dataframe: DataFrame, schema: String) \u003d {\n    var t \u003d System.nanoTime()\n    dataframe.write.option(\"createTableOptions\", \"ENGINE\u003dinnodb\").\n    option(\"createTableColumnTypes\", schema).option(\"mode\",\"overwrite\").jdbc(url, \"benchmark.jdbc_innodb_\"+name, connectionProperties)\n    val jdbc_innodb_time \u003d System.nanoTime() - t\n    t \u003d System.nanoTime()\n    dataframe.write.option(\"numPartitions\", 1).option(\"createTableOptions\", \"ENGINE\u003dcolumnstore\").\n    option(\"createTableColumnTypes\", schema).option(\"mode\",\"overwrite\").jdbc(url, \"benchmark.jdbc_columnstore_\"+name, connectionProperties)\n    val jdbc_columnstore_time \u003d System.nanoTime() - t\n    t \u003d System.nanoTime()\n    createColumnStoreAPITable(\"api_columnstore_\"+name, schema)\n    ColumnStoreExporter.export(\"benchmark\", \"api_columnstore_\"+name, dataframe)\n    val api_columnstore_time \u003d System.nanoTime() - t\n    (jdbc_innodb_time, jdbc_columnstore_time, api_columnstore_time)\n}\n\nval ascii_benchmark \u003d benchmark(\"ascii\", asciiDF, \"ascii_representation CHAR(1), number INT\")\nval rand_benchmark \u003d benchmark(\"rand\", randDF, \"id BIGINT, uniform DOUBLE, normal DOUBLE\")\nval hash_benchmark \u003d benchmark(\"hash\", hashDF, \"number BIGINT, sha256 VARCHAR(64), sha512 VARCHAR(128), md5 VARCHAR(32)\")",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:35.041",
+      "dateUpdated": "2018-09-03 10:38:13.312",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -336,47 +336,27 @@
         "forms": {}
       },
       "results": {
-        "code": "SUCCESS",
+        "code": "ERROR",
         "msg": [
           {
             "type": "TEXT",
-            "data": "createColumnStoreAPITable: (name: String, schema: String)Unit\nbenchmark: (name: String, dataframe: org.apache.spark.sql.DataFrame, schema: String)(Long, Long, Long)\nExecution time: 0.242645\nRows inserted: 128\nTruncation count: 1\nSaturated count: 0\nInvalid count: 0\nascii_benchmark: (Long, Long, Long) \u003d (101011900,3649588700,733657400)\nExecution time: 0.6255085\nRows inserted: 1000\nTruncation count: 0\nSaturated count: 0\nInvalid count: 0\nrand_benchmark: (Long, Long, Long) \u003d (239393700,32110589800,1133282100)\nExecution time: 1.2476653\nRows inserted: 1000\nTruncation count: 0\nSaturated count: 0\nInvalid count: 0\nhash_benchmark: (Long, Long, Long) \u003d (232919600,59596121300,1838054600)\n"
+            "data": "createColumnStoreAPITable: (name: String, schema: String)Unit\n\u003cconsole\u003e:81: error: reference to ColumnStoreExporter is ambiguous;\nit is imported twice in the same scope by\nimport com.mariadb.columnstore.api.connector.ColumnStoreExporter\nand import $line2078403376210$read.ColumnStoreExporter\n           ColumnStoreExporter.export(\"benchmark\", \"api_columnstore_\"+name, dataframe)\n           ^\n"
           }
         ]
-      },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d25",
-            "http://10.5.0.6:4040/jobs/job?id\u003d26",
-            "http://10.5.0.6:4040/jobs/job?id\u003d27",
-            "http://10.5.0.6:4040/jobs/job?id\u003d28",
-            "http://10.5.0.6:4040/jobs/job?id\u003d29",
-            "http://10.5.0.6:4040/jobs/job?id\u003d30",
-            "http://10.5.0.6:4040/jobs/job?id\u003d31",
-            "http://10.5.0.6:4040/jobs/job?id\u003d32",
-            "http://10.5.0.6:4040/jobs/job?id\u003d33"
-          ],
-          "interpreterSettingId": "spark"
-        }
       },
       "apps": [],
       "jobName": "paragraph_1532600383347_876766928",
       "id": "20180726-101943_392650583",
       "dateCreated": "2018-07-26 10:19:43.347",
-      "dateStarted": "2018-08-04 13:23:51.858",
-      "dateFinished": "2018-08-04 13:25:32.368",
-      "status": "FINISHED",
+      "dateStarted": "2018-09-03 10:35:47.702",
+      "dateFinished": "2018-09-03 10:35:48.051",
+      "status": "ERROR",
       "progressUpdateIntervalMs": 500
     },
     {
       "text": "%md\nShow the comparison in numbers",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:32.404",
+      "dateUpdated": "2018-09-03 10:37:53.492",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -417,7 +397,7 @@
     {
       "text": "println(\"jdbc_innodb\\tjdbc_columnstore\\tapi_columnstore\\t\\trows\\t\\titems\")\nprintln(ascii_benchmark._1/1000000000.toDouble+\"s\\t\"+ascii_benchmark._2/1000000000.toDouble+\"s\\t\\t\"+ascii_benchmark._3/1000000000.toDouble+\"s\\t\\t\"+asciiDF.count+\"\\t\\t\"+asciiDF.count*asciiDF.columns.size)\nprintln(rand_benchmark._1/1000000000.toDouble+\"s\\t\"+rand_benchmark._2/1000000000.toDouble+\"s\\t\\t\"+rand_benchmark._3/1000000000.toDouble+\"s\\t\\t\"+randDF.count+\"\\t\\t\"+randDF.count*randDF.columns.size)\nprintln(hash_benchmark._1/1000000000.toDouble+\"s\\t\"+hash_benchmark._2/1000000000.toDouble+\"s\\t\\t\"+hash_benchmark._3/1000000000.toDouble+\"s\\t\\t\"+hashDF.count+\"\\t\\t\"+hashDF.count*hashDF.columns.size)",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:32.573",
+      "dateUpdated": "2018-09-03 10:37:53.512",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -504,23 +484,6 @@
           }
         ]
       },
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            "http://10.5.0.6:4040/jobs/job?id\u003d34",
-            "http://10.5.0.6:4040/jobs/job?id\u003d35",
-            "http://10.5.0.6:4040/jobs/job?id\u003d36",
-            "http://10.5.0.6:4040/jobs/job?id\u003d37",
-            "http://10.5.0.6:4040/jobs/job?id\u003d38",
-            "http://10.5.0.6:4040/jobs/job?id\u003d39"
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
       "apps": [],
       "jobName": "paragraph_1532600386131_-664858900",
       "id": "20180726-101946_912860111",
@@ -533,7 +496,7 @@
     {
       "text": "\nprint(\"\"\"%table\n\"\"\")\n\nprint(\"Test\\tascii_benchmark\\trand_benchmark\\thash_benchmark\\n\")\nprint(\"JDBC_innodb\\t\"+ascii_benchmark._1/1000000000.toDouble+\"\\t\"+rand_benchmark._1/1000000000.toDouble+\"\\t\"+hash_benchmark._1/1000000000.toDouble+\"\\n\")\nprint(\"JDBC_columnstore\\t\"+ascii_benchmark._2/1000000000.toDouble+\"\\t\"+rand_benchmark._2/1000000000.toDouble+\"\\t\"+hash_benchmark._2/1000000000.toDouble+\"\\n\")\nprint(\"API_columnstore\\t\"+ascii_benchmark._3/1000000000.toDouble+\"\\t\"+rand_benchmark._3/1000000000.toDouble+\"\\t\"+hash_benchmark._3/1000000000.toDouble+\"\\n\")\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:33.926",
+      "dateUpdated": "2018-09-03 10:37:53.529",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -718,7 +681,7 @@
     },
     {
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:34.878",
+      "dateUpdated": "2018-09-03 10:37:53.551",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -730,7 +693,8 @@
           "completionKey": "TAB",
           "completionSupport": true
         },
-        "editorMode": "ace/mode/scala"
+        "editorMode": "ace/mode/scala",
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -745,7 +709,7 @@
     },
     {
       "user": "anonymous",
-      "dateUpdated": "2018-08-04 13:25:34.961",
+      "dateUpdated": "2018-09-03 10:37:53.573",
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -757,7 +721,8 @@
           "completionKey": "TAB",
           "completionSupport": true
         },
-        "editorMode": "ace/mode/scala"
+        "editorMode": "ace/mode/scala",
+        "editorHide": true
       },
       "settings": {
         "params": {},

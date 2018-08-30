@@ -13,7 +13,7 @@ services:
       mcsnet:
         ipv4_address: 10.5.0.2
         aliases:
-         - columnstore
+        - columnstore_host_nm
     ports:
       - "3306:3306"
 
