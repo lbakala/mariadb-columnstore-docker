@@ -1,4 +1,4 @@
-CREATE USER 'zeppelin_user'@'%' IDENTIFIED BY 'zeppelin_pass';
+CREATE USER IF NOT EXISTS 'zeppelin_user'@'%' IDENTIFIED BY 'zeppelin_pass';
 GRANT ALL ON bookstore.* TO 'zeppelin_user'@'%';
 GRANT ALL ON test.* TO 'zeppelin_user'@'%';
 GRANT ALL ON benchmark.* TO 'zeppelin_user'@'%';
