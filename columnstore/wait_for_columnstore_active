@@ -33,10 +33,12 @@ if [ $ATTEMPT -ge $MAX_TRIES ]; then
 fi
 
 # during install the system status can be active but the cs system catalog
-# is still being created, so wait for this to complete. This will currently
-# fail if run on a um2 or greater but almost all scripts should only be
-# run on um1 and let replication clone to other ums
-if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
+# is still being created, so wait for this to complete. This will first
+# check that mysqld is running and this is a UM. If this is run from UM2
+# or greater it will succeed if the standard error preventing DDL from
+# running is reported.
+MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
+if [ $MYSQLDS_RUNNING -gt 0 ]; then
     echo "Waiting for system catalog to be fully created"
     ATTEMPT=1
     STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;" 2>&1)
@@ -46,7 +48,7 @@ if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
         fi
         echo "$STATUS" | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master."
         if [ 0 -eq $? ]; then
-            echo "Not um1 so assuming system ready"
+            echo "Assuming system ready due to expected non UM1 DDL error: $STATUS"
             exit 0
         fi
         sleep 2
@@ -60,5 +62,7 @@ if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
     else
         echo "System ready"
     fi
+else
+  echo "System ready, non UM node"
 fi
 exit 0

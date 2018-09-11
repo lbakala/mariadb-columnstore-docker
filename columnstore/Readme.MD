@@ -64,11 +64,19 @@ $ docker stop mcs
 ```sh
 $ docker start mcs
 ```
+
+- To block until the columnstore cluster is fully up a helper script can be used (the -d arg can be omitted if you do not wish to see status check output):
+
+```sh
+$ /sbin/wait_for_columnstore_active -d
+```
+
 - To remove the container (-v removes the associated data volumes for the database storage):
 
 ```sh
 $ docker rm -v mcs
 ```
+
 - To remove the image
 
 ```sh
@@ -78,7 +86,7 @@ $ docker rmi mariadb/columnstore
 The container can be customized by environment variables and a custom directory with initialization scripts.
 
 ### PostConfigure Input
-The environment variable CS_POSTCFG_INPUT can be overridden to specify different input values to postConfigure. The default value in the Dockerfile will start up a single server deployment. If the environment variable is empty then postConfigure will not be run and the container will just run ProcMon only.
+The environment variable CS_POSTCFG_INPUT can be overridden to specify different input values to postConfigure. The default value in the Dockerfile will start up a single server deployment. If the environment variable is empty then postConfigure will not be run and the container will just run the ColumnStore service process ProcMon.
 
 ### Database creation
 The environment variable CS_DATABASE can be set in which case a database with that name will be created after the cluster is active.
