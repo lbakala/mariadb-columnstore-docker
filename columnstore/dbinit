@@ -4,7 +4,7 @@
 # - CS_DATABASE - if set create a database with this name
 
 # file used to track / record initialization and prevent subsequent rerun
-FLAG=/initialized
+FLAG=/usr/local/mariadb/columnstore/etc/container-initialized
 # directory which can contain sql, sql.gz, and sh scripts that will be run
 # after succesful initialzation.
 INITDIR=/docker-entrypoint-initdb.d
@@ -36,7 +36,7 @@ chmod a+x /usr/local/mariadb/columnstore/bin/rsync.sh
 
 # hack to specify user env var as this is sometimes relied on to detect
 # root vs non root install
-export USER=root 
+export USER=root
 
 # Initialize CS only once.
 if [ -e $FLAG ]; then
