@@ -22,8 +22,9 @@ RUN export USER=root && \
 
 COPY service /etc/service/
 COPY dbinit runit_bootstrap wait_for_columnstore_active /usr/sbin/
+COPY init.d-rsyslog /etc/init.d/rsyslog
 
-RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /usr/sbin/dbinit /usr/sbin/wait_for_columnstore_active && \
+RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /usr/sbin/dbinit /usr/sbin/wait_for_columnstore_active /etc/init.d/rsyslog && \
     mkdir -p /var/log/mariadb/columnstore && \
     mkdir /docker-entrypoint-initdb.d && \
     mkdir /log
