@@ -34,6 +34,10 @@ mv /usr/local/mariadb/columnstore/bin/rsync.sh /usr/local/mariadb/columnstore/bi
 touch /usr/local/mariadb/columnstore/bin/rsync.sh
 chmod a+x /usr/local/mariadb/columnstore/bin/rsync.sh
 
+# hack to specify user env var as this is sometimes relied on to detect
+# root vs non root install
+export USER=root 
+
 # Initialize CS only once.
 if [ -e $FLAG ]; then
     echo "Container already initialized at $(date)"
