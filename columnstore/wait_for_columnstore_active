@@ -55,7 +55,7 @@ if [ -f "/usr/local/mariadb/columnstore/mysql/bin/mysql" ]; then
     done
     /usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest;"
     if [ $ATTEMPT -ge $MAX_TRIES ]; then
-        echo "ERROR: ColumnStore not ready for use after $MAX_TRIES attempts"
+        echo "ERROR: ColumnStore not ready for use after $MAX_TRIES attempts, last status: $STATUS"
         exit 1
     else
         echo "System ready"

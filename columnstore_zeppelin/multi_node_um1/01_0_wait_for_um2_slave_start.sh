@@ -24,7 +24,7 @@ while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
 done
 
 if [ $ATTEMPT -ge $MAX_TRIES ]; then
-    echo "ERROR: Did not detect slave start on um2 after $MAX_TRIES attempts"
+    echo "ERROR: Did not detect slave start on um2 after $MAX_TRIES attempts, last status: $STATUS"
     exit 1
 fi
 
