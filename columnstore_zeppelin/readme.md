@@ -12,6 +12,7 @@
 		* [Build columnstore](#build-columnstore)
 		* [Build Zeppelin instance (optional)](#build-zeppelin-instance-optional)
 		* [Bring the whole cluster up](#bring-the-whole-cluster-up)
+		* [Bring the cluster down and cleanup](#bring-the-cluster-down-and-cleanup)
 		* [Troubleshooting](#troubleshooting)
 	* [Zeppelin Guide](#zeppelin-guide)
 		* [What is Zeppelin](#what-is-zeppelin)
@@ -38,7 +39,7 @@ git clone https://github.com/mariadb-corporation/mariadb-columnstore-docker.git
 ```
 
 The space requirement for the docker images is around 4GB disk space. 
-The docker application should have minimum 4GB RAM Memmory allocated in order for those 5 machines to work properly.
+The docker application should have minimum 4GB RAM Memory allocated in order for those 5 machines to work properly.
 
 Make sure you are in columnstore_zeppelin folder
 
@@ -78,9 +79,20 @@ docker logs -f columnstore_zeppelin_um1_1
 ```
 
 The Bookstore Sandbox Database can be accessed directly with following command:
+
 ```bash
 mysql -h127.0.0.1 -uzeppelin_user -pzeppelin_pass bookstore
 ```
+
+### Bring the cluster down and cleanup
+
+To clean up the images and the volumes the installation created use the folowing command:
+
+```bash
+docker-compose down -v
+```
+This will bring down the cluster including the network configuration and all created volumes.
+
 ### Troubleshooting
 
 In case you run a service on 3306,3307 or 8080 the ports configuration in docker-compose.yml should be changed.
@@ -103,7 +115,6 @@ Should be altered like this:
 ```
 
 Assuming 3308 is unbound on our machine.
-
 
 ## Zeppelin Guide
 

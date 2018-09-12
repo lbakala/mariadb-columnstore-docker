@@ -12,7 +12,7 @@ if [ $# -gt 0 ] && [ "$1" == "-d" ]; then
 fi
 
 ATTEMPT=1
-# this essentiall waits for the root @um1 login to be created as well as the slave to be started.
+# this essential waits for the root @um1 login to be created as well as the slave to be started.
 STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root -h um2 -e "show slave status\G" | grep "Waiting for master")
 while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
     if [ ! -z $CS_DEBUG ]; then
