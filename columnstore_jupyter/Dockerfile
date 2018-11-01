@@ -30,6 +30,7 @@ ADD mariadb-columnstore-api.list /etc/apt/sources.list.d
 RUN apt-get update && \
     apt-get install -y libuv1 libxml2 libsnappy1v5 bzip2 mariadb-columnstore-api && \
     ln -s /usr/lib/python3/dist-packages/columnStoreExporter.py /opt/conda/lib/python3.6/site-packages/ && \
+    ln -s /usr/lib/python3/dist-packages/mcsapi_reserved_words.txt /opt/conda/lib/python3.6/site-packages/ && \
     ln -s /usr/lib/python3/dist-packages/pymcsapi.py /opt/conda/lib/python3.6/site-packages/ && \
     ln -s /usr/lib/python3/dist-packages/_pymcsapi.so /opt/conda/lib/python3.6/site-packages/ && \
     mkdir -p /usr/local/mariadb/columnstore/etc && \
