@@ -1,18 +1,38 @@
-#!/bin/sh
-
+#!/bin/bash
+MCSDIR=/usr/local/mariadb/columnstore
 MAX_TRIES=36 # 3 minutes
 if [ ! -z "$CS_WAIT_ATTEMPTS" ]; then
     MAX_TRIES=$CS_WAIT_ATTEMPTS
 fi
 
-# if argument is -d enable debug output
-if [ $# -gt 0 ] && [ "$1" == "-d" ]; then
-    CS_DEBUG=1
-fi
+while getopts ":hvp:t:" opt; do
+  case ${opt} in
+    v ) CS_DEBUG=1
+      ;;
+    t ) MAX_TRIES="$OPTARG"
+      ;;
+    p ) ROOT_PASSWORD="$OPTARG"
+        ;;
+    h )
+        echo "Usage:"
+        echo "    wait_for_columnstore_active -v -t <TRIES> -p <ROOT_PASSWORD>"
+        echo "    -v                  enable verbose output"
+        echo "    -t <N>              test attempts before timeout, default 36"
+        echo "    -p <ROOT_PASSWORD>  optional root password to use for db test"
+        exit 0
+        ;;
+    \? )
+      echo "Invalid option: $OPTARG" 1>&2
+      ;;
+    : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+  esac
+done
 
 ATTEMPT=1
 # wait for mcsadmin getSystemStatus to show active
-STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
 if [ ! -z $CS_DEBUG ]; then
     echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
 fi
@@ -20,7 +40,7 @@ echo "$STATUS" | grep -q 'System.*ACTIVE'
 while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
     sleep 5
     ATTEMPT=$(($ATTEMPT+1))
-    STATUS=$(/usr/local/mariadb/columnstore/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+    STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
     if [ ! -z $CS_DEBUG ]; then
         echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
     fi
@@ -41,7 +61,13 @@ MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
 if [ $MYSQLDS_RUNNING -gt 0 ]; then
     echo "Waiting for system catalog to be fully created"
     ATTEMPT=1
-    STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;" 2>&1)
+    TEST_TABLE="columnstore_info.mcs_wait_test_$RANDOM"
+    mysql=( $MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -u root )
+    if [ ! -z "$ROOT_PASSWORD" ]; then
+      mysql+=( -p"${MARIADB_ROOT_PASSWORD}" )
+    fi
+
+    STATUS=$("${mysql[@]}" -e "create table $TEST_TABLE(i tinyint) engine=columnstore;" 2>&1)
     while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
         if [ ! -z $CS_DEBUG ]; then
             echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): create table test error: $STATUS"
@@ -53,9 +79,9 @@ if [ $MYSQLDS_RUNNING -gt 0 ]; then
         fi
         sleep 2
         ATTEMPT=$(($ATTEMPT+1))
-        STATUS=$(/usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest; create table installtest(i tinyint) engine=columnstore;" 2>&1)
+        STATUS=$("${mysql[@]}" -e "create table $TEST_TABLE(i tinyint) engine=columnstore;" 2>&1)
     done
-    /usr/local/mariadb/columnstore/mysql/bin/mysql -u root test -e "drop table if exists installtest;"
+    "${mysql[@]}" -e "drop table if exists $TEST_TABLE;"
     if [ $ATTEMPT -ge $MAX_TRIES ]; then
         echo "ERROR: ColumnStore not ready for use after $MAX_TRIES attempts, last status: $STATUS"
         exit 1

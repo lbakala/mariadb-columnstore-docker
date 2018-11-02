@@ -10,7 +10,29 @@ FLAG=/usr/local/mariadb/columnstore/etc/container-initialized
 INITDIR=/docker-entrypoint-initdb.d
 
 MCSDIR=/usr/local/mariadb/columnstore
-MCSMYCMD="$MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -u root"
+mysql=( $MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -u root )
+
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		exit 1
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(< "${!fileVar}")"
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
 
 # wait for the ProcMon process to start
 wait_for_procmon()
@@ -49,15 +71,20 @@ else
     # Compute number of custom install files, if any
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
 
-    # first time install with CS_POSTCFG_INPUT set then run postConfigure
+    # first time install with MARIADB_CS_POSTCFG_INPUT set then run postConfigure
     # with this as input. Must stop columnstore service first as postConfigure
     # will fail otherwise. The service is only used for restarted pm1 containers
     # or non pm1 containers in a cluster.
-    if [ ! -z "$CS_POSTCFG_INPUT" ]; then
+		# Support backward compat with CS_POSTCFG_INPUT
+		MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
+    if [ ! -z "$MARIADB_CS_POSTCFG_INPUT" ]; then
         echo "Stopping columnstore service to run postConfigure"
         /usr/sbin/sv stop columnstore
-        echo -e "$CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
-    elif [ ! -z "$CS_DATABASE" ] || [ $CUSTOM_INSTALL_FILES -gt 0 ]; then
+        echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
+    elif [ ! -z "$MARIADB_ROOT_PASSWORD" ] ||
+		     [ ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" ] ||
+				 [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ] ||
+		     [ $CUSTOM_INSTALL_FILES -gt 0 ]; then
         # container has custom install files but no postConfigure so wait for
         # columnstore to startup by some other means
         echo "Waiting for columnstore to start to run post install files"
@@ -69,14 +96,60 @@ else
         fi
     fi
 
-    # Create custom database for scripts if needed based on CS_DATABASE env var
-    if [ ! -z "$CS_DATABASE" ]; then
-        echo "Creating custom database: $CS_DATABASE"
-        DBNAME=$CS_DATABASE
-        $MCSMYCMD -vvv -e "CREATE DATABASE $DBNAME;" 2>&1
-    else
-        DBNAME=test
-    fi
+		# only perform user setup / creation of one of the root password env vars
+		# set and mysqld is running locally (single server or um1 on multi node)
+		if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+			MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
+			if [ $MYSQLDS_RUNNING -gt 0 ]; then
+				if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+					export MARIADB_ROOT_PASSWORD="$(pwgen -1 32)"
+					echo "GENERATED MARIADB ROOT PASSWORD: $MARIADB_ROOT_PASSWORD"
+				fi
+
+		    # create root user, default listens from anywhere
+				file_env 'MARIADB_ROOT_HOST' '%'
+				if [ ! -z "$MARIADB_ROOT_HOST" -a "$MARIADB_ROOT_HOST" != 'localhost' ]; then
+					read -r -d '' rootCreate << EOSQL || true
+						CREATE USER 'root'@'${MARIADB_ROOT_HOST}' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}' ;
+						GRANT ALL ON *.* TO 'root'@'${MARIADB_ROOT_HOST}' WITH GRANT OPTION ;
+EOSQL
+				fi
+
+				# unlike the server image, we want this replicated for columnstore so um2 has the same setup
+		   "${mysql[@]}" 2>&1 << EOSQL
+		      DELETE FROM mysql.user WHERE user NOT IN ('mysql.sys', 'mysqlxsys', 'root') OR host NOT IN ('localhost') ;
+		      SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
+		      GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
+		      ${rootCreate}
+		      DROP DATABASE IF EXISTS test ;
+		      FLUSH PRIVILEGES ;
+EOSQL
+
+				if [ ! -z "$MARIADB_ROOT_PASSWORD" ]; then
+					mysql+=( -p"${MARIADB_ROOT_PASSWORD}" )
+				fi
+
+		    # Create custom database if specified. CS_DATABASE for backward compat
+		    MARIADB_DATABASE="${MARIADB_DATABASE:-$CS_DATABASE}"
+		    if [ ! -z "$MARIADB_DATABASE" ]; then
+						"${mysql[@]}" 2>&1 -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;"
+			      mysql+=( "$MARIADB_DATABASE" )
+		    fi
+
+		    file_env 'MARIADB_USER'
+				file_env 'MARIADB_PASSWORD'
+				if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
+					"${mysql[@]}" 2>&1 << EOSQL
+					  CREATE USER '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD' ;
+						GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'%' ;
+EOSQL
+
+					if [ "$MARIADB_DATABASE" ]; then
+					  "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'%' ;"  2>&1
+					fi
+				fi
+			fi
+   fi
 
     # check for any custom post install sql or shell scripts to run in INITDIR
     if [ 0 -eq $CUSTOM_INSTALL_FILES ]; then
@@ -87,14 +160,14 @@ else
         for f in $(ls $INITDIR/); do
             if [[ $f == *.sql ]];then
                 echo "Run $f at $(date)"
-                $MCSMYCMD -vvv $DBNAME < $f 2>&1
+                "${mysql[@]}" -vvv < $f 2>&1
                 if [ 1 -eq $? ]; then
                     echo "Script $f failed, aborting setup"
                     exit 1
                 fi
             elif [[ $f == *.sql.gz ]];then
                 echo "Run $f at $(date)"
-                zcat $f | $MCSMYCMD -vvv $DBNAME 2>&1
+                zcat $f | "${mysql[@]}" -vvv  2>&1
                 if [ 1 -eq $? ]; then
                     echo "Script $f failed, aborting setup"
                     exit 1
