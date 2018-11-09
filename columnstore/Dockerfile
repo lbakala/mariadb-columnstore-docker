@@ -7,7 +7,8 @@ RUN export USER=root && \
     /bin/echo "export USER=root" >> /root/.bashrc && \
     groupadd -r mysql && \
     useradd -r -g mysql mysql && \
-    yum -y install expect zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools runit which psmisc lsof snappy rsync && \
+    yum -y install epel-release && \
+    yum -y install expect zlib rsyslog libaio boost file sudo libnl net-tools sysvinit-tools runit which psmisc lsof snappy rsync pwgen && \
     yum -y install mariadb-columnstore-client mariadb-columnstore-common mariadb-columnstore-libs mariadb-columnstore-platform mariadb-columnstore-server mariadb-columnstore-shared mariadb-columnstore-storage-engine && \
     yum clean all && \
     rm -rf /var/cache/yum && \
@@ -23,14 +24,15 @@ RUN export USER=root && \
 COPY service /etc/service/
 COPY dbinit runit_bootstrap wait_for_columnstore_active /usr/sbin/
 COPY init.d-rsyslog /etc/init.d/rsyslog
+COPY mysql /usr/bin
 
-RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /usr/sbin/dbinit /usr/sbin/wait_for_columnstore_active /etc/init.d/rsyslog && \
+RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap /usr/sbin/dbinit /usr/sbin/wait_for_columnstore_active /etc/init.d/rsyslog /usr/bin/mysql && \
     mkdir -p /var/log/mariadb/columnstore && \
     mkdir /docker-entrypoint-initdb.d && \
     mkdir /log
 
 # default postConfigure input to create single node cluster
-ENV CS_POSTCFG_INPUT "1\ncolumnstore-1\n1\n1\n"
+ENV MARIADB_CS_POSTCFG_INPUT "1\ncolumnstore-1\n1\n1\n"
 
 EXPOSE 3306
 

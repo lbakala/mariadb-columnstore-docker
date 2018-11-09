@@ -3,7 +3,7 @@ services:
   um1:
     image: mariadb/columnstore:latest
     environment:
-      - CS_POSTCFG_INPUT=
+      - MARIADB_CS_POSTCFG_INPUT=
     volumes:
       - um1_etc:/usr/local/mariadb/columnstore/etc
       - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
@@ -20,7 +20,7 @@ services:
   um2:
     image: mariadb/columnstore:latest
     environment:
-      - CS_POSTCFG_INPUT=
+      - MARIADB_CS_POSTCFG_INPUT=
     volumes:
       - um2_etc:/usr/local/mariadb/columnstore/etc
       - um2_mysql:/usr/local/mariadb/columnstore/mysql/db
@@ -35,7 +35,7 @@ services:
   pm2:
     image: mariadb/columnstore:latest
     environment:
-      - CS_POSTCFG_INPUT=
+      - MARIADB_CS_POSTCFG_INPUT=
     volumes:
       - dbroot2:/usr/local/mariadb/columnstore/data2
       - pm2_etc:/usr/local/mariadb/columnstore/etc
@@ -48,7 +48,7 @@ services:
 #      - seccomp:unconfined
     image: mariadb/columnstore:latest
     environment:
-      - CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n2\num1\n\n\num2\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
+      - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n2\num1\n\n\num2\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
     depends_on:
       - um1
       - um2
