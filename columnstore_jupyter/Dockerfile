@@ -4,7 +4,7 @@ USER root
 RUN mkdir -p /usr/share/java && \
     cd /usr/share/java && \
     mkdir -p /home/jovyan/ML_Demo && \
-    curl -O https://downloads.mariadb.com/Connectors/java/connector-java-2.2.6/mariadb-java-client-2.2.6.jar && \
+    curl -O https://downloads.mariadb.com/Connectors/java/connector-java-2.3.0/mariadb-java-client-2.3.0.jar && \
     cd /usr/lib && \
     curl -O http://search.maven.org/remotecontent?filepath=junit/junit/4.12/junit-4.12.jar
 
@@ -28,7 +28,7 @@ RUN apt-get update && \
 ADD mariadb-columnstore-api.list /etc/apt/sources.list.d
 
 RUN apt-get update && \
-    apt-get install -y libuv1 libxml2 libsnappy1v5 bzip2 mariadb-columnstore-api && \
+    apt-get install -y libuv1 libxml2 libsnappy1v5 bzip2 mariadb-columnstore-api-* && \
     ln -s /usr/lib/python3/dist-packages/columnStoreExporter.py /opt/conda/lib/python3.6/site-packages/ && \
     ln -s /usr/lib/python3/dist-packages/mcsapi_reserved_words.txt /opt/conda/lib/python3.6/site-packages/ && \
     ln -s /usr/lib/python3/dist-packages/pymcsapi.py /opt/conda/lib/python3.6/site-packages/ && \

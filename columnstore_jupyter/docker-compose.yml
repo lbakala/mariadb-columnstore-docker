@@ -2,7 +2,7 @@ version: "2"
 
 services:
   jupyter:
-    image: mariadb/columnstore_jupyter:latest
+    image: mariadb/columnstore_jupyter:1.2
     command: start-notebook.sh --NotebookApp.password='sha1:817af87d3fe5:febd7d6959b12ee6839a26d56f8f54c88922e9c2'
     hostname: jupyter
     ports:
@@ -10,7 +10,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan/work
   columnstore:
-    image: mariadb/columnstore:latest
+    image: mariadb/columnstore:1.2
     ports:
       - "3306:3306"
     volumes:
