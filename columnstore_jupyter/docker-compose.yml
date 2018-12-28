@@ -10,7 +10,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan/work
   columnstore:
-    image: mariadb/columnstore:latest
+    image: mariadb/columnstore:1.1
     ports:
       - "3306:3306"
     volumes:

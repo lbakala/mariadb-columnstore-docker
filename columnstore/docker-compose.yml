@@ -1,7 +1,7 @@
 version: "2"
 services:
   um1:
-    image: mariadb/columnstore:latest
+    image: mariadb/columnstore:1.1
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
       - MARIADB_RANDOM_ROOT_PASSWORD=1
@@ -19,7 +19,7 @@ services:
       - "3306:3306"
 
   pm2:
-    image: mariadb/columnstore:latest
+    image: mariadb/columnstore:1.1
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
     volumes:
@@ -30,7 +30,7 @@ services:
         ipv4_address: 10.5.0.3
 
   pm1:
-    image: mariadb/columnstore:latest
+    image: mariadb/columnstore:1.1
     environment:
       - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n1\num1\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
     depends_on:
