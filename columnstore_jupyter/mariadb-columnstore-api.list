@@ -1,1 +1,1 @@
-deb https://downloads.mariadb.com/MariaDB/mariadb-columnstore-api/latest/repo/ubuntu16 xenial main
+deb https://downloads.mariadb.com/MariaDB/mariadb-columnstore-api/1.1/repo/ubuntu16 xenial main
