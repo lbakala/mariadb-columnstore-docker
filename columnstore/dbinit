@@ -68,6 +68,11 @@ else
     echo "Initializing container at $(date) - waiting for ProcMon to start"
     wait_for_procmon
 
+		# Starting with 1.2, syslog setup is done in post-install during image
+		# build. For some reason it's necessary to restart rsyslogd on first run
+		# to get logging going
+		sv restart rsyslogd
+
     # Compute number of custom install files, if any
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
 
