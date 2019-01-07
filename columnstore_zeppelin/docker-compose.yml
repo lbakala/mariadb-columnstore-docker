@@ -4,6 +4,10 @@ services:
     image: mariadb/columnstore:1.2
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
+      - MARIADB_ALLOW_EMPTY_PASSWORD=1
+      - MARIADB_USER=zeppelin_user
+      - MARIADB_PASSWORD=zeppelin_pass
+      - MARIADB_DATABASE=bookstore
     volumes:
       - um1_etc:/usr/local/mariadb/columnstore/etc
       - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
@@ -21,11 +25,11 @@ services:
     image: mariadb/columnstore:1.2
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
+      - MARIADB_DROP_LOCAL_USERS=1
     volumes:
       - um2_etc:/usr/local/mariadb/columnstore/etc
       - um2_mysql:/usr/local/mariadb/columnstore/mysql/db
       - um2_local:/usr/local/mariadb/columnstore/local
-      - ./multi_node_um2:/docker-entrypoint-initdb.d
     networks:
       mcsnet:
         ipv4_address: 10.5.0.3

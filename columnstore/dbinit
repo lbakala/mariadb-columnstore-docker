@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Environment variables supported:
 # - CS_POSTCFG_INPUT - if set runs postConfigure with the value piped into stdin
 # - CS_DATABASE - if set create a database with this name
@@ -44,6 +44,33 @@ wait_for_procmon()
     done
 }
 
+# additional wait check to ensure postConfigure is fully done and complete
+wait_for_postcfg_done()
+{
+    ATTEMPT=1
+    MAX_TRIES=36
+    if [ ! -z "$CS_WAIT_ATTEMPTS" ]; then
+        MAX_TRIES=$CS_WAIT_ATTEMPTS
+    fi
+    FULLY_CONFIGURED=$( $MCSDIR/bin/getConfig Installation FullyConfigured )
+    while [ 0 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+        if [ ! -z $CS_DEBUG ]; then
+            echo "wait_for_postcfg_done($ATTEMPT/$MAX_TRIES): FullyConfigured: $FULLY_CONFIGURED"
+        fi
+        if [ "$FULLY_CONFIGURED" = "Y" ]; then
+            echo "Detected postConfigure complete as Installation.FullyConfigured: $FULLY_CONFIGURED"
+            break
+        fi
+        sleep 2
+        ATTEMPT=$(($ATTEMPT+1)) FULLY_CONFIGURED=$( $MCSDIR/bin/getConfig Installation FullyConfigured )
+    done
+
+    if [ "$FULLY_CONFIGURED" != "Y" ]; then
+        echo "ERROR: Failed to detect postConfigure complete as Installation.FullyConfigured: $FULLY_CONFIGURED"
+        exit 1
+    fi
+}
+
 # hack to ensure server-id is set to unique value per vm because my.cnf is
 # not in a good location for a volume
 SERVER_ID=$(hostname -i | cut -d "." -f 4)
@@ -86,9 +113,15 @@ else
         echo "Stopping columnstore service to run postConfigure"
         /usr/sbin/sv stop columnstore
         echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
+				# Set a columnstore.xml property that can be used to detect postConfigure
+				# complete from other nodes (as the change is pushed out)
+				if [ 0 -eq $? ]; then
+				    $MCSDIR/bin/setConfig Installation FullyConfigured Y
+				fi
     elif [ ! -z "$MARIADB_ROOT_PASSWORD" ] ||
 		     [ ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" ] ||
 				 [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ] ||
+				 [ ! -z "$MARIADB_DROP_LOCAL_USERS" ] ||
 		     [ $CUSTOM_INSTALL_FILES -gt 0 ]; then
         # container has custom install files but no postConfigure so wait for
         # columnstore to startup by some other means
@@ -99,11 +132,18 @@ else
             echo "ERROR: ColumnStore did not start so custom install files not run."
             exit 1
         fi
+			  wait_for_postcfg_done
     fi
 
+		# allow deletion of local users on non um1 with seperate  env var
+  	if [ ! -z "$MARIADB_DROP_LOCAL_USERS" ]; then
+		    "${mysql[@]}" 2>&1 << EOSQL
+			      SET @@SESSION.SQL_LOG_BIN=0;
+			      DELETE FROM mysql.user WHERE user = '';
+EOSQL
+    fi
 		# only perform user setup / creation of one of the root password env vars
-		# set and mysqld is running locally (single server or um1 on multi node)
-		if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+	  if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
 			MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
 			if [ $MYSQLDS_RUNNING -gt 0 ]; then
 				if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
@@ -120,14 +160,17 @@ else
 EOSQL
 				fi
 
-				# unlike the server image, we want this replicated for columnstore so um2 has the same setup
+				# pull this out seperately since the host specific users on um1 don't
+				# exist on other UM's and will fail replication.
+		    "${mysql[@]}" 2>&1 << EOSQL
+			      SET @@SESSION.SQL_LOG_BIN=0;
+			      DELETE FROM mysql.user WHERE user = '';
+EOSQL
 		   "${mysql[@]}" 2>&1 << EOSQL
-		      DELETE FROM mysql.user WHERE user NOT IN ('mysql.sys', 'mysqlxsys', 'root') OR host NOT IN ('localhost') ;
 		      SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
 		      GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
 		      ${rootCreate}
 		      DROP DATABASE IF EXISTS test ;
-		      FLUSH PRIVILEGES ;
 EOSQL
 
 				if [ ! -z "$MARIADB_ROOT_PASSWORD" ]; then
