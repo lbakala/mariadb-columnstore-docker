@@ -12,19 +12,19 @@ The following are required:
 
 ## Run Single Instance Container
 
-To pull MariaDB ColumnStore latest version run the following command:
+To pull MariaDB ColumnStore 1.2 version run the following command:
 ```
-docker pull mariadb/columnstore
+docker pull mariadb/columnstore:1.2
 ```
 
 To run MariaDB ColumnStore run the following command:
 ```
-docker run -d --name mcs mariadb/columnstore
+docker run -d --name mcs mariadb/columnstore:1.2
 ```
 
 To specify a root password:
 ```
-docker run -d --name mcs -eMARIADB_ROOT_PASSWORD=mypassword mariadb/columnstore
+docker run -d --name mcs -eMARIADB_ROOT_PASSWORD=mypassword mariadb/columnstore:1.2
 ```
 
 The following output will be seen indicating the server is up:
@@ -61,6 +61,7 @@ The following environment variables can be utilized to configure behavior:
 * MARIADB_USER : create a user with this name, with all privileges on MARIADB_DATABASE if specified
 * MARIADB_PASSWORD : password for above user
 * MARIADB_CS_POSTCFG_INPUT : override input values for postConfigure. The default value in the Dockerfile will start up a single server deployment. If the environment variable is empty then postConfigure will not be run and the container will just run the ColumnStore service process ProcMon.
+* MARIADB_DROP_LOCAL_USERS : Drop anonymous local users, useful for  removing this on non um1 um containers.
 
 Note that the ColumnStore docker image differs from the MariaDB server docker image in that  it does not mandate specification of one of the first 3 password entries. This is for backward compatibility and also due to the fact that specifying these for a multi UM deployment is unreliable / not recommended due to timing issues with the current setup and replication.
 

@@ -135,31 +135,31 @@ We use Zeppelin to allow data scientists to play with the sandbox data stored in
 
 After the installation is completed you can navigate to [http://localhost:8080/](http://localhost:8080/) and will be presented with the Zeppelin home page
 
-![Img 1](./readmeimg/img1.jpg)
+![Img 1](./imgreadme/img1.jpg)
 
 In the lower right section is the Notebook section. There you can find **MariaDB AX Sandbox Folder**
 Click top open.
 
-![Img 2](./readmeimg/img2.jpg)
+![Img 2](./imgreadme/img2.jpg)
 
 Choose **Bookstore Analytics with Scala and Spark**
 
-![Img 3](./readmeimg/img3.jpg)
+![Img 3](./imgreadme/img3.jpg)
 
 When you open iot for first time you will be presented with the interpreter bindings.
 Press **Save** to save those bindings.
 
-![Img 4](./readmeimg/img4.jpg)
+![Img 4](./imgreadme/img4.jpg)
 You are ready to us Zeppelin with MAriaDB AX Sandbox Data
 
 You can follow this link to get more information about the [Zeppelin user interface](https://zeppelin.apache.org/docs/0.8.0/quickstart/explore_ui.html#note-layout).
 
 You can start with "Run All Paragraphs" ...
-![Img 5.1](./readmeimg/img5.1.jpg)
+![Img 5.1](./imgreadme/img5.1.jpg)
 after confirmation  all scripts will be executed and the results presented.
-![Img 5.2](./readmeimg/img5.2.jpg)
+![Img 5.2](./imgreadme/img5.2.jpg)
 
-You can also follow the tutorial and run the individual paragraphs one by one pressing ![run](./readmeimg/run.jpg) on each paragraph.
+You can also follow the tutorial and run the individual paragraphs one by one pressing ![run](./imgreadme/run.jpg) on each paragraph.
 
 Follow the screen instructions.
 
