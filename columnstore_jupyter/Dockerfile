@@ -44,4 +44,4 @@ RUN apt-get update && \
     bzip2 -d mnist.t.bz2 && \
     chmod -R 777 .
 
-ADD Columnstore.xml /usr/local/mariadb/columnstore/etc/Columnstore.xml
+COPY Columnstore.xml /usr/local/mariadb/columnstore/etc/Columnstore.xml

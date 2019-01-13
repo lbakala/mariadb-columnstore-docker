@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: Columnstore.xml 1286 2009-03-30 22:39:41Z dcathey $ -->
+<!-- $Id: Columnstore.xml 3713 2013-08-16 20:04:47Z wweeks $ -->
+<!--
+	WARNING: Do not make changes to this file unless directed to do so by
+	MariaDB service engineers. Incorrect settings can render your system
+	unusable and will require a service call to correct.
+-->
 <Columnstore Version="V1.0.0">
 	<ExeMgr1>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8601</Port>
-		<Module>pm1</Module>
+		<Module>um1</Module>
 	</ExeMgr1>
 	<JobProc>
 		<IPAddr>0.0.0.0</IPAddr>
 		<Port>8602</Port>
 	</JobProc>
 	<ProcMgr>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8603</Port>
 	</ProcMgr>
+	<ProcMgr_Alarm>
+		<IPAddr>10.5.1.14</IPAddr>
+		<Port>8606</Port>
+	</ProcMgr_Alarm>
 	<ProcStatusControl>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8604</Port>
 	</ProcStatusControl>
 	<ProcStatusControlStandby>
-		<IPAddr>0.0.0.0</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8605</Port>
 	</ProcStatusControlStandby>
+	<!-- Disabled
+	<ProcHeartbeatControl>
+		<IPAddr>0.0.0.0</IPAddr>
+		<Port>8605</Port>
+	</ProcHeartbeatControl>
+	-->
+	<!-- ProcessMonitor Port: 8800 - 8820 is reserved to support External Modules-->
 	<localhost_ProcessMonitor>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>127.0.0.1</IPAddr>
 		<Port>8800</Port>
 	</localhost_ProcessMonitor>
 	<dm1_ProcessMonitor>
@@ -31,11 +47,11 @@
 		<Port>8800</Port>
 	</dm1_ProcessMonitor>
 	<um1_ProcessMonitor>
-		<IPAddr>0.0.0.0</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8800</Port>
 	</um1_ProcessMonitor>
 	<pm1_ProcessMonitor>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8800</Port>
 	</pm1_ProcessMonitor>
 	<dm1_ServerMonitor>
@@ -43,33 +59,32 @@
 		<Port>8622</Port>
 	</dm1_ServerMonitor>
 	<um1_ServerMonitor>
-		<IPAddr>0.0.0.0</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8622</Port>
 	</um1_ServerMonitor>
 	<pm1_ServerMonitor>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8622</Port>
 	</pm1_ServerMonitor>
 	<pm1_WriteEngineServer>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8630</Port>
 	</pm1_WriteEngineServer>
 	<DDLProc>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8612</Port>
 	</DDLProc>
 	<DMLProc>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8614</Port>
 	</DMLProc>
 	<BatchInsert>
 		<RowsPerBatch>10000</RowsPerBatch>
 	</BatchInsert>
 	<PrimitiveServers>
-		<Count>1</Count>
-		<ConnectionsPerPrimProc>8</ConnectionsPerPrimProc>
+		<Count>2</Count>
+		<ConnectionsPerPrimProc>2</ConnectionsPerPrimProc>
 		<ProcessorThreshold>128</ProcessorThreshold>
-		<!-- <ProcessorThreads>16</ProcessorThreads> --> <!-- defaults to num cores * 2 -->
 		<ProcessorQueueSize>10K</ProcessorQueueSize> <!-- minimum of extent size 8192 -->
 		<DebugLevel>0</DebugLevel>
 		<LBID_Shift>13</LBID_Shift>
@@ -78,151 +93,154 @@
 		<!-- <BPPCount>16</BPPCount> --> <!-- Default num cores * 2.  A cap on the number of simultaneous primitives per jobstep -->
 		<PrefetchThreshold>1</PrefetchThreshold>
 		<PTTrace>0</PTTrace>
-		<RotatingDestination>n</RotatingDestination>
+		<RotatingDestination>y</RotatingDestination> <!-- Iterate thru UM ports; set to 'n' if UM/PM on same server -->
 		<!-- <HighPriorityPercentage>60</HighPriorityPercentage> -->
 		<!-- <MediumPriorityPercentage>30</MediumPriorityPercentage> -->
 		<!-- <LowPriorityPercentage>10</LowPriorityPercentage> -->
-	<AggregationMemoryCheck>95</AggregationMemoryCheck>
 		<DirectIO>y</DirectIO>
 	</PrimitiveServers>
 	<PMS1>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS1>
 	<PMS2>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS2>
 	<PMS3>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS3>
 	<PMS4>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS4>
 	<PMS5>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS5>
 	<PMS6>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS6>
 	<PMS7>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS7>
 	<PMS8>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS8>
 	<PMS9>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS9>
 	<PMS10>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS10>
 	<PMS11>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS11>
 	<PMS12>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS12>
 	<PMS13>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS13>
 	<PMS14>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS14>
 	<PMS15>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS15>
 	<PMS16>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS16>
 	<PMS17>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS17>
 	<PMS18>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS18>
 	<PMS19>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS19>
 	<PMS20>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS20>
 	<PMS21>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS21>
 	<PMS22>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS22>
 	<PMS23>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS23>
 	<PMS24>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS24>
 	<PMS25>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS25>
 	<PMS26>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS26>
 	<PMS27>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS27>
 	<PMS28>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS28>
 	<PMS29>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS29>
 	<PMS30>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS30>
 	<PMS31>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8620</Port>
 	</PMS31>
 	<PMS32>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8620</Port>
 	</PMS32>
 	<SystemConfig>
 		<SystemLang>C</SystemLang>
 		<SystemName>columnstore-1</SystemName>
 		<ParentOAMModuleName>pm1</ParentOAMModuleName>
-		<StandbyOAMModuleName>unassigned</StandbyOAMModuleName>
+		<StandbyOAMModuleName>pm2</StandbyOAMModuleName>
+		<PrimaryUMModuleName>um1</PrimaryUMModuleName>
+		<ModuleHeartbeatPeriod>1</ModuleHeartbeatPeriod>
+		<ModuleHeartbeatCount>3</ModuleHeartbeatCount>
+		<ModuleProcMonWaitCount>12</ModuleProcMonWaitCount>	// 2.5 minutes
 		<!-- Disabled
 		<ProcessHeartbeatPeriod>-1</ProcessHeartbeatPeriod>
 		-->
 		<!-- Warning: Do not change this value once database is built -->
-		<DBRootCount>1</DBRootCount>
+		<DBRootCount>2</DBRootCount>
 		<DBRoot1>/usr/local/mariadb/columnstore/data1</DBRoot1>
 		<DBRMRoot>$INSTALLDIR/data1/systemFiles/dbrm/BRM_saves</DBRMRoot>
 		<TableLockSaveFile>$INSTALLDIR/data1/systemFiles/dbrm/tablelocks</TableLockSaveFile>
@@ -231,29 +249,30 @@
 		<ExternalCriticalThreshold>90</ExternalCriticalThreshold>
 		<ExternalMajorThreshold>80</ExternalMajorThreshold>
 		<ExternalMinorThreshold>70</ExternalMinorThreshold>
-		<TempDiskPath>/tmp</TempDiskPath>
+		<!-- <TempDiskPath>/tmp</TempDiskPath>
 		<WorkingDir>/tmp</WorkingDir>
+		<TempFileDir>/tmp/columnstore_tmp_files</TempFileDir>
+		-->
 		<TransactionArchivePeriod>10</TransactionArchivePeriod>
 		<NMSIPAddress>0.0.0.0</NMSIPAddress>
 		<TempSaveSize>128M</TempSaveSize> <!-- default SWSDL max element save size -->
 		<WaitPeriod>10</WaitPeriod> <!-- in seconds -->
-		<TempFileDir>/tmp/columnstore_tmp_files</TempFileDir>
 		<CalpontHome>$INSTALLDIR</CalpontHome>
-		<ModuleHeartbeatPeriod>10</ModuleHeartbeatPeriod>
-		<ModuleHeartbeatCount>3</ModuleHeartbeatCount>
 		<ProcessRestartCount>10</ProcessRestartCount>
 		<ProcessRestartPeriod>120</ProcessRestartPeriod>
 		<SwapAction>restartSystem</SwapAction>	<!-- OAM command (or 'none') to run when swap space exceeds Major Threshold -->
 		<ActivePmFailoverDisabled>n</ActivePmFailoverDisabled>
-                <MemoryCheckPercent>95</MemoryCheckPercent> <!-- Max real memory to limit growth of buffers to -->
+		<MemoryCheckPercent>95</MemoryCheckPercent> <!-- Max real memory to limit growth of buffers to -->
 		<DataFileLog>OFF</DataFileLog>
 		<!-- enable if you want to limit how much memory may be used for hdfs read/write memory buffers.
  		<hdfsRdwrBufferMaxSize>8G</hdfsRdwrBufferMaxSize>
 		-->
- 		<hdfsRdwrScratch>/tmp/rdwrscratch</hdfsRdwrScratch> <!-- Do not set to an hdfs file path -->
+ 		<hdfsRdwrScratch>/rdwrscratch</hdfsRdwrScratch> <!-- Do not set to an hdfs file path -->
+ 		<TempFileDir>/columnstore_tmp_files</TempFileDir>
+ 		<SystemTempFileDir>/tmp/columnstore_tmp_files</SystemTempFileDir>
 		<DataFilePlugin/>
 		<DataFileEnvFile/>
-		<PrimaryUMModuleName>pm1</PrimaryUMModuleName>
+		<DBRoot2>/usr/local/mariadb/columnstore/data2</DBRoot2>
 	</SystemConfig>
 	<SystemModuleConfig>
 		<ModuleType1>dm</ModuleType1>
@@ -282,9 +301,9 @@
 		<ModuleType2>um</ModuleType2>
 		<ModuleDesc2>User Module</ModuleDesc2>
 		<RunType2>SIMPLEX</RunType2>
-		<ModuleCount2>0</ModuleCount2>
-		<ModuleIPAddr1-1-2>0.0.0.0</ModuleIPAddr1-1-2>
-		<ModuleHostName1-1-2>unassigned</ModuleHostName1-1-2>
+		<ModuleCount2>1</ModuleCount2>
+		<ModuleIPAddr1-1-2>10.5.1.12</ModuleIPAddr1-1-2>
+		<ModuleHostName1-1-2>um1</ModuleHostName1-1-2>
 		<ModuleDisableState1-2>ENABLED</ModuleDisableState1-2>
 		<ModuleCPUCriticalThreshold2>0</ModuleCPUCriticalThreshold2>
 		<ModuleCPUMajorThreshold2>0</ModuleCPUMajorThreshold2>
@@ -305,9 +324,9 @@
 		<ModuleType3>pm</ModuleType3>
 		<ModuleDesc3>Performance Module</ModuleDesc3>
 		<RunType3>SIMPLEX</RunType3>
-		<ModuleCount3>1</ModuleCount3>
-		<ModuleIPAddr1-1-3>columnstore</ModuleIPAddr1-1-3>
-		<ModuleHostName1-1-3>localhost</ModuleHostName1-1-3>
+		<ModuleCount3>2</ModuleCount3>
+		<ModuleIPAddr1-1-3>10.5.1.14</ModuleIPAddr1-1-3>
+		<ModuleHostName1-1-3>pm1</ModuleHostName1-1-3>
 		<ModuleDisableState1-3>ENABLED</ModuleDisableState1-3>
 		<ModuleCPUCriticalThreshold3>0</ModuleCPUCriticalThreshold3>
 		<ModuleCPUMajorThreshold3>0</ModuleCPUMajorThreshold3>
@@ -325,6 +344,17 @@
 		<ModuleDiskMonitorFileSystem1-3>/</ModuleDiskMonitorFileSystem1-3>
 		<ModuleDBRootCount1-3>1</ModuleDBRootCount1-3>
 		<ModuleDBRootID1-1-3>1</ModuleDBRootID1-1-3>
+		<ModuleHostName1-2-2>unassigned</ModuleHostName1-2-2>
+		<ModuleIPAddr1-2-2>0.0.0.0</ModuleIPAddr1-2-2>
+		<ModuleHostName1-2-3>unassigned</ModuleHostName1-2-3>
+		<ModuleIPAddr1-2-3>0.0.0.0</ModuleIPAddr1-2-3>
+		<ModuleDisableState2-3>ENABLED</ModuleDisableState2-3>
+		<ModuleHostName2-1-3>pm2</ModuleHostName2-1-3>
+		<ModuleIPAddr2-1-3>10.5.1.13</ModuleIPAddr2-1-3>
+		<ModuleHostName2-2-3>unassigned</ModuleHostName2-2-3>
+		<ModuleIPAddr2-2-3>0.0.0.0</ModuleIPAddr2-2-3>
+		<ModuleDBRootID2-1-3>2</ModuleDBRootID2-1-3>
+		<ModuleDBRootCount2-3>1</ModuleDBRootCount2-3>
 	</SystemModuleConfig>
 	<SystemExtDeviceConfig>
 		<Count>0</Count>
@@ -334,22 +364,14 @@
 	</SystemExtDeviceConfig>
 	<SessionManager>
 		<MaxConcurrentTransactions>1000</MaxConcurrentTransactions>
-		<SharedMemoryTmpFile>$INSTALLDIR/data1/systemFiles/dbrm/CalpontShm</SharedMemoryTmpFile>
 		<TxnIDFile>$INSTALLDIR/data1/systemFiles/dbrm/SMTxnID</TxnIDFile>
 	</SessionManager>
-	<SessionMonitor>
-		<SharedMemoryTmpFile>$INSTALLDIR/data1/systemFiles/dbrm/CalpontSessionMonitorShm</SharedMemoryTmpFile>
-		<TransactionAgeLimit>10</TransactionAgeLimit>
-	</SessionMonitor>
-	<VersionBuffer> 
+	<VersionBuffer>
 		<!-- VersionBufferFileSize must be a multiple of 8192.
-			One version buffer file will be put on each DB root. -->
-		<VersionBufferFileSize>1GB</VersionBufferFileSize> 
+		One version buffer file will be put on each DB root. -->
+		<VersionBufferFileSize>1GB</VersionBufferFileSize>
 	</VersionBuffer>
 	<OIDManager>
-		<!-- XXXPAT: This is located in tmp so we all have R/W access.
-		It should be relocated to $INSTALLDIR/share/oidbitmap
-		on the production machine-->
 		<!-- Do not change this file after database built	 -->
 		<OIDBitmapFile>$INSTALLDIR/data1/systemFiles/dbrm/oidbitmap</OIDBitmapFile>
 		<!-- Do not change this value after database built	 -->
@@ -357,30 +379,30 @@
 	</OIDManager>
 	<WriteEngine>
 		<BulkRoot>$INSTALLDIR/data/bulk</BulkRoot>
-		<BulkRollbackDir>$INSTALLDIR/data/bulk/rollback</BulkRollbackDir>
+		<BulkRollbackDir>$INSTALLDIR/data1/systemFiles/bulkRollback</BulkRollbackDir>
 		<MaxFileSystemDiskUsagePct>98</MaxFileSystemDiskUsagePct>
 		<CompressedPaddingBlocks>1</CompressedPaddingBlocks> <!-- Number of blocks used to pad compressed chunks -->
 	</WriteEngine>
 	<DBRM_Controller>
-		<NumWorkers>1</NumWorkers>
-		<IPAddr>columnstore</IPAddr>
+		<NumWorkers>3</NumWorkers>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8616</Port>
 	</DBRM_Controller>
 	<!-- Worker Port: 8700 - 8720 is reserved to support External Modules-->
 	<DBRM_Worker1>
-		<IPAddr>columnstore</IPAddr>
+		<IPAddr>10.5.1.14</IPAddr>
 		<Port>8700</Port>
 		<Module>pm1</Module>
 	</DBRM_Worker1>
 	<DBRM_Worker2>
-		<IPAddr>0.0.0.0</IPAddr>
+		<IPAddr>10.5.1.12</IPAddr>
 		<Port>8700</Port>
-		<Module>unassigned</Module>
+		<Module>um1</Module>
 	</DBRM_Worker2>
 	<DBRM_Worker3>
-		<IPAddr>0.0.0.0</IPAddr>
+		<IPAddr>10.5.1.13</IPAddr>
 		<Port>8700</Port>
-		<Module>unassigned</Module>
+		<Module>pm2</Module>
 	</DBRM_Worker3>
 	<DBRM_Worker4>
 		<IPAddr>0.0.0.0</IPAddr>
@@ -418,8 +440,10 @@
 		<Module>unassigned</Module>
 	</DBRM_Worker10>
 	<DBBC>
-		<!-- The percentage of RAM to use for the disk block cache. Defaults to 86% -->
-		<NumBlocksPct>50</NumBlocksPct>
+		<!-- The percentage of RAM to use for the disk block cache. Defaults to 70% -->
+        <!-- Alternatively, this can be specified in absolute terms using
+             the suffixes 'm' or 'g' to denote size in megabytes or gigabytes.-->
+		<!-- <NumBlocksPct>70</NumBlocksPct> -->
 		<!-- <NumThreads>16</NumThreads> --> <!-- 1-256.  Default is 16. -->
 		<NumCaches>1</NumCaches><!-- # of parallel caches to instantiate -->
 		<IOMTracing>0</IOMTracing>
@@ -428,47 +452,49 @@
 		<MaxOpenFiles>2K</MaxOpenFiles>
 		<DecreaseOpenFilesCount>200</DecreaseOpenFilesCount>
 		<FDCacheTrace>0</FDCacheTrace>
+		<NumBlocksPct>70</NumBlocksPct>
 	</DBBC>
 	<Installation>
 		<SystemStartupOffline>n</SystemStartupOffline>
 		<InitialInstallFlag>y</InitialInstallFlag>
-		<SingleServerInstall>y</SingleServerInstall>
-		<ServerTypeInstall>2</ServerTypeInstall>
+		<SingleServerInstall>n</SingleServerInstall>
+		<ServerTypeInstall>1</ServerTypeInstall>
 		<PMwithUM>n</PMwithUM>
-		<MySQLRep>n</MySQLRep>
+		<MySQLRep>y</MySQLRep>
 		<DBRootStorageType>internal</DBRootStorageType>
 		<UMStorageType>internal</UMStorageType>
-		<SystemLogConfigFile>/etc/rsyslog.d/49-columnstore.conf</SystemLogConfigFile>	
-		<rpw>unassigned</rpw>
-		<Cloud>unassigned</Cloud>
 		<EEPackageType>rpm</EEPackageType>
-		<AmazonAccessKey>unassigned</AmazonAccessKey>
-		<AmazonSecretKey>unassigned</AmazonSecretKey>
-		<AmazonRegion>us-east-1</AmazonRegion>
-		<AmazonZone>unassigned</AmazonZone>
-		<AmazonSubNetID>unassigned</AmazonSubNetID>
-		<AmazonVPCNextPrivateIP>unassigned</AmazonVPCNextPrivateIP>
-		<PMInstanceType>unassigned</PMInstanceType>
+		<SystemLogConfigFile>/etc/rsyslog.d/49-columnstore.conf</SystemLogConfigFile>
+		<Cloud>unassigned</Cloud>
+		<AmazonVPCNextPrivateIP>autoassign</AmazonVPCNextPrivateIP>
 		<UMInstanceType>unassigned</UMInstanceType>
 		<UMSecurityGroup>unassigned</UMSecurityGroup>
 		<UMVolumeSize>unassigned</UMVolumeSize>
+		<UMVolumeType>gp2</UMVolumeType>
+		<UMVolumeIOPS>unassigned</UMVolumeIOPS>
+		<PMInstanceType>unassigned</PMInstanceType>
 		<PMVolumeSize>unassigned</PMVolumeSize>
-		<AmazonPMFailover>n</AmazonPMFailover>
-		<AmazonAutoTagging>n</AmazonAutoTagging>
+		<PMVolumeType>gp2</PMVolumeType>
+		<PMVolumeIOPS>unassigned</PMVolumeIOPS>
+		<AmazonPMFailover>y</AmazonPMFailover>
+		<AmazonAutoTagging>y</AmazonAutoTagging>
 		<AmazonElasticIPCount>0</AmazonElasticIPCount>
 		<AmazonElasticIPAddr1>unassigned</AmazonElasticIPAddr1>
 		<AmazonElasticModule1>unassigned</AmazonElasticModule1>
-		<CoreFileFlag>n</CoreFileFlag>
-		<JavaHome>unassigned</JavaHome>
-		<JavaPath>unassigned</JavaPath>
-		<MySQLPort>3306</MySQLPort>
-		<DistributedInstall>y</DistributedInstall>
 		<DataRedundancyConfig>n</DataRedundancyConfig>
+		<DataRedundancyCopies>0</DataRedundancyCopies>
+		<DataRedundancyStorageType>unassigned</DataRedundancyStorageType>
+		<CoreFileFlag>n</CoreFileFlag>
+		<MySQLPort>3306</MySQLPort>
+		<AmazonDeviceName>/dev/xvd</AmazonDeviceName>
+		<DistributedInstall>n</DistributedInstall>
+		<LockFileDirectory>/var/lock/subsys</LockFileDirectory>
+		<ProfileFile>/etc/profile.d/columnstoreAlias.sh</ProfileFile>
 	</Installation>
 	<ExtentMap>
 		<!--
 		WARNING: these can only be changed on an empty system. Once any object has been allocated
-		it cannot be changed!. Valid values for ExtentRows are: 64M, 8M and 1M. The default is 8M.
+		it cannot be changed!. Extent size is 8M rows.
 		-->
 		<FilesPerColumnPartition>4</FilesPerColumnPartition> <!-- should be multiple of DBRootCount -->
 		<ExtentsPerSegmentFile>2</ExtentsPerSegmentFile>
@@ -478,21 +504,21 @@
 		<MaxBuckets>128</MaxBuckets>
 		<MaxElems>128K</MaxElems>  <!-- 128 buckets * 128K * 16 = 256 MB -->
 		<FifoSizeLargeSide>128</FifoSizeLargeSide>
-		<PmMaxMemorySmallSide>64M</PmMaxMemorySmallSide><!-- divide by 48 to get element count -->
-		<TotalUmMemory>25%</TotalUmMemory>
+		<PmMaxMemorySmallSide>64M</PmMaxMemorySmallSide><!-- divide by 48 to getapproximate row count -->
+		<TotalUmMemory>50%</TotalUmMemory>
 		<TotalPmUmMemory>10%</TotalPmUmMemory>
 		<CPUniqueLimit>100</CPUniqueLimit>
 		<AllowDiskBasedJoin>N</AllowDiskBasedJoin>
 		<!-- Be careful modifying TempFilePath!  On start, ExeMgr deletes
 			the entire directory and recreates it to make sure no
-			files are left behind.  -->
-		<TempFilePath>$INSTALLDIR/tmp</TempFilePath>
+			files are left behind.
+		<TempFilePath>/tmp</TempFilePath>  -->
 		<TempFileCompression>Y</TempFileCompression>
 	</HashJoin>
 	<JobList>
 		<FlushInterval>16K</FlushInterval>
 		<FifoSize>32</FifoSize>
-		<RequestSize>1</RequestSize>  <!-- Number of extents per request, should be
+		<RequestSize>1</RequestSize>  <!-- Number of extents per request, should be 
 			  less than MaxOutstandingRequests. Otherwise, default value 1 is used. -->
 		<!--  ProcessorThreadsPerScan is the number of jobs issued to process
 			  each extent.  The default is 16.  MaxOutstandingRequests is the size of 
@@ -500,8 +526,8 @@
 			  is 20 extents worth of work for the PMs to process at any given time.
 			  ProcessorThreadsPerScan * MaxOutstandingRequests should be at least
 			  as many threads are available across all PMs.  -->
-		<!-- <ProcessorThreadsPerScan>16</ProcessorThreadsPerScan> -->
-		<MaxOutstandingRequests>20</MaxOutstandingRequests>
+		<!-- <ProcessorThreadsPerScan>16</ProcessorThreadsPerScan> --> 
+		<MaxOutstandingRequests>20</MaxOutstandingRequests> 
 		<ThreadPoolSize>100</ThreadPoolSize>
 	</JobList>
 	<TupleWSDL>
@@ -515,10 +541,13 @@
 		<!-- <RowAggrRowGroupsPerThread>20</RowAggrRowGroupsPerThread> --> <!-- Default value is 20 -->
 	</RowAggregation>
 	<CrossEngineSupport>
-		<Host>columnstore</Host>
+		<Host>127.0.0.1</Host>
 		<Port>3306</Port>
 		<User>root</User>
 		<Password/>
+		<TLSCA/>
+		<TLSClientCert/>
+		<TLSClientKey/>
 	</CrossEngineSupport>
 	<QueryStats>
 		<Enabled>N</Enabled>
@@ -530,7 +559,22 @@
 		<Enabled>Y</Enabled>
 	</NetworkCompression>
 	<QueryTele>
-		<Host>columnstore</Host>
+		<Host>127.0.0.1</Host>
 		<Port>0</Port>
 	</QueryTele>
+	<ProcHeartbeatControl>
+		<IPAddr>10.5.1.14</IPAddr>
+	</ProcHeartbeatControl>
+	<pm2_ProcessMonitor>
+		<IPAddr>10.5.1.13</IPAddr>
+		<Port>8800</Port>
+	</pm2_ProcessMonitor>
+	<pm2_ServerMonitor>
+		<IPAddr>10.5.1.13</IPAddr>
+		<Port>8622</Port>
+	</pm2_ServerMonitor>
+	<pm2_WriteEngineServer>
+		<IPAddr>10.5.1.13</IPAddr>
+		<Port>8630</Port>
+	</pm2_WriteEngineServer>
 </Columnstore>
