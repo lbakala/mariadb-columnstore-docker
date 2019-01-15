@@ -101,11 +101,6 @@ else
     # to get logging going
     sv restart rsyslogd
 
-    # Compute number of custom install files, if any
-    CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
-    if [ ! -z $MARIADB_CS_DEBUG ]; then
-        echo "$CUSTOM_INSTALL_FILES custom files"
-    fi
     # first time install with MARIADB_CS_POSTCFG_INPUT set then run postConfigure
     # with this as input. Must stop columnstore service first as postConfigure
     # will fail otherwise. The service is only used for restarted pm1 containers
@@ -205,6 +200,11 @@ EOSQL
         fi
    fi
     WRK_DIR=`pwd`
+    # Check number of custom install files and execute them 
+    CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
+    if [ ! -z $MARIADB_CS_DEBUG ]; then
+        echo "$CUSTOM_INSTALL_FILES custom files"
+    fi
     # check for any custom post install sql or shell scripts to run in INITDIR
     if [ 0 -eq $CUSTOM_INSTALL_FILES ]; then
         echo "No custom post install files to run at $(date)"
