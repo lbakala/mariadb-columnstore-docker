@@ -1,13 +1,16 @@
 version: "2"
 services:
   um1:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION}
     environment:
-      - MARIADB_CS_POSTCFG_INPUT=
-      - MARIADB_ALLOW_EMPTY_PASSWORD=1
-      - MARIADB_USER=zeppelin_user
-      - MARIADB_PASSWORD=zeppelin_pass
-      - MARIADB_DATABASE=bookstore
+      - MARIADB_CS_POSTCFG_INPUT=${MARIADB_CS_POSTCFG_INPUT}
+      - MARIADB_RANDOM_ROOT_PASSWORD=${MARIADB_RANDOM_ROOT_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_ALLOW_EMPTY_PASSWORD=${MARIADB_ALLOW_EMPTY_PASSWORD}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_CS_DEBUG=${MARIADB_CS_DEBUG}
     volumes:
       - um1_etc:/usr/local/mariadb/columnstore/etc
       - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
@@ -22,7 +25,7 @@ services:
       - "3306:3306"
 
   um2:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
       - MARIADB_DROP_LOCAL_USERS=1
@@ -37,9 +40,10 @@ services:
       - "3307:3306"
 
   pm2:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
+      - MARIADB_CS_DEBUG=
     volumes:
       - dbroot2:/usr/local/mariadb/columnstore/data2
       - pm2_etc:/usr/local/mariadb/columnstore/etc
@@ -50,9 +54,10 @@ services:
   pm1:
 #    security_opt:
 #      - seccomp:unconfined
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n2\num1\n\n\num2\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
+      - MARIADB_CS_DEBUG=
     depends_on:
       - um1
       - um2

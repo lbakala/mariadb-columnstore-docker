@@ -50,6 +50,7 @@ Temporary Items
 .vscode
 
 # Big Csv files 
+.tools
 *.csv
 *.zip
 *.tar

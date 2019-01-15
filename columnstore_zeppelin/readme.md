@@ -79,7 +79,7 @@ docker-compose up --build
 
 It can take up to 10 min before the cluster starts and the data is ingested.
 
-The following log entry marks the end of the load. 
+The following log entry marks the end of the load.
 **`"Container initialization complete at ..."`**
 
 The status of data ingest can be tracked in the UM1 container log file.
@@ -93,13 +93,20 @@ The Bookstore Sandbox Database can be accessed directly with following command:
 mysql -h127.0.0.1 -uzeppelin_user -pzeppelin_pass bookstore
 ```
 
+The docker volumes created during the process can be released using:
+```bash
+docker-compose down -v
+```
+Use this command to start clean when you need to restart theprocess.
+
+
 ### Troubleshooting
 
 In case you run a service on 3306,3307 or 8080 the ports configuration in docker-compose.yml should be changed.
 You might encounter the following error
 `ERROR: Encountered errors while bringing up the project.`
 
-i.e. if we have another MariaDB server running on port 3306 
+i.e. if we have another MariaDB server running on port 3306
 The following configuration
 
 ```yaml
@@ -165,7 +172,11 @@ Follow the screen instructions.
 
 ## Useful Links
 [Docker Commands](https://docs.docker.com/engine/reference/commandline/cli/)
+
 [Docker Compose Commands](https://docs.docker.com/compose/reference/overview/)
+
 [Zeppelin UI Guide](https://zeppelin.apache.org/docs/0.8.0/quickstart/explore_ui.html)
+
 [Zeppelin Tutorial](https://zeppelin.apache.org/docs/0.8.0/quickstart/tutorial.html)
+
 [Zeppelin with MariaDB and JDBC](https://zeppelin.apache.org/docs/0.8.0/interpreter/jdbc.html#mariadb)
