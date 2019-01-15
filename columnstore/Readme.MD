@@ -98,3 +98,4 @@ The root password is randomly generated and output to docker logs.
 ```sh
 $ docker-compose down -v
 ```
+
