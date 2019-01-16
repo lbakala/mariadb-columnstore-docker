@@ -1,34 +1,36 @@
 #!/bin/bash
 . ./test/helpers/testfwk.sh
 CS_INIT_FLAG=/usr/local/mariadb/columnstore/etc/container-initialized
-TEST_CONTAINER_NAME=$1 #This is a multinode test which creates its own containers. This variable is not used. 
+TEST_MARIADB_CONTAINER_NAME=$1 #This is a multinode test which creates its own containers. This variable is not used. 
 shift 1
-MARIADB_host='127.0.0.1'
-MARIADB_ROOT_PASSWORD='this is an example test password'
-MARIADB_USER='zeppelin_user'
-MARIADB_PASSWORD='zeppelin_pass'
-MARIADB_DATABASE='bookstore'
-MARIADB_CS_TAG=mariadb/columnstore
-MARIADB_CS_VERSION=1.2
+export MARIADB_host='127.0.0.1'
+export MARIADB_ROOT_PASSWORD='this is an example test password'
+export MARIADB_USER='zeppelin_user'
+export MARIADB_PASSWORD='zeppelin_pass'
+export MARIADB_DATABASE='bookstore'
+export MARIADB_CS_TAG=mariadb/columnstore
+export MARIADB_CS_VERSION=1.2
 export COMPOSE_PROJECT_NAME='sandboxtest'
 set -e
 cd ../columnstore
-if [ ! -z $MARIADB_TEST_DEBUG ]; then
-    docker build -t ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION} --quiet . &> /dev/null 
+if [[ -z $MARIADB_TEST_DEBUG ]]; then
+    docker build -t ${MARIADB_CONTAINER_NAME} --quiet . &> /dev/null 
 else
-    docker build -t ${MARIADB_CS_TAG}:${MARIADB_CS_VERSION} .
+    docker build -t ${MARIADB_CONTAINER_NAME} .
 fi
 cd ../columnstore_zeppelin
-if [ ! -z $MARIADB_TEST_DEBUG ]; then
+if [[ -z $MARIADB_TEST_DEBUG ]]; then
     docker-compose down -v &> /dev/null 
+    echo 'y' | docker volume prune &> /dev/null 
+    echo 'y' | docker network prune &> /dev/null 
 else
     docker-compose down -v
+    echo 'y' | docker volume prune 
+    echo 'y' | docker network prune
 fi
-
-echo 'y' | docker network prune &> /dev/null 
 echo ''
 
-if [ ! -z $MARIADB_TEST_DEBUG ]; then
+if [[ -z $MARIADB_TEST_DEBUG ]]; then
     docker-compose up --build -d &> /dev/null 
 else
     docker-compose up --build -d
@@ -109,7 +111,7 @@ tests+=( "[ "$(docker exec -i $cname_um wc -l /var/log/mariadb/columnstore/info.
 start_tst tests[@] 3
 
 cd ../columnstore_zeppelin
-if [ ! -z $MARIADB_TEST_DEBUG ]; then
+if [[ -z $MARIADB_TEST_DEBUG ]]; then
     docker-compose down -v 2>/dev/null
 else
     docker-compose down -v
