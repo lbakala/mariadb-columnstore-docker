@@ -74,7 +74,7 @@ mysql() {
 #Check if CS is initialised
 ATTEMPT=1
 
-while ! $(docker exec $cname_um test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le 60 ]; do
+while ! $(docker exec $cname_um test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le 120 ]; do
     echo -ne "."
     sleep 5
     ATTEMPT=$(($ATTEMPT+1))

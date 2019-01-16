@@ -12,7 +12,7 @@ else
 fi
 echo "Building ${MARIADB_CONTAINER_NAME}"
 docker build -t ''${MARIADB_CONTAINER_NAME}'' . --quiet
-#tests+=( "./test/mariadb-docker/run.sh $MARIADB_CONTAINER_NAME" "Test mariadb-docker" )
+tests+=( "./test/mariadb-docker/run.sh $MARIADB_CONTAINER_NAME" "Test mariadb-docker" )
 tests+=( "./test/mariadb-sandbox/run.sh $MARIADB_CONTAINER_NAME" "Test mariadb-sandbox" )
 if [ ${#tests[@]} -gt 0 ]; then
     echo ""
