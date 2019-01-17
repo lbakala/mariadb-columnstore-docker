@@ -36,11 +36,26 @@ file_env() {
 # wait for the ProcMon process to start
 wait_for_procmon()
 {
+    ATTEMPT=1
+    MAX_TRIES=72
+    if [ ! -z "$CS_WAIT_ATTEMPTS" ]; then
+        MAX_TRIES=$(($CS_WAIT_ATTEMPTS*2))
+    fi
     ps -e | grep ProcMon
-    while [ 1 -eq $? ]; do
+    while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+        if [ ! -z $CS_DEBUG ]; then
+            echo "wait_for_procmon($ATTEMPT/$MAX_TRIES)"
+        fi
         sleep 1
+        ATTEMPT=$(($ATTEMPT+1))
         ps -e | grep ProcMon
     done
+    
+    ps -e | grep ProcMon
+    if [ 0 -ne $? ]; then
+        echo "ERROR: Failed to start the ProcMon process. Tried $ATTEMPT attempts."
+        exit 1
+    fi
 }
 
 # additional wait check to ensure postConfigure is fully done and complete
@@ -57,7 +72,7 @@ wait_for_postcfg_done()
             echo "wait_for_postcfg_done($ATTEMPT/$MAX_TRIES): FullyConfigured: $FULLY_CONFIGURED"
         fi
         if [ "$FULLY_CONFIGURED" = "Y" ]; then
-            echo "Detected postConfigure complete as Installation.FullyConfigured: $FULLY_CONFIGURED"
+            echo "Detected postConfigure complete as Installation. FullyConfigured: $FULLY_CONFIGURED"
             break
         fi
         sleep 2
@@ -83,7 +98,6 @@ touch /usr/local/mariadb/columnstore/bin/rsync.sh
 chmod a+x /usr/local/mariadb/columnstore/bin/rsync.sh
 
 
-
 # hack to specify user env var as this is sometimes relied on to detect
 # root vs non root install
 export USER=root
@@ -99,37 +113,33 @@ else
     # Starting with 1.2, syslog setup is done in post-install during image
     # build. For some reason it's necessary to restart rsyslogd on first run
     # to get logging going
-    sv restart rsyslogd
+    /usr/sbin/sv restart rsyslogd
 
     # first time install with MARIADB_CS_POSTCFG_INPUT set then run postConfigure
     # with this as input. Must stop columnstore service first as postConfigure
     # will fail otherwise. The service is only used for restarted pm1 containers
     # or non pm1 containers in a cluster.
-        # Support backward compat with CS_POSTCFG_INPUT
-        MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
+    # Support backward compat with CS_POSTCFG_INPUT
+    MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
     if [ ! -z "$MARIADB_CS_POSTCFG_INPUT" ]; then
         echo "Stopping columnstore service to run postConfigure"
         /usr/sbin/sv stop columnstore
         echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
-                # Set a columnstore.xml property that can be used to detect postConfigure
-                # complete from other nodes (as the change is pushed out)
-                if [ 0 -eq $? ]; then
-                    $MCSDIR/bin/setConfig Installation FullyConfigured Y
-                fi
-    elif [ ! -z "$MARIADB_ROOT_PASSWORD" ] ||
-             [ ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" ] ||
-                 [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ] ||
-             [ $CUSTOM_INSTALL_FILES -gt 0 ]; then
-        # container has custom install files but no postConfigure so wait for
-        # columnstore to startup by some other means
+        # Set a columnstore.xml property that can be used to detect postConfigure
+        # complete from other nodes (as the change is pushed out)
+        if [ 0 -eq $? ]; then
+            $MCSDIR/bin/setConfig Installation FullyConfigured Y
+        fi
+    else
+        # wait columnstore to startup by some other means
         echo "Waiting for columnstore to start to run post install files"
         /usr/sbin/wait_for_columnstore_active
-        if [ 1 -eq $? ]; then
+		if [ 1 -eq $? ]; then
             # exit now if columnstore did not start
             echo "ERROR: ColumnStore did not start so custom install files not run."
             exit 1
         fi
-              wait_for_postcfg_done
+        wait_for_postcfg_done
     fi
 
     # allow deletion of local users on non um1 with seperate  env var
@@ -139,36 +149,37 @@ else
                   DELETE FROM mysql.user WHERE user = '';
 EOSQL
     fi
-        # only perform user setup / creation of one of the root password env vars
-      if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
-            MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
-            if [ $MYSQLDS_RUNNING -gt 0 ]; then
-                if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
-                    export MARIADB_ROOT_PASSWORD="$(pwgen -1 32)"
-                    echo "GENERATED MARIADB ROOT PASSWORD: $MARIADB_ROOT_PASSWORD"
-                fi
+    
+	MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
+    if [ $MYSQLDS_RUNNING -gt 0 ]; then
+	    # only perform user setup / creation of one of the root password env vars
+        if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+            if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+                export MARIADB_ROOT_PASSWORD="$(/usr/bin/pwgen -1 32)"
+                echo "GENERATED MARIADB ROOT PASSWORD: $MARIADB_ROOT_PASSWORD"
+            fi
 
             # create root user, default listens from anywhere
-                file_env 'MARIADB_ROOT_HOST' '%'
-                if [ ! -z "$MARIADB_ROOT_HOST" -a "$MARIADB_ROOT_HOST" != 'localhost' ]; then
-                    read -r -d '' rootCreate << EOSQL || true
-                        CREATE USER 'root'@'${MARIADB_ROOT_HOST}' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}' ;
-                        GRANT ALL ON *.* TO 'root'@'${MARIADB_ROOT_HOST}' WITH GRANT OPTION ;
+            file_env 'MARIADB_ROOT_HOST' '%'
+            if [ ! -z "$MARIADB_ROOT_HOST" -a "$MARIADB_ROOT_HOST" != 'localhost' ]; then
+                read -r -d '' rootCreate << EOSQL || true
+                    CREATE USER 'root'@'${MARIADB_ROOT_HOST}' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}' ;
+                    GRANT ALL ON *.* TO 'root'@'${MARIADB_ROOT_HOST}' WITH GRANT OPTION ;
 EOSQL
-                fi
+            fi
 
-                # pull this out seperately since the host specific users on um1 don't
-                # exist on other UM's and will fail replication.
+            # pull this out seperately since the host specific users on um1 don't
+            # exist on other UM's and will fail replication.
            "${mysql[@]}" 2>&1 << EOSQL
-                  SET @@SESSION.SQL_LOG_BIN=0;
-                  DELETE FROM mysql.user WHERE user = '';
-                  DELETE FROM mysql.user WHERE password = '' AND host <> 'localhost';  
+                SET @@SESSION.SQL_LOG_BIN=0;
+                DELETE FROM mysql.user WHERE user = '';
+                DELETE FROM mysql.user WHERE password = '' AND host <> 'localhost';  
 EOSQL
            "${mysql[@]}" 2>&1 << EOSQL
-              SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
-              GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
-              ${rootCreate}
-              DROP DATABASE IF EXISTS test ;
+                SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
+                GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
+                ${rootCreate}
+                DROP DATABASE IF EXISTS test ;
 EOSQL
 
             if [ ! -z "$MARIADB_ROOT_PASSWORD" ]; then
@@ -181,24 +192,25 @@ EOSQL
                         "${mysql[@]}" 2>&1 -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;"
                   mysql+=( "$MARIADB_DATABASE" )
             fi
-
-            file_env 'MARIADB_USER'
-            file_env 'MARIADB_PASSWORD'
-            if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
-                "${mysql[@]}" 2>&1 << EOSQL
-                    CREATE USER '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD' ;
-                    CREATE USER '$MARIADB_USER'@'localhost' IDENTIFIED BY '$MARIADB_PASSWORD' ;
-                    GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'%' ;
-                    GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'localhost' ;
+		fi
+		
+        file_env 'MARIADB_USER'
+        file_env 'MARIADB_PASSWORD'
+        if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
+            "${mysql[@]}" 2>&1 << EOSQL
+                CREATE USER '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD' ;
+                CREATE USER '$MARIADB_USER'@'localhost' IDENTIFIED BY '$MARIADB_PASSWORD' ;
+                GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'%' ;
+                GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'localhost' ;
 EOSQL
 
-                if [ "$MARIADB_DATABASE" ]; then
-                    "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'%' ;"  2>&1
-                    "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'localhost' ;"  2>&1
-                fi
+            if [ "$MARIADB_DATABASE" ]; then
+                "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'%' ;"  2>&1
+                "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'localhost' ;"  2>&1
             fi
         fi
-   fi
+    fi
+	
     WRK_DIR=`pwd`
     # Check number of custom install files and execute them 
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
@@ -215,14 +227,14 @@ EOSQL
             if [[ $f == *.sql ]];then
                 echo "Run $f at $(date)"
                 "${mysql[@]}" -vvv < $f 2>&1
-                if [ 1 -eq $? ]; then
+                if [ 0 -ne $? ]; then
                     echo "Script $f failed, aborting setup"
                     exit 1
                 fi
             elif [[ $f == *.sql.gz ]];then
                 echo "Run $f at $(date)"
                 zcat $f | "${mysql[@]}" -vvv  2>&1
-                if [ 1 -eq $? ]; then
+                if [ 0 -ne $? ]; then
                     echo "Script $f failed, aborting setup"
                     exit 1
                 fi
@@ -234,7 +246,7 @@ EOSQL
                 else
                     /bin/sh -x $f 2>&1
                 fi
-                if [ 1 -eq $? ]; then
+                if [ 0 -ne $? ]; then
                     echo "Script $f failed, aborting setup"
                     exit 1
                 fi
@@ -243,9 +255,6 @@ EOSQL
     fi
     cd $WRK_DIR
     unset MARIADB_ROOT_PASSWORD
-    if [ ! -z $GENERATED_ROOT ]; then
-        echo "Generated MariaDB root password is: $GENERATED_ROOT"
-    fi
     echo "Container initialization complete at $(date)"
     touch $FLAG
 fi
