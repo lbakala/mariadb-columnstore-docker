@@ -1,6 +1,8 @@
 #!/bin/bash
 # Environment variables supported:
 # - MARIADB_CS_POSTCFG_INPUT - if set runs postConfigure with the value piped into stdin
+# - MARIADB_CS_NUM_BLOCKS_PCT - if set uses this amount of physical memory to utilize for disk block caching
+# - MARIADB_CS_TOTAL_UM_MEMORY - if set uses this amount of physical memory to utilize for joins, intermediate results and set operations on the UM
 # - MARIADB_DATABASE - if set create a database with this name
 
 # file used to track / record initialization and prevent subsequent rerun
@@ -105,13 +107,22 @@ else
     # with this as input. Must stop columnstore service first as postConfigure
     # will fail otherwise. The service is only used for restarted pm1 containers
     # or non pm1 containers in a cluster.
-        # Support backward compat with CS_POSTCFG_INPUT
-        MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
+    # Support backward compat with CS_POSTCFG_INPUT
+    MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
     if [ ! -z "$MARIADB_CS_POSTCFG_INPUT" ]; then
+		# build the postConfigure command line parameter
+		postConfigureParameter=""
+		if [ ! -z "$MARIADB_CS_NUM_BLOCKS_PCT" ]; then
+			postConfigureParameter="$postConfigureParameter -numBlocksPct $MARIADB_CS_NUM_BLOCKS_PCT"
+		fi
+		if [ ! -z "$MARIADB_CS_TOTAL_UM_MEMORY" ]; then
+			postConfigureParameter="$postConfigureParameter -totalUmMemory $MARIADB_CS_TOTAL_UM_MEMORY"
+		fi
         echo "Stopping columnstore service to run postConfigure"
         /usr/sbin/sv stop columnstore
-        echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
-                # Set a columnstore.xml property that can be used to detect postConfigure
+		echo $MCSDIR/bin/postConfigure -n $postConfigureParameter
+        echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n $postConfigureParameter
+                # Set a Columnstore.xml property that can be used to detect postConfigure
                 # complete from other nodes (as the change is pushed out)
                 if [ 0 -eq $? ]; then
                     $MCSDIR/bin/setConfig Installation FullyConfigured Y

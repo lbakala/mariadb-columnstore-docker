@@ -32,7 +32,9 @@ RUN chmod 755 /etc/service/*/run /etc/service/*/finish /usr/sbin/runit_bootstrap
     mkdir /log
 
 # default postConfigure input to create single node cluster
-ENV MARIADB_CS_POSTCFG_INPUT "1\ncolumnstore-1\n1\n1\n"
+ENV MARIADB_CS_POSTCFG_INPUT="1\ncolumnstore-1\n1\n1\n" \
+MARIADB_CS_NUM_BLOCKS_PCT=1024M \
+MARIADB_CS_TOTAL_UM_MEMORY=256M
 
 EXPOSE 3306
 
