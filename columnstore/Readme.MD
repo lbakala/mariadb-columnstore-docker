@@ -59,7 +59,7 @@ Container initialization complete at Tue Jul 24 05:16:48 UTC 2018
 The following environment variables can be utilized to configure behavior:
 * MARIADB_ROOT_PASSWORD : specify the password for the root user
 * MARIADB_ALLOW_EMPTY_PASSWORD : allow empty password for the root user
-* MARIADB_RANDOM_ROOT_PASSWORD : generate a random password for the root user (output to logs)
+* MARIADB_RANDOM_ROOT_PASSWORD : generate a random password for the root user (output to logs). Note: This option takes precedence over MARIADB_ROOT_PASSWORD.
 * MARIADB_INITDB_SKIP_TZINFO : skip timezone setup
 * MARIADB_ROOT_HOST : host for root user, defaults to '%'
 * MARIADB_DATABASE : create a database with this name
