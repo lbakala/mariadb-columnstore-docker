@@ -129,12 +129,15 @@ else
         # complete from other nodes (as the change is pushed out)
         if [ 0 -eq $? ]; then
             $MCSDIR/bin/setConfig Installation FullyConfigured Y
+        else
+            echo "ERROR: postConfigure crashed with exit code $?"
+            exit 1
         fi
     else
         # wait columnstore to startup by some other means
         echo "Waiting for columnstore to start to run post install files"
         /usr/sbin/wait_for_columnstore_active
-		if [ 1 -eq $? ]; then
+        if [ 1 -eq $? ]; then
             # exit now if columnstore did not start
             echo "ERROR: ColumnStore did not start so custom install files not run."
             exit 1
@@ -150,9 +153,9 @@ else
 EOSQL
     fi
     
-	MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
+    MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
     if [ $MYSQLDS_RUNNING -gt 0 ]; then
-	    # only perform user setup / creation of one of the root password env vars
+        # only perform user setup / creation of one of the root password env vars
         if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
             if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
                 export MARIADB_ROOT_PASSWORD="$(/usr/bin/pwgen -1 32)"
@@ -192,8 +195,8 @@ EOSQL
                         "${mysql[@]}" 2>&1 -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;"
                   mysql+=( "$MARIADB_DATABASE" )
             fi
-		fi
-		
+        fi
+        
         file_env 'MARIADB_USER'
         file_env 'MARIADB_PASSWORD'
         if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
@@ -210,7 +213,7 @@ EOSQL
             fi
         fi
     fi
-	
+    
     WRK_DIR=`pwd`
     # Check number of custom install files and execute them 
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)
