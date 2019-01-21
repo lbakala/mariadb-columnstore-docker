@@ -34,4 +34,4 @@ start_tst()
     fi
 }
 
-export start_test
+export start_tst
