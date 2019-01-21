@@ -12,7 +12,6 @@ FLAG=/usr/local/mariadb/columnstore/etc/container-initialized
 INITDIR=/docker-entrypoint-initdb.d
 MCSDIR=/usr/local/mariadb/columnstore
 mysql=( $MCSDIR/mysql/bin/mysql --defaults-extra-file=$MCSDIR/mysql/my.cnf -uroot )
-
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
@@ -224,7 +223,7 @@ EOSQL
             fi
         fi
     fi
-    
+
     WRK_DIR=`pwd`
     # Check number of custom install files and execute them 
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)

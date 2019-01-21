@@ -3,7 +3,7 @@ services:
   um1:
     image: ${MARIADB_CONTAINER_NAME}
     environment:
-      - MARIADB_CS_POSTCFG_INPUT=${MARIADB_CS_POSTCFG_INPUT}
+      - MARIADB_CS_POSTCFG_INPUT=
       - MARIADB_RANDOM_ROOT_PASSWORD=${MARIADB_RANDOM_ROOT_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_ALLOW_EMPTY_PASSWORD=${MARIADB_ALLOW_EMPTY_PASSWORD}
@@ -18,11 +18,11 @@ services:
       - ./multi_node_um1:/docker-entrypoint-initdb.d
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.2
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.2
         aliases:
         - columnstore_host_nm
     ports:
-      - "3306:3306"
+      - ${MARIADB_UM1_BINDING}
 
   um2:
     image: ${MARIADB_CONTAINER_NAME}
@@ -35,7 +35,7 @@ services:
       - um2_local:/usr/local/mariadb/columnstore/local
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.3
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.3
     ports:
       - "3307:3306"
 
@@ -49,7 +49,7 @@ services:
       - pm2_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.4
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.4
 
   pm1:
 #    security_opt:
@@ -58,6 +58,8 @@ services:
     environment:
       - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n2\num1\n\n\num2\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
       - MARIADB_CS_DEBUG=
+      - MARIADB_CS_NUM_BLOCKS_PCT=${MARIADB_NUM_BLOCKS_PCT}
+      - MARIADB_CS_TOTAL_UM_MEMORY=${MARIADB_TOTAL_UM_MEMORY}
     depends_on:
       - um1
       - um2
@@ -67,11 +69,11 @@ services:
       - pm1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.5
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.5
   zeppelin:
     hostname: zeppelin
     build: ../columnstore_zeppelin
-
+    image: mariadb/sandboxzeppelin
     ports:
       - "8080:8080"
     depends_on:
@@ -84,7 +86,7 @@ services:
     - um1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.6
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.6
 
 volumes:
   dbroot1:
@@ -103,5 +105,5 @@ networks:
     driver: bridge
     ipam:
      config:
-       - subnet: 10.5.0.0/16
-         gateway: 10.5.0.1
+       - subnet: ${MARIADB_CS_NETWORK_SPACE}.0/24
+         gateway: ${MARIADB_CS_NETWORK_SPACE}.1

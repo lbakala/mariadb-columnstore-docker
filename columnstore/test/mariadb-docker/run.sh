@@ -8,7 +8,7 @@ export MARIADB_ROOT_PASSWORD='this is an example test password'
 export MARIADB_USER='0123456789012345' # "ERROR: 1470  String 'my cool mysql user' is too long for user name (should be no longer than 16)"
 export MARIADB_PASSWORD='my cool mariadb password'
 export MARIADB_DATABASE='my cool mariadb database'
-cname="mariadb-container-$RANDOM-$RANDOM"
+cname="${MARIADB_TEST_CONTAINER_PREFIX}docker"
 cid="$(
     docker create \
         -e MARIADB_ROOT_PASSWORD \
@@ -16,7 +16,7 @@ cid="$(
         -e MARIADB_PASSWORD \
         -e MARIADB_DATABASE \
         --name "$cname" \
-        $TEST_CONTAINER_NAME
+        $MARIADB_CONTAINER_NAME
 )"
 docker cp ./test/mariadb-docker/initdb.sql $cid:/docker-entrypoint-initdb.d/initdb.sql
 cid="$(docker start $cid)"
@@ -49,11 +49,11 @@ while ! $(docker exec $cid test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le 60 ]; do
 done
 echo $ATTEMPT
 
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT CURRENT_USER();')" = "$MARIADB_USER@localhost" ]" "Testing SELECT CURRENT_USER();. Expected: $MARIADB_USER@localhost" )
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT 1')" = 1 ]" "Testing SELECT 1. Expected: 1" )
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT 1')" = 1 ]" "Testing SELECT 1. Expected: 1" )
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT 1')" = 1 ]" "Testing SELECT 1. Expected: 1" )
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT COUNT(*) FROM test')" = 1 ]" "Testing SELECT COUNT(*) FROM test. Expected: 1" )
-tests+=( "[ "$(mysql "$MARIADB_DATABASE" 'SELECT c FROM test')" == 'goodbye!' ]" "Testing SELECT c FROM test. Expected: goodbye!" )
-tests+=( "[ "$(docker exec $cid wc -l /var/log/mariadb/columnstore/info.log | cut -d ' ' -f 1)" -gt 0 ]" "Testing log at /var/log/mariadb/columnstore/info.log. Expected: some rows" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT CURRENT_USER();') = \"$MARIADB_USER@localhost\" ]" "Testing SELECT CURRENT_USER();. Expected: $MARIADB_USER@localhost" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT COUNT(*) FROM test') = 1 ]" "Testing SELECT COUNT(*) FROM test. Expected: 1" )
+tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT c FROM test') == 'goodbye!' ]" "Testing SELECT c FROM test. Expected: goodbye!" )
+tests+=( "[ \$(docker exec $cid wc -l /var/log/mariadb/columnstore/info.log | cut -d ' ' -f 1) -gt 0 ]" "Testing log at /var/log/mariadb/columnstore/info.log. Expected: some rows" )
 start_tst tests[@] 3

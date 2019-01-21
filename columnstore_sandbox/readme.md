@@ -27,7 +27,7 @@ $ docker-compose down -v
 
 Build columnstore
 ```sh
-$ docker build -t mariadb/columnstore:1.2 ../columnstore
+$ docker build -t mariadb/columnstore:1.2-dev ../columnstore
 ```
 
 Build columnstore with the sandbox dataset

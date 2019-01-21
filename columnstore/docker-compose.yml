@@ -1,26 +1,28 @@
 version: "2"
 services:
   um1:
-    image: mariadb/columnstore:1.2-dev
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
-      - MARIADB_CS_POSTCFG_INPUT=
-      - MARIADB_RANDOM_ROOT_PASSWORD=
-      - MARIADB_ROOT_PASSWORD=
-      - MARIADB_USER=dbuser
-      - MARIADB_PASSWORD=dbpassword
-      - MARIADB_DATABASE=mydb
+      - MARIADB_CS_POSTCFG_INPUT=${MARIADB_CS_POSTCFG_INPUT}
+      - MARIADB_RANDOM_ROOT_PASSWORD=${MARIADB_RANDOM_ROOT_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_ALLOW_EMPTY_PASSWORD=${MARIADB_ALLOW_EMPTY_PASSWORD}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_CS_DEBUG=${MARIADB_CS_DEBUG}
     volumes:
       - um1_etc:/usr/local/mariadb/columnstore/etc
       - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
       - um1_local:/usr/local/mariadb/columnstore/local
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.2
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.2
     ports:
-      - "3306:3306"
+      - ${MARIADB_UM1_BINDING}
 
   pm2:
-    image: mariadb/columnstore:1.2-dev
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
     volumes:
@@ -28,14 +30,14 @@ services:
       - pm2_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.3
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.3
 
   pm1:
-    image: mariadb/columnstore:1.2-dev
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n1\num1\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
-      - MARIADB_CS_NUM_BLOCKS_PCT=1024M
-      - MARIADB_CS_TOTAL_UM_MEMORY=512M
+      - MARIADB_CS_NUM_BLOCKS_PCT=${MARIADB_NUM_BLOCKS_PCT}
+      - MARIADB_CS_TOTAL_UM_MEMORY=${MARIADB_TOTAL_UM_MEMORY}
     depends_on:
       - um1
       - pm2
@@ -44,7 +46,7 @@ services:
       - pm1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.0.4
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.4
 
 volumes:
   dbroot1:
@@ -60,5 +62,5 @@ networks:
     driver: bridge
     ipam:
      config:
-       - subnet: 10.5.0.0/16
-         gateway: 10.5.0.1
+       - subnet: ${MARIADB_CS_NETWORK_SPACE}.0/24
+         gateway: ${MARIADB_CS_NETWORK_SPACE}.1
