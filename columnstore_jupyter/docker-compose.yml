@@ -1,13 +1,16 @@
 version: "2"
 services:
   um1:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
-      - MARIADB_CS_POSTCFG_INPUT=
-      - MARIADB_RANDOM_ROOT_PASSWORD=1
-      - MARIADB_USER=jupiter_user
-      - MARIADB_PASSWORD=jupiter_pass
-      - MARIADB_DATABASE=test
+      - MARIADB_CS_POSTCFG_INPUT=${MARIADB_CS_POSTCFG_INPUT}
+      - MARIADB_RANDOM_ROOT_PASSWORD=${MARIADB_RANDOM_ROOT_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_ALLOW_EMPTY_PASSWORD=${MARIADB_ALLOW_EMPTY_PASSWORD}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_CS_DEBUG=${MARIADB_CS_DEBUG}
     volumes:
       - um1_etc:/usr/local/mariadb/columnstore/etc
       - um1_mysql:/usr/local/mariadb/columnstore/mysql/db
@@ -15,14 +18,14 @@ services:
       - ./columnstore_um1:/docker-entrypoint-initdb.d
     networks:
       mcsnet:
-        ipv4_address: 10.5.1.12
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.12
         aliases:
-        - columnstore_host_nm
+        - ${MARIADB_UM1_BINDING}
     ports:
       - "3306:3306"
 
   pm2:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
     volumes:
@@ -30,12 +33,14 @@ services:
       - pm2_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.1.13
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.13
 
   pm1:
-    image: mariadb/columnstore:1.2
+    image: ${MARIADB_CONTAINER_NAME}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=2\n1\nn\ny\ncolumnstore-1\n1\n1\num1\n\n\n2\npm1\n\n\n1\npm2\n\n\n2\n
+      - MARIADB_CS_NUM_BLOCKS_PCT=${MARIADB_NUM_BLOCKS_PCT}
+      - MARIADB_CS_TOTAL_UM_MEMORY=${MARIADB_TOTAL_UM_MEMORY}
     depends_on:
       - um1
       - pm2
@@ -44,7 +49,7 @@ services:
       - pm1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:
-        ipv4_address: 10.5.1.14
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.14
   jupyter:
     image: mariadb/columnstore_jupyter:1.2
     command: start-notebook.sh --NotebookApp.password='sha1:817af87d3fe5:febd7d6959b12ee6839a26d56f8f54c88922e9c2'
@@ -61,7 +66,7 @@ services:
 
     networks:
       mcsnet:
-        ipv4_address: 10.5.1.19
+        ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.19
 
 volumes:
   dbroot1:
@@ -77,5 +82,5 @@ networks:
     driver: bridge
     ipam:
      config:
-       - subnet: 10.5.1.0/16
-         gateway: 10.5.1.1
+       - subnet: ${MARIADB_CS_NETWORK_SPACE}.0/24
+         gateway: ${MARIADB_CS_NETWORK_SPACE}.1
