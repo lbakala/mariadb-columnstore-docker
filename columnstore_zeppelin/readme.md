@@ -60,7 +60,7 @@ cd columnstore_zeppelin
 ```
 
 ```bash
-docker build -t mariadb/columnstore:1.2 ../columnstore
+docker build -t mariadb/columnstore:1.2-dev ../columnstore
 ```
 
 ### Build Zeppelin instance (optional)
