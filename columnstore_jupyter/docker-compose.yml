@@ -20,9 +20,9 @@ services:
       mcsnet:
         ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.12
         aliases:
-        - ${MARIADB_UM1_BINDING}
+        - columnstore_host_nm
     ports:
-      - "3306:3306"
+      - ${MARIADB_UM1_BINDING}
 
   pm2:
     image: ${MARIADB_CONTAINER_NAME}
