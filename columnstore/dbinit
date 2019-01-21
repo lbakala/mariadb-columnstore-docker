@@ -124,7 +124,7 @@ else
     MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
     if [ ! -z "$MARIADB_CS_POSTCFG_INPUT" ]; then
         # build the postConfigure command line parameter
-        postConfigureParameter=""
+        postConfigureParameter="-x"
         if [ ! -z "$MARIADB_CS_NUM_BLOCKS_PCT" ]; then
             postConfigureParameter="$postConfigureParameter -numBlocksPct $MARIADB_CS_NUM_BLOCKS_PCT"
         fi
