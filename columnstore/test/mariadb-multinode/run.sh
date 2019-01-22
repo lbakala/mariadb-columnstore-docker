@@ -13,7 +13,7 @@ minp=$(date +%M)
 export MARIADB_CS_NETWORK_SPACE="10.$((10#${minp} +11)).$((10#${secp: -2} + 11))"
 export COMPOSE_PROJECT_NAME=''${MARIADB_TEST_CONTAINER_PREFIX}multinode''
 TEST_WAIT_ATTEMPTS=120
-echo "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
+echo -ne "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
 
 cleanup(){
     if [[ -z ${MARIADB_TEST_DEBUG} ]]; then
@@ -84,6 +84,7 @@ while ! $(docker exec $cname_um1 test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le ${TE
     ATTEMPT=$(($ATTEMPT+1))
 done
 echo $ATTEMPT
+
 
 if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt ${TEST_WAIT_ATTEMPTS} ]; then
     echo "$(( (${ATTEMPT}-1)*5 )) seconds."

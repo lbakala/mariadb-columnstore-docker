@@ -12,8 +12,8 @@ secp=$(date +%s)
 minp=$(date +%M)
 export MARIADB_CS_NETWORK_SPACE="10.$((10#${minp} +21)).$((10#${secp: -2} + 11))"
 export COMPOSE_PROJECT_NAME=''${MARIADB_TEST_CONTAINER_PREFIX}sandbox''
-TEST_WAIT_ATTEMPTS=120
-echo "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
+TEST_WAIT_ATTEMPTS=180
+echo -ne "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
 
 cleanup() {
     cd ../columnstore_zeppelin
@@ -41,8 +41,8 @@ else
     docker-compose down -v
     echo 'y' | docker volume prune 
     echo 'y' | docker network prune
+    echo ''
 fi
-echo ''
 
 if [[ -z $MARIADB_TEST_DEBUG ]]; then
     docker-compose up --build -d &> /dev/null 

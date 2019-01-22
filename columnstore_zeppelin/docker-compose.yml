@@ -20,7 +20,7 @@ services:
       mcsnet:
         ipv4_address: ${MARIADB_CS_NETWORK_SPACE}.2
         aliases:
-        - columnstore_host_nm
+        - ${MARIADB_DATABASE_SERVICE}
     ports:
       - ${MARIADB_UM1_BINDING}
 
@@ -71,7 +71,15 @@ services:
   zeppelin:
     hostname: zeppelin
     build: ../columnstore_zeppelin
-    image: mariadb/sandboxzeppelin
+    image: ${ZEPPELIN_CONTAINER_NAME}
+    environment:
+      - ZEPPELIN_WEB_HOST=${ZEPPELIN_WEB_HOST}
+      - ZEPPELIN_WEB_PORT=${ZEPPELIN_WEB_PORT}
+      - ZEPPELIN_WEB_DEMO_USER=${ZEPPELIN_WEB_DEMO_USER}
+      - ZEPPELIN_WEB_DEMO_PASS=${ZEPPELIN_WEB_DEMO_PASS}
+      - ZEPPELIN_WEB_ADMIN_USER=${ZEPPELIN_WEB_ADMIN_USER}
+      - ZEPPELIN_WEB_ADMIN_PASS=${ZEPPELIN_WEB_ADMIN_PASS}
+      - MARIADB_DATABASE_SERVICE=${MARIADB_DATABASE_SERVICE}
     ports:
       - "8080:8080"
     depends_on:
@@ -80,7 +88,6 @@ services:
       - pm1
       - pm2
     volumes:
-    - ../columnstore_zeppelin/notebook:/zeppelin/notebook
     - um1_etc:/usr/local/mariadb/columnstore/etc
     networks:
       mcsnet:

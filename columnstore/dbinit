@@ -144,7 +144,7 @@ else
         wait_for_postcfg_done
     fi
 
-    # allow deletion of local users on non um1 with seperate  env var
+    # allow deletion of local users on non um1 with separate  env var
     if [ ! -z "$MARIADB_DROP_LOCAL_USERS" ]; then
         "${mysql[@]}" 2>&1 << EOSQL
                   SET @@SESSION.SQL_LOG_BIN=0;
@@ -170,7 +170,7 @@ EOSQL
 EOSQL
             fi
 
-            # pull this out seperately since the host specific users on um1 don't
+            # pull this out separately since the host specific users on um1 don't
             # exist on other UM's and will fail replication.
            "${mysql[@]}" 2>&1 << EOSQL
                 SET @@SESSION.SQL_LOG_BIN=0;
