@@ -28,7 +28,6 @@ services:
     image: ${MARIADB_CONTAINER_NAME}
     environment:
       - MARIADB_CS_POSTCFG_INPUT=
-      - MARIADB_DROP_LOCAL_USERS=1
     volumes:
       - um2_etc:/usr/local/mariadb/columnstore/etc
       - um2_mysql:/usr/local/mariadb/columnstore/mysql/db
