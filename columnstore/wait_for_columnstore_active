@@ -37,7 +37,7 @@ if [ ! -z $MARIADB_CS_DEBUG ]; then
     echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
 fi
 echo "$STATUS" | grep -q 'System.*ACTIVE'
-while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
     sleep 5
     ATTEMPT=$(($ATTEMPT+1))
     STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
@@ -69,7 +69,7 @@ if [ $MYSQLDS_RUNNING -gt 0 ]; then
     fi
 
     STATUS=$("${mysql[@]}" -e "create table $TEST_TABLE(i tinyint) engine=columnstore;" 2>&1)
-    while [ 1 -eq $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+    while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
         if [ ! -z $MARIADB_CS_DEBUG ]; then
             echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): create table test error: $STATUS"
         fi

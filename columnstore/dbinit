@@ -21,7 +21,7 @@ file_env() {
     local fileVar="${var}_FILE"
     local def="${2:-}"
     if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-        echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+        echo >&2 "ERROR: both $var and $fileVar are set (but are exclusive)"
         exit 1
     fi
     local val="$def"
@@ -85,6 +85,106 @@ wait_for_postcfg_done()
         exit 1
     fi
 }
+
+# commands executed by UM1 (e.g. setting the root password and deleting local users
+actions_executed_by_um1()
+{
+    # deletion of local users on non um1
+    # to avoid concurrency issues we let um1 execute the SQL commands on all other ums
+    mapfile -t UM_IP_ADDRESSES < <($MCSDIR/bin/mcsadmin getSystemNetworkConfig | grep "User Module" | grep -Eo "$SERVER_SUBNET.*" | grep -v $(hostname -i))
+    if [ ${#UM_IP_ADDRESSES[@]} -gt 0 ]; then
+        echo "multi um setup with "$(( ${#UM_IP_ADDRESSES[@]} + 1 ))" ums found. um1 will drop local users on all other ums"
+        # create a temporary user for the remote commands
+        TEMP_ROOT_PASSWORD=$(/usr/bin/pwgen -1 32)
+        ${mysql[@]} -e "CREATE USER 'root'@\"$SERVER_SUBNET.%\" IDENTIFIED BY \"$TEMP_ROOT_PASSWORD\"; GRANT ALL ON *.* TO 'root'@\"$SERVER_SUBNET.%\" WITH GRANT OPTION;"
+        if [ $? -ne 0 ]; then
+            echo "ERROR: during temporary root user creation"
+            exit 1
+        fi
+        echo "temporary root user created"
+        
+        # execute the remote deletion of local users on each um
+        REMOTE_SQL="${mysql[@]} -p$TEMP_ROOT_PASSWORD"
+        for UM_IP_ADDRESS in ${UM_IP_ADDRESSES[@]}; do
+            USERS_TO_BE_DROPPED=$($REMOTE_SQL -h $UM_IP_ADDRESS -r -s -N -e "SELECT CONCAT(\"DROP USER IF EXISTS '\",User,\"'@'\", Host,\"';\") FROM mysql.user WHERE (Password='' AND User NOT IN ('mysql.sys', 'mysqlxsys','root')) OR (User='root' AND Password='' AND NOT (Host LIKE '$SERVER_SUBNET.%' OR  Host='localhost'));"| tr '\n' ' ')
+            $REMOTE_SQL -h $UM_IP_ADDRESS -e "$USERS_TO_BE_DROPPED"
+            if [ $? -ne 0 ]; then
+                echo "ERROR: during local user deletion at um with ip address $UM_IP_ADDRESS"
+                exit 1
+            fi
+            echo "local users dropped at um with ip address $UM_IP_ADDRESS"
+        done
+        
+        # delete the temporary user for the remote commands
+        ${mysql[@]} -e "DROP USER 'root'@\"$SERVER_SUBNET.%\";"
+        if [ $? -ne 0 ]; then
+            echo "ERROR: during temporary root user deletion"
+            exit 1
+        fi
+        echo "temporary root user dropped"
+        unset TEMP_ROOT_PASSWORD
+        unset REMOTE_SQL
+    fi
+    unset UM_IP_ADDRESSES
+    
+    # only perform user setup / creation of one of the root password env vars
+    if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+        if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
+            export MARIADB_ROOT_PASSWORD="$(/usr/bin/pwgen -1 32)"
+            echo "GENERATED MARIADB ROOT PASSWORD: $MARIADB_ROOT_PASSWORD"
+        fi
+        # create root user, default listens from anywhere
+        file_env 'MARIADB_ROOT_HOST' '%'
+        if [ ! -z "$MARIADB_ROOT_HOST" -a "$MARIADB_ROOT_HOST" != 'localhost' ]; then
+            read -r -d '' rootCreate << EOSQL || true
+                CREATE USER 'root'@'${MARIADB_ROOT_HOST}' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}' ;
+                GRANT ALL ON *.* TO 'root'@'${MARIADB_ROOT_HOST}' WITH GRANT OPTION ;
+EOSQL
+        fi
+
+        # pull this out separately since the host specific users on um1 don't
+        # exist on other UM's and will fail replication.
+       "${mysql[@]}" 2>&1 << EOSQL
+            SET @@SESSION.SQL_LOG_BIN=0;
+            DELETE FROM mysql.user WHERE user = '';
+            DELETE FROM mysql.user WHERE password = '' AND host <> 'localhost';  
+EOSQL
+           "${mysql[@]}" 2>&1 << EOSQL
+            SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
+            GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
+            ${rootCreate}
+            DROP DATABASE IF EXISTS test ;
+EOSQL
+
+        if [ ! -z "$MARIADB_ROOT_PASSWORD" ]; then
+            mysql+=( -p"${MARIADB_ROOT_PASSWORD}" )
+        fi
+
+        # Create custom database if specified. CS_DATABASE for backward compat
+        MARIADB_DATABASE="${MARIADB_DATABASE:-$CS_DATABASE}"
+        if [ ! -z "$MARIADB_DATABASE" ]; then
+                    "${mysql[@]}" 2>&1 -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;"
+              mysql+=( "$MARIADB_DATABASE" )
+        fi
+    fi
+        
+    file_env 'MARIADB_USER'
+    file_env 'MARIADB_PASSWORD'
+    if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
+        "${mysql[@]}" 2>&1 << EOSQL
+            CREATE USER '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD' ;
+            CREATE USER '$MARIADB_USER'@'localhost' IDENTIFIED BY '$MARIADB_PASSWORD' ;
+            GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'%' ;
+            GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'localhost' ;
+EOSQL
+
+        if [ "$MARIADB_DATABASE" ]; then
+            "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'%' ;"  2>&1
+            "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'localhost' ;"  2>&1
+        fi
+    fi
+}
+
 # hack to ensure server-id is set to unique value per vm because my.cnf is
 # not in a good location for a volume
 SERVER_ID=$(hostname -i | cut -d "." -f 4)
@@ -147,7 +247,7 @@ else
         # wait columnstore to startup by some other means
         echo "Waiting for columnstore to start to run post install files"
         /usr/sbin/wait_for_columnstore_active
-        if [ 1 -eq $? ]; then
+        if [ 0 -ne $? ]; then
             # exit now if columnstore did not start
             echo "ERROR: ColumnStore did not start so custom install files not run."
             exit 1
@@ -155,71 +255,21 @@ else
         wait_for_postcfg_done
     fi
 
-    # allow deletion of local users on non um1 with seperate  env var
-    if [ ! -z "$MARIADB_DROP_LOCAL_USERS" ]; then
-        "${mysql[@]}" 2>&1 << EOSQL
-                  SET @@SESSION.SQL_LOG_BIN=0;
-                  DELETE FROM mysql.user WHERE user = '';
-EOSQL
-    fi
-    
+    # Figure out if we are at a um
     MYSQLDS_RUNNING=$(ps -ef | grep -v grep | grep mysqld | wc -l)
     if [ $MYSQLDS_RUNNING -gt 0 ]; then
-        # only perform user setup / creation of one of the root password env vars
-        if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
-            if [ ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
-                export MARIADB_ROOT_PASSWORD="$(/usr/bin/pwgen -1 32)"
-                echo "GENERATED MARIADB ROOT PASSWORD: $MARIADB_ROOT_PASSWORD"
-            fi
-
-            # create root user, default listens from anywhere
-            file_env 'MARIADB_ROOT_HOST' '%'
-            if [ ! -z "$MARIADB_ROOT_HOST" -a "$MARIADB_ROOT_HOST" != 'localhost' ]; then
-                read -r -d '' rootCreate << EOSQL || true
-                    CREATE USER 'root'@'${MARIADB_ROOT_HOST}' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}' ;
-                    GRANT ALL ON *.* TO 'root'@'${MARIADB_ROOT_HOST}' WITH GRANT OPTION ;
-EOSQL
-            fi
-
-            # pull this out seperately since the host specific users on um1 don't
-            # exist on other UM's and will fail replication.
-           "${mysql[@]}" 2>&1 << EOSQL
-                SET @@SESSION.SQL_LOG_BIN=0;
-                DELETE FROM mysql.user WHERE user = '';
-                DELETE FROM mysql.user WHERE password = '' AND host <> 'localhost';  
-EOSQL
-           "${mysql[@]}" 2>&1 << EOSQL
-                SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MARIADB_ROOT_PASSWORD}') ;
-                GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
-                ${rootCreate}
-                DROP DATABASE IF EXISTS test ;
-EOSQL
-
-            if [ ! -z "$MARIADB_ROOT_PASSWORD" ]; then
-                mysql+=( -p"${MARIADB_ROOT_PASSWORD}" )
-            fi
-
-            # Create custom database if specified. CS_DATABASE for backward compat
-            MARIADB_DATABASE="${MARIADB_DATABASE:-$CS_DATABASE}"
-            if [ ! -z "$MARIADB_DATABASE" ]; then
-                        "${mysql[@]}" 2>&1 -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;"
-                  mysql+=( "$MARIADB_DATABASE" )
-            fi
-        fi
-        
-        file_env 'MARIADB_USER'
-        file_env 'MARIADB_PASSWORD'
-        if [ "$MARIADB_USER" -a "$MARIADB_PASSWORD" ]; then
-            "${mysql[@]}" 2>&1 << EOSQL
-                CREATE USER '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD' ;
-                CREATE USER '$MARIADB_USER'@'localhost' IDENTIFIED BY '$MARIADB_PASSWORD' ;
-                GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'%' ;
-                GRANT CREATE TEMPORARY TABLES ON infinidb_vtable.* to '$MARIADB_USER'@'localhost' ;
-EOSQL
-
-            if [ "$MARIADB_DATABASE" ]; then
-                "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'%' ;"  2>&1
-                "${mysql[@]}" -e "GRANT ALL ON \`$MARIADB_DATABASE\`.* TO '$MARIADB_USER'@'localhost' ;"  2>&1
+        # Figure out if at um1, only um1 is able to execute DDL
+        TEST_TABLE="columnstore_info.mcs_wait_test_$RANDOM"
+        STATUS=$(${mysql[@]} -e "create table $TEST_TABLE(i tinyint) engine=columnstore;" 2>&1)
+        if [ $? -eq 0 ]; then
+            ${mysql[@]} -e "drop table if exists $TEST_TABLE;" 2>&1
+            # Let um1 take care about root user creation and local user deletion
+            actions_executed_by_um1
+        else
+            if [ ! [ $(echo $STATUS | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master.") -o \
+                     $(echo $STATUS | grep -q "ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)") ] ]; then
+                echo "ERROR: During figuring out if executed at primary um"
+                exit 1
             fi
         fi
     fi

@@ -13,7 +13,7 @@ minp=$(date +%M)
 export MARIADB_CS_NETWORK_SPACE="10.$((10#${minp} +11)).$((10#${secp: -2} + 11))"
 export COMPOSE_PROJECT_NAME=''${MARIADB_TEST_CONTAINER_PREFIX}multinode''
 TEST_WAIT_ATTEMPTS=120
-echo "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
+echo -ne "Network:${MARIADB_CS_NETWORK_SPACE}.0/24"
 
 cleanup(){
     if [[ -z ${MARIADB_TEST_DEBUG} ]]; then
@@ -43,6 +43,8 @@ else
 fi
 trap cleanup EXIT
 cname_um1="${COMPOSE_PROJECT_NAME}_um1_1"
+cname_pm1="${COMPOSE_PROJECT_NAME}_pm1_1"
+cname_pm2="${COMPOSE_PROJECT_NAME}_pm2_1"
 
 ATTEMPT=1
 while [ -z "$(docker ps -a | grep $cname_um1)" ] && [ $ATTEMPT -le 20 ]; do
@@ -78,23 +80,25 @@ mysql() {
 #Check if CS is initialised
 ATTEMPT=1
 
-while ! $(docker exec $cname_um1 test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le ${TEST_WAIT_ATTEMPTS} ]; do
+while (! $(docker exec $cname_um1 test -f "$CS_INIT_FLAG") || ! $(docker exec $cname_pm1 test -f "$CS_INIT_FLAG") || ! $(docker exec $cname_pm2 test -f "$CS_INIT_FLAG")) && [ $ATTEMPT -le $TEST_WAIT_ATTEMPTS ]; do
     echo -ne "."
     sleep 5
     ATTEMPT=$(($ATTEMPT+1))
 done
 echo $ATTEMPT
 
-if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt ${TEST_WAIT_ATTEMPTS} ]; then
+
+if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt $TEST_WAIT_ATTEMPTS ]; then
     echo "$(( (${ATTEMPT}-1)*5 )) seconds."
     echo ""
-    echo ">>>>>>>>>>>>> $cname_um1 log follows. <<<<<<<<<<<<<"
-    docker logs $cname_um1
-    echo ">>>>>>>>>>>>> $cname_um1 end of log. <<<<<<<<<<<<<"
+    echo ">>>>>>>>>>>>> docker-compose logs follow. <<<<<<<<<<<<<"
+    docker-compose logs -t
+    echo ">>>>>>>>>>>>> docker-compose logs end. <<<<<<<<<<<<<"
 fi
 
 docker exec $cname_um1 rm -rf /docker-entrypoint-initdb.d/test_initdb.sql
 
+tests+=( "[ $ATTEMPT -le $TEST_WAIT_ATTEMPTS ]" "Testing if Columnstore was initialized successfully. Expected: True" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT CURRENT_USER();') = \"$MARIADB_USER@localhost\" ]" "Testing SELECT CURRENT_USER();. Expected: $MARIADB_USER@localhost" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
@@ -103,5 +107,3 @@ tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT COUNT(*) FROM test') = 1 ]" "
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT c FROM test') == 'goodbye!' ]" "Testing SELECT c FROM test. Expected: goodbye!" )
 tests+=( "[ \$(docker exec -i $cname_um1 wc -l /var/log/mariadb/columnstore/info.log | cut -d ' ' -f 1) -gt 0 ]" "Testing log at /var/log/mariadb/columnstore/info.log. Expected: some rows" )
 start_tst tests[@] 3
-
-cleanup
