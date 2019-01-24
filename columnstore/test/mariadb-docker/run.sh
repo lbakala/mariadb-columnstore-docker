@@ -2,6 +2,7 @@
 . ./test/helpers/testfwk.sh
 CS_INIT_FLAG=/usr/local/mariadb/columnstore/etc/container-initialized
 TEST_CONTAINER_NAME=$1
+TEST_WAIT_ATTEMPTS=60
 shift 1
 export MARIADB_HOST='127.0.0.1'
 export MARIADB_ROOT_PASSWORD='this is an example test password'
@@ -42,13 +43,22 @@ mysql() {
 #Check if CS is initialised
 
 ATTEMPT=1
-while ! $(docker exec $cid test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le 60 ]; do
+while ! $(docker exec $cid test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le $TEST_WAIT_ATTEMPTS ]; do
     echo -ne "."
     sleep 5
     ATTEMPT=$((ATTEMPT+1))
 done
 echo $ATTEMPT
 
+if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt $TEST_WAIT_ATTEMPTS ]; then
+    echo "$(( (${ATTEMPT}-1)*5 )) seconds."
+    echo ""
+    echo ">>>>>>>>>>>>> docker logs for $cid follow. <<<<<<<<<<<<<"
+    docker logs -t $cid
+    echo ">>>>>>>>>>>>> docker logs for $cid end. <<<<<<<<<<<<<"
+fi
+
+tests+=( "[ $ATTEMPT -le $TEST_WAIT_ATTEMPTS ]" "Testing if Columnstore was initialized successfully. Expected: True" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT CURRENT_USER();') = \"$MARIADB_USER@localhost\" ]" "Testing SELECT CURRENT_USER();. Expected: $MARIADB_USER@localhost" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )
 tests+=( "[ \$(mysql \"$MARIADB_DATABASE\" 'SELECT 1') = 1 ]" "Testing SELECT 1. Expected: 1" )

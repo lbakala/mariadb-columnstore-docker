@@ -255,8 +255,8 @@ else
             # Let um1 take care about root user creation and local user deletion
             actions_executed_by_um1
         else
-            echo "$STATUS" | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master."
-            if [ 0 -ne $? ]; then
+            if [ ! [ $(echo $STATUS | grep -q "DML and DDL statements for Columnstore tables can only be run from the replication master.") -o \
+                     $(echo $STATUS | grep -q "ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)") ] ]; then
                 echo "ERROR: During figuring out if executed at primary um"
                 exit 1
             fi
