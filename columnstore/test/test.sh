@@ -16,7 +16,8 @@ cleanup(){
 }
 
 UUID=$(dbus-uuidgen)
-export MARIADB_TEST_CONTAINER_PREFIX="mariadbtest${UUID: -8}"  #underscores in the docker project name are not accepted well by the travis docker service. 
+export MARIADB_TEST_CONTAINER_PREFIX="mtest${UUID: -8}"  #underscores in the docker project name are not accepted well by the travis docker service.
+                                                         #we also have to keep the complete DNS container host name below 60 characters as enforced by mysql.user
 
 if [[ ! -z "$1" ]]; then
     export MARIADB_CONTAINER_NAME="${1}"
