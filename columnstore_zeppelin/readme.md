@@ -51,25 +51,60 @@ The disk space requirement for the docker images is around 4GB.
 
 Make sure you are in columnstore_zeppelin folder
 
-### Build columnstore
+### Build columnstore sandbox
+#### Quick start
+You can use the following shell script to start the columnstore cluster.
+```bash
+bash sandboxdemo.sh
+```
 
-Navigate to the columnstore directory.
+The file executes the following comands:
+
+```bash
+cd columnstore
+docker build -t mariadb/columnstore:1.2 .
+cd .columnstore_zeppelin
+echo 'y' | docker network prune &> /dev/null 
+echo ''
+docker-compose down -v
+docker-compose up --build
+docker-compose down -v
+```
+#### Step-by-Step
+
+*Navigate to the columnstore zeppelin directory.*
 
 ```bash
 cd columnstore_zeppelin
 ```
 
-```bash
-docker build -t mariadb/columnstore:1.2 ../columnstore
-```
-
-### Build Zeppelin instance (optional)
+*Build the docker image from definitions*
 
 ```bash
-docker build -t mariadb/columnstore_zeppelin:latest ../columnstore_zeppelin
+docker build -t mariadb/columnstore:1.2 .columnstore
 ```
 
-### Bring the whole cluster up
+*Build Zeppelin instance (optional)*
+
+```bash
+docker build -t mariadb/columnstore_zeppelin:latest .columnstore_zeppelin
+```
+
+*Cleanup network settings (optional)*
+Removes all unused network configurations. This step is required only if there is a previous network configurations.
+```bash
+echo 'y' | docker network prune
+```
+
+*Remove all existing volumes (optional)*
+The following command will remove all disk volumes used by this application.
+```bash
+docker-compose down -v
+```
+
+This command should be used to clean up the volumes before or after restart of the cluster.
+
+#### Start the whole cluster
 
 The command is starting a columnstore cluster with 4 nodes 2UM and 2PM modules:
 
@@ -103,7 +138,7 @@ Use this command to start clean when you need to restart theprocess.
 ### Troubleshooting
 
 In case you run a service on 3306,3307 or 8080 the ports configuration in docker-compose.yml should be changed.
-You might encounter the following error
+You might encounter the following error 
 `ERROR: Encountered errors while bringing up the project.`
 
 i.e. if we have another MariaDB server running on port 3306
@@ -142,31 +177,30 @@ We use Zeppelin to allow data scientists to play with the sandbox data stored in
 
 After the installation is completed you can navigate to [http://localhost:8080/](http://localhost:8080/) and will be presented with the Zeppelin home page
 
-![Img 1](./imgreadme/img1.jpg)
+![Img 2](imgreadme/img1.png)
 
-In the lower right section is the Notebook section. There you can find **MariaDB AX Sandbox Folder**
-Click top open.
+Press the login button and enter the credentials below:
+![Img 3](imgreadme/img1.2.png)
 
-![Img 2](./imgreadme/img2.jpg)
+User: ```demo```
 
+Password: ```highlyillogical```
+
+In the lower right section the Notebook section. There you can find **MariaDB AX Sandbox Folder**
+Click to open.
 Choose **Bookstore Analytics with Scala and Spark**
+![Img 4](imgreadme/img4.png)
 
-![Img 3](./imgreadme/img3.jpg)
+When you open the Notebook for the first time you should reload all paragraphs by using the  "Run All Paragraphs" button ![run](imgreadme/run.png)  ...
 
-When you open iot for first time you will be presented with the interpreter bindings.
-Press **Save** to save those bindings.
+![Img 5](imgreadme/img5.0.png)
+after confirmation all scripts will be executed and the results presented.
 
-![Img 4](./imgreadme/img4.jpg)
-You are ready to us Zeppelin with MAriaDB AX Sandbox Data
+You are now ready to use Zeppelin with MAriaDB AX Sandbox Data
 
 You can follow this link to get more information about the [Zeppelin user interface](https://zeppelin.apache.org/docs/0.8.0/quickstart/explore_ui.html#note-layout).
 
-You can start with "Run All Paragraphs" ...
-![Img 5.1](./imgreadme/img5.1.jpg)
-after confirmation  all scripts will be executed and the results presented.
-![Img 5.2](./imgreadme/img5.2.jpg)
-
-You can also follow the tutorial and run the individual paragraphs one by one pressing ![run](./imgreadme/run.jpg) on each paragraph.
+You can also follow the tutorial and run the individual paragraphs one by one pressing ![run](imgreadme/run.png) on each paragraph.
 
 Follow the screen instructions.
 
