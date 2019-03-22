@@ -1,6 +1,8 @@
 #!/bin/bash
 # Environment variables supported:
 # - MARIADB_CS_POSTCFG_INPUT - if set runs postConfigure with the value piped into stdin
+# - MARIADB_CS_NUM_BLOCKS_PCT - if set uses this amount of physical memory to utilize for disk block caching
+# - MARIADB_CS_TOTAL_UM_MEMORY - if set uses this amount of physical memory to utilize for joins, intermediate results and set operations on the UM
 # - MARIADB_DATABASE - if set create a database with this name
 
 # file used to track / record initialization and prevent subsequent rerun
@@ -79,7 +81,36 @@ wait_for_postcfg_done()
     done
 
     if [ "$FULLY_CONFIGURED" != "Y" ]; then
-        echo "ERROR: Failed to detect postConfigure complete as Installation.FullyConfigured: $FULLY_CONFIGURED"
+        echo "ERROR: Failed to detect postConfigure complete as Installation. FullyConfigured: $FULLY_CONFIGURED"
+        exit 1
+    fi
+}
+
+# additional wait check to ensure that slave UMs are up and ready to configure
+# requires arguments HOST, USER, PASSWORD
+wait_for_um_slave_start()
+{
+    echo "Waiting for $1 to respond"
+    
+    MAX_TRIES=36
+    if [ ! -z "$CS_WAIT_ATTEMPTS" ]; then
+        MAX_TRIES=$CS_WAIT_ATTEMPTS
+    fi
+    
+    ATTEMPT=1
+    # this essential waits for the root @um1 login to be created as well as the slave to be started.
+    STATUS=$($MCSDIR/mysql/bin/mysql -u $2 -h $1 -p$3 -e "show slave status\G" | grep "Waiting for master")
+    while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+        if [ ! -z $MARIADB_CS_DEBUG ]; then
+            echo "waiting for um $1 slave start($ATTEMPT/$MAX_TRIES): $STATUS"
+        fi
+        sleep 5
+        ATTEMPT=$(($ATTEMPT+1))
+        STATUS=$($MCSDIR/mysql/bin/mysql -u $2 -h $1 -p$3 -e "show slave status\G" | grep "Waiting for master")
+    done
+    
+    if [ $ATTEMPT -gt $MAX_TRIES ]; then
+        echo "ERROR: Did not detect slave start on $1 after $MAX_TRIES attempts, last status: $STATUS"
         exit 1
     fi
 }
@@ -87,14 +118,22 @@ wait_for_postcfg_done()
 # commands executed by UM1 (e.g. setting the root password and deleting local users
 actions_executed_by_um1()
 {
+    echo "executing actions at um1"
     # deletion of local users on non um1
     # to avoid concurrency issues we let um1 execute the SQL commands on all other ums
-    mapfile -t UM_IP_ADDRESSES < <($MCSDIR/bin/mcsadmin getSystemNetworkConfig | grep "User Module" | grep -Eo "$SERVER_SUBNET.*" | grep -v $(hostname -i))
-    if [ ${#UM_IP_ADDRESSES[@]} -gt 0 ]; then
-        echo "multi um setup with "$(( ${#UM_IP_ADDRESSES[@]} + 1 ))" ums found. um1 will drop local users on all other ums"
+    UM_COUNTER=2
+    UM_HOST=$($MCSDIR/bin/getConfig um"$UM_COUNTER"_ProcessMonitor IPAddr)
+    UM_HOSTS=()
+    while [ "$UM_HOST" != "" ]; do
+        UM_HOSTS+=$UM_HOST
+        UM_COUNTER=$(($UM_COUNTER + 1))
+        UM_HOST=$($MCSDIR/bin/getConfig um"$UM_COUNTER"_ProcessMonitor IPAddr)
+    done
+    if [ ${#UM_HOSTS[@]} -gt 0 ]; then
+        echo "multi um setup with "$(( ${#UM_HOSTS[@]} + 1 ))" ums found. um1 will drop local users on all other ums"
         # create a temporary user for the remote commands
         TEMP_ROOT_PASSWORD=$(/usr/bin/pwgen -1 32)
-        ${mysql[@]} -e "CREATE USER 'root'@\"$SERVER_SUBNET.%\" IDENTIFIED BY \"$TEMP_ROOT_PASSWORD\"; GRANT ALL ON *.* TO 'root'@\"$SERVER_SUBNET.%\" WITH GRANT OPTION;"
+        ${mysql[@]} -e "CREATE USER 'root'@'%' IDENTIFIED BY \"$TEMP_ROOT_PASSWORD\"; GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;"
         if [ $? -ne 0 ]; then
             echo "ERROR: during temporary root user creation"
             exit 1
@@ -103,18 +142,19 @@ actions_executed_by_um1()
         
         # execute the remote deletion of local users on each um
         REMOTE_SQL="${mysql[@]} -p$TEMP_ROOT_PASSWORD"
-        for UM_IP_ADDRESS in ${UM_IP_ADDRESSES[@]}; do
-            USERS_TO_BE_DROPPED=$($REMOTE_SQL -h $UM_IP_ADDRESS -r -s -N -e "SELECT CONCAT(\"DROP USER IF EXISTS '\",User,\"'@'\", Host,\"';\") FROM mysql.user WHERE (Password='' AND User NOT IN ('mysql.sys', 'mysqlxsys','root')) OR (User='root' AND Password='' AND NOT (Host LIKE '$SERVER_SUBNET.%' OR  Host='localhost'));"| tr '\n' ' ')
-            $REMOTE_SQL -h $UM_IP_ADDRESS -e "$USERS_TO_BE_DROPPED"
+        for UM_HOST in ${UM_HOSTS[@]}; do
+            wait_for_um_slave_start $UM_HOST "root" $TEMP_ROOT_PASSWORD
+            USERS_TO_BE_DROPPED=$($REMOTE_SQL -h $UM_HOST -r -s -N -e "SELECT CONCAT(\"DROP USER IF EXISTS '\",User,\"'@'\", Host,\"';\") FROM mysql.user WHERE (Password='' AND User NOT IN ('mysql.sys', 'mysqlxsys','root')) OR (User='root' AND Password='' AND NOT (Host LIKE '$SERVER_SUBNET.%' OR  Host='localhost'));"| tr '\n' ' ')
+            $REMOTE_SQL -h $UM_HOST -e "$USERS_TO_BE_DROPPED"
             if [ $? -ne 0 ]; then
-                echo "ERROR: during local user deletion at um with ip address $UM_IP_ADDRESS"
+                echo "ERROR: during local user deletion at um: $UM_HOST"
                 exit 1
             fi
-            echo "local users dropped at um with ip address $UM_IP_ADDRESS"
+            echo "local users dropped at um: $UM_HOST"
         done
         
         # delete the temporary user for the remote commands
-        ${mysql[@]} -e "DROP USER 'root'@\"$SERVER_SUBNET.%\";"
+        ${mysql[@]} -e "DROP USER 'root'@'%';"
         if [ $? -ne 0 ]; then
             echo "ERROR: during temporary root user deletion"
             exit 1
@@ -123,7 +163,7 @@ actions_executed_by_um1()
         unset TEMP_ROOT_PASSWORD
         unset REMOTE_SQL
     fi
-    unset UM_IP_ADDRESSES
+    unset UM_HOSTS
     
     # only perform user setup / creation of one of the root password env vars
     if  [ ! -z "$MARIADB_ROOT_PASSWORD" -o ! -z "$MARIADB_ALLOW_EMPTY_PASSWORD" -o ! -z "$MARIADB_RANDOM_ROOT_PASSWORD" ]; then
@@ -221,9 +261,18 @@ else
     # Support backward compat with CS_POSTCFG_INPUT
     MARIADB_CS_POSTCFG_INPUT="${MARIADB_CS_POSTCFG_INPUT:-$CS_POSTCFG_INPUT}"
     if [ ! -z "$MARIADB_CS_POSTCFG_INPUT" ]; then
+        # build the postConfigure command line parameter
+        postConfigureParameter="-x -xr"
+        if [ ! -z "$MARIADB_CS_NUM_BLOCKS_PCT" ]; then
+            postConfigureParameter="$postConfigureParameter -numBlocksPct $MARIADB_CS_NUM_BLOCKS_PCT"
+        fi
+        if [ ! -z "$MARIADB_CS_TOTAL_UM_MEMORY" ]; then
+            postConfigureParameter="$postConfigureParameter -totalUmMemory $MARIADB_CS_TOTAL_UM_MEMORY"
+        fi
         echo "Stopping columnstore service to run postConfigure"
         /usr/sbin/sv stop columnstore
-        echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n
+        echo $MCSDIR/bin/postConfigure -n $postConfigureParameter
+        echo -e "$MARIADB_CS_POSTCFG_INPUT" | $MCSDIR/bin/postConfigure -n $postConfigureParameter
         # Set a columnstore.xml property that can be used to detect postConfigure
         # complete from other nodes (as the change is pushed out)
         if [ 0 -eq $? ]; then
@@ -262,7 +311,7 @@ else
             fi
         fi
     fi
-    
+
     WRK_DIR=`pwd`
     # Check number of custom install files and execute them 
     CUSTOM_INSTALL_FILES=$(ls $INITDIR/*.{sql,sql.gz,sh} -la 2>/dev/null | wc -l)

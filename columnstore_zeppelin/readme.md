@@ -81,13 +81,13 @@ cd columnstore_zeppelin
 *Build the docker image from definitions*
 
 ```bash
-docker build -t mariadb/columnstore:1.2 .columnstore
+docker build -t mariadb/columnstore:1.2 ../columnstore
 ```
 
 *Build Zeppelin instance (optional)*
 
-```bash
-docker build -t mariadb/columnstore_zeppelin:latest .columnstore_zeppelin
+```
+docker build -t mariadb/columnstore_zeppelin:latest ../columnstore_zeppelin
 ```
 
 *Cleanup network settings (optional)*

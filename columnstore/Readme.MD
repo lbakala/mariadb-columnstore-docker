@@ -3,6 +3,7 @@
 ## Introduction
 This docker image will startup a single server instance of MariaDB ColumnStore running on CENTOS 7. It is designed and suitable for demo and evaluation.
 
+
 ## Requirements
 The following are required:
 - A computer with a 64bit OS, CPU virtualization extensions enabled in the BIOS and minimum 8GB RAM
@@ -12,19 +13,19 @@ The following are required:
 
 ## Run Single Instance Container
 
-To pull MariaDB ColumnStore 1.2 version run the following command:
+To build the latest MariaDB ColumnStore version run the following command:
 ```
-docker pull mariadb/columnstore:1.2
+docker build -t mariadb/columnstore:latest .
 ```
 
 To run MariaDB ColumnStore run the following command:
 ```
-docker run -d --name mcs mariadb/columnstore:1.2
+docker run -d --name mcs mariadb/columnstore:latest
 ```
 
 To specify a root password:
 ```
-docker run -d --name mcs -eMARIADB_ROOT_PASSWORD=mypassword mariadb/columnstore:1.2
+docker run -d --name mcs -eMARIADB_ROOT_PASSWORD=mypassword mariadb/columnstore:latest
 ```
 
 The following output will be seen indicating the server is up:
@@ -61,6 +62,8 @@ The following environment variables can be utilized to configure behavior:
 * MARIADB_USER : create a user with this name, with all privileges on MARIADB_DATABASE if specified
 * MARIADB_PASSWORD : password for above user
 * MARIADB_CS_POSTCFG_INPUT : override input values for postConfigure. The default value in the Dockerfile will start up a single server deployment. If the environment variable is empty then postConfigure will not be run and the container will just run the ColumnStore service process ProcMon.
+* MARIADB_CS_NUM_BLOCKS_PCT - If set uses this amount of physical memory to utilize for disk block caching. Explicit amounts need to be suffixed with M or G. Will override the default setting of 1024M from Dockerfile.
+- MARIADB_CS_TOTAL_UM_MEMORY - If set uses this amount of physical memory to utilize for joins, intermediate results and set operations on the UM. Explicit amounts need to be suffixed with M or G. Will override the default setting of 256M from Dockerfile.
 * MARIADB_DROP_LOCAL_USERS : Drop anonymous local users, useful for  removing this on non um1 um containers.
 
 Note that the ColumnStore docker image differs from the MariaDB server docker image in that  it does not mandate specification of one of the first 3 password entries. This is for backward compatibility and also due to the fact that specifying these for a multi UM deployment is unreliable / not recommended due to timing issues with the current setup and replication.
@@ -72,6 +75,12 @@ Custom scripts can be mapped as a host volume to /docker-entrypoint-initdb.d for
 * .sql.gz : gzip compressed sql script
 
 ## Multi Node Cluster compose file
+- If not already built, you have to build the latest MariaDB ColumnStore 1.2 version using following command:
+
+```
+docker build -t mariadb/columnstore:1.2 .
+```
+
 - The docker-compose.yml file will bring up a 1um 2pm cluster using local storage
 per container to allow easy evaluation of a multi node cluster. To run this:
 
@@ -98,4 +107,3 @@ The root password is randomly generated and output to docker logs.
 ```sh
 $ docker-compose down -v
 ```
-

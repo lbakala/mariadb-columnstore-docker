@@ -97,6 +97,18 @@ while (! $(docker exec $cname_um1 test -f "$CS_INIT_FLAG") || ! $(docker exec $c
 done
 echo $ATTEMPT
 
+printFiles() {
+   files=("$@")
+   for file in "${files[@]}";
+      do
+          echo "$file"
+          docker exec $cname_um1 cat $file
+      done
+}
+
+echo "ColumnStore version information:"
+array=("/usr/local/mariadb/columnstore/releasenum" "/usr/local/mariadb/columnstore/gitversionEngine" "/usr/local/mariadb/columnstore/mysql/gitversionServer")
+printFiles "${array[@]}"
 if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt $TEST_WAIT_ATTEMPTS ]; then
     echo "$(( (${ATTEMPT}-1)*5 )) seconds."
     echo ""

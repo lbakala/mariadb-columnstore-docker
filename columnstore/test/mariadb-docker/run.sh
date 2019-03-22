@@ -19,6 +19,7 @@ cid="$(
         --name "$cname" \
         $MARIADB_CONTAINER_NAME
 )"
+
 docker cp ./test/mariadb-docker/initdb.sql $cid:/docker-entrypoint-initdb.d/initdb.sql
 cid="$(docker start $cid)"
 docker exec $cid sed -i s/\#\#test_db_name\#\#/"$MARIADB_DATABASE"/g /docker-entrypoint-initdb.d/initdb.sql
@@ -50,6 +51,18 @@ while ! $(docker exec $cid test -f "$CS_INIT_FLAG") && [ $ATTEMPT -le $TEST_WAIT
 done
 echo $ATTEMPT
 
+printFiles() {
+   files=("$@")
+   for file in "${files[@]}";
+      do
+          echo "$file"
+          docker exec $cid cat $file
+      done
+}
+
+echo "ColumnStore version information:"
+array=("/usr/local/mariadb/columnstore/releasenum" "/usr/local/mariadb/columnstore/gitversionEngine" "/usr/local/mariadb/columnstore/mysql/gitversionServer")
+printFiles "${array[@]}"
 if [[ ! -z $MARIADB_TEST_DEBUG ]] || [ $ATTEMPT -gt $TEST_WAIT_ATTEMPTS ]; then
     echo "$(( (${ATTEMPT}-1)*5 )) seconds."
     echo ""
